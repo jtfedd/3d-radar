@@ -1,0 +1,5 @@
+# Compiled python files
+*.pyc
+
+# Blender backup files
+*.blend[0-9]*
