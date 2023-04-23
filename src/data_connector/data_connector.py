@@ -12,8 +12,18 @@ class DataConnector:
 
         self.s3Connector = S3DataConnector()
 
-    def getFilepath(self, key):
-        fileName = key + '.pickle'
+    def load(self, request):
+        data, cached = self.loadCached(request)
+        if cached:
+            return data
+
+        data = self.s3Connector.load(request)
+        self.saveCached(request, data)
+
+        return data
+
+    def getFilepath(self, request):
+        fileName = request.cacheKey() + '.pickle'
         return os.path.join(self.cacheDir, fileName)
     
     def loadCached(self, key):
@@ -40,13 +50,3 @@ class DataConnector:
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
         print('Wrote', filePath)
-    
-    def load(self, key):
-        data, cached = self.loadCached(key)
-        if cached:
-            return data
-
-        data = self.s3Connector.load(key)
-        self.saveCached(key, data)
-
-        return data

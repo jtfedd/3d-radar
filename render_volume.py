@@ -3,11 +3,18 @@ import numpy as np
 
 from src.gradient import gradient
 from src.data_connector.data_connector import DataConnector
+from src.data_connector.request import Request
 
-test_file = '2019/06/26/KVWX/KVWX20190626_221105_V06'
+import datetime
 
-def get_data(filename):
-    return DataConnector().load(filename)
+def get_data():
+    site = 'KVWX'
+    date = datetime.date(year=2019, month=6, day=26)
+    time = datetime.time(hour=22, minute=11, second=5)
+
+    request = Request(site, date, time)
+
+    return DataConnector().load(request)
     
 def process_sweep(base, sweep, radarBase, minVal, maxVal):
     for ray in sweep:
@@ -63,7 +70,7 @@ class Viewer(ShowBase):
         ShowBase.__init__(self)
         radarBase = self.render.attachNewNode("radar")
 
-        f = get_data(test_file)
+        f = get_data()
 
         minVal, maxVal = process_min_max(f)
 
