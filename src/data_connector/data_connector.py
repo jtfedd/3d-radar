@@ -1,4 +1,6 @@
 from src.data_connector.s3_data_connector import S3DataConnector
+
+import blosc
 import os
 import pickle
 
@@ -26,8 +28,8 @@ class DataConnector:
         fileName = request.cacheKey() + '.pickle'
         return os.path.join(self.cacheDir, fileName)
     
-    def loadCached(self, key):
-        filePath = self.getFilepath(key)
+    def loadCached(self, request):
+        filePath = self.getFilepath(request)
 
         if not os.path.exists(filePath):
             return None, False
@@ -35,18 +37,24 @@ class DataConnector:
         print('Reading', filePath)
         
         with open(filePath, 'rb') as f:
-            data = pickle.load(f)
+            compressed_data = f.read()
+        
+        decompressed_data = blosc.decompress(compressed_data)
+        data = pickle.loads(decompressed_data)
         
         print('Read', filePath)
 
         return data, True
     
-    def saveCached(self, key, data):
-        filePath = self.getFilepath(key)
+    def saveCached(self, request, data):
+        filePath = self.getFilepath(request)
 
         print('Writing', filePath)
 
+        pickled_data = pickle.dumps(data)
+        compressed_data = blosc.compress(pickled_data)
+
         with open(filePath, 'wb') as f:
-            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+            f.write(compressed_data)
 
         print('Wrote', filePath)
