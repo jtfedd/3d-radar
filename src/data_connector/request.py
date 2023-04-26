@@ -1,5 +1,3 @@
-import os
-
 class Request:
     def __init__(self, station, date, time):
         self.station = station

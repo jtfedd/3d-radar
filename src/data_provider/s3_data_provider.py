@@ -1,9 +1,12 @@
 import boto3
 import botocore
 
-from metpy.io import Level2File
+from src.data_provider.data_provider import DataProvider
 
-class S3DataConnector:
+from metpy.io import Level2File
+from src.model.scan import Scan
+
+class S3DataProvider(DataProvider):
     def __init__(self):
         config = botocore.client.Config(signature_version=botocore.UNSIGNED, user_agent_extra='Resource')
         s3 = boto3.resource('s3', config=config)
@@ -27,4 +30,7 @@ class S3DataConnector:
         f = Level2File(data['Body'])
         print('Parsed', key)
 
-        return f
+        print('Post-processing', key)
+        scan = Scan(f, request.station, request.date, request.time)
+
+        return scan

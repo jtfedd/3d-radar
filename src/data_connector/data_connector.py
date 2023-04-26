@@ -1,25 +1,23 @@
-from src.data_connector.s3_data_connector import S3DataConnector
-
 import blosc
-import os
 import pickle
+import os
 
 class DataConnector:
-    def __init__(self):
+    def __init__(self, provider):
         scriptDir = os.path.abspath(os.path.dirname(__file__))
         self.cacheDir = os.path.join(scriptDir, 'cached_data')
 
         if not os.path.exists(self.cacheDir):
             os.makedirs(self.cacheDir)
 
-        self.s3Connector = S3DataConnector()
+        self.provider = provider
 
     def load(self, request):
         data, cached = self.loadCached(request)
         if cached:
             return data
 
-        data = self.s3Connector.load(request)
+        data = self.provider.load(request)
         self.saveCached(request, data)
 
         return data
