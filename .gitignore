@@ -3,3 +3,6 @@
 
 # Blender backup files
 *.blend[0-9]*
+
+# Cached data file
+**/cached_data/*
