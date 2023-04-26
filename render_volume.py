@@ -1,85 +1,64 @@
 from direct.showbase.ShowBase import ShowBase
-import numpy as np
 
-from src.gradient import gradient
+from src.gradient import Gradient
 from src.data_connector.data_connector import DataConnector
+from src.data_provider.s3_data_provider import S3DataProvider
 from src.data_connector.request import Request
 
 import datetime
 
-def get_data():
+import random
+
+def getData():
     site = 'KVWX'
     date = datetime.date(year=2019, month=6, day=26)
     time = datetime.time(hour=22, minute=11, second=5)
 
     request = Request(site, date, time)
 
-    return DataConnector().load(request)
-    
-def process_sweep(base, sweep, radarBase, minVal, maxVal):
-    for ray in sweep:
-        process_ray(base, ray, radarBase, minVal, maxVal)
+    provider = S3DataProvider()
+    connector = DataConnector(provider)
 
-def process_ray(base, ray, radarBase, minVal, maxVal):
-    header = ray[0]
-
-    azimuth = header.az_angle
-    elevation = header.el_angle
-
-    ref_header = ray[4][b'REF'][0]
-    ref_range = np.arange(ref_header.num_gates) * ref_header.gate_width + ref_header.first_gate
-
-    cos_el = np.cos(np.deg2rad(elevation))
-    sin_el = np.sin(np.deg2rad(elevation))
-
-    cos_az = np.cos(np.deg2rad(azimuth))
-    sin_az = np.sin(np.deg2rad(azimuth))
-
-    for i, value in enumerate(ray[4][b'REF'][1]):
-        if np.isnan(value):
-            continue
-
-        rng = ref_range[i]
-
-        x = rng * cos_el * sin_az
-        y = rng * cos_el * cos_az
-        z = rng * sin_el
-
-        cube = base.loader.loadModel("assets/cube.glb")
-        cube.reparentTo(radarBase)
-        cube.setPos(x, y, z)
-        cube.setColorScale(gradient(minVal, maxVal, value))
-
-def process_min_max(f):
-    minValue = f.sweeps[0][0][4][b'REF'][1][0]
-    maxValue = f.sweeps[0][0][4][b'REF'][1][0]
-
-    for sweep in f.sweeps:
-        for ray in sweep:
-            for value in ray[4][b'REF'][1]:
-                if value < minValue:
-                    minValue = value
-                if value > maxValue:
-                    maxValue = value
-
-    return minValue, maxValue
-    
+    return connector.load(request)
 
 class Viewer(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
-        radarBase = self.render.attachNewNode("radar")
+        self.setBackgroundColor(0, 0, 0, 1)
+        self.radarBase = self.render.attachNewNode("radar")
 
-        f = get_data()
+        scan = getData()
 
-        minVal, maxVal = process_min_max(f)
+        print("Processing min and max")
+        self.minVal = 1000000000
+        self.maxVal = -1000000000
+        scan.foreach(lambda p : self.processMinMax(p))
+        self.gradient = Gradient(self.minVal, self.maxVal)
 
-        for sweep in f.sweeps:
-            process_sweep(self, sweep, radarBase, minVal, maxVal)
+        print("Building render volume")
+        scan.foreach(lambda p : self.renderCube(p))
 
-        radarBase.clearModelNodes()
-        radarBase.flattenStrong()
+        print("Final scene post-processing")
+        self.radarBase.clearModelNodes()
+        self.radarBase.flattenStrong()
 
+        print("Done!")
+
+    def processMinMax(self, point):
+        if point.reflectivity < self.minVal:
+            self.minVal = point.reflectivity
+        if point.reflectivity > self.maxVal:
+            self.maxVal = point.reflectivity
+
+    def renderCube(self, point):
+        if random.randrange(0, 100) != 1:
+            return
+
+        cube = self.loader.loadModel("assets/cube.glb")
+        cube.reparentTo(self.radarBase)
+
+        cube.setPos(point.x, point.y, point.z)
+        cube.setColorScale(self.gradient.value(point.reflectivity))
 
 app = Viewer()
 app.run()
