@@ -14,7 +14,7 @@ It is recommended that you set up a python virtual environment before fetching d
 
 Create a virtual environment:
 ```
-python -m venv venv
+python -m venv .venv
 ```
 Activate the virual environment:
 ```
@@ -31,5 +31,5 @@ deactivate
 
 Once you have your virtual environment activated, run the following command to fetch the project dependencies:
 ```
-pip -r requirements.txt
+pip install -r requirements.txt
 ```
