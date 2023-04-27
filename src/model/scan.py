@@ -1,15 +1,20 @@
 from src.model.sweep import Sweep
 
 class Scan:
-    def __init__(self, level2File, station, date, time):
+    @classmethod
+    def fromLevel2Data(cls, level2File, station, date, time):
+        sweeps = []
+
+        for sweep in level2File.sweeps:
+            sweeps.append(Sweep.fromLevel2Data(sweep))
+        
+        return cls(sweeps, station, date, time)
+
+    def __init__(self, sweeps, station, date, time):
+        self.sweeps = sweeps
         self.station = station
         self.date = date
         self.time = time
-
-        self.sweeps = []
-
-        for sweep in level2File.sweeps:
-            self.sweeps.append(Sweep(sweep))
     
     def foreach(self, f):
         for sweep in self.sweeps:
