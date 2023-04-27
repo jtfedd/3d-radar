@@ -19,9 +19,9 @@ python -m venv .venv
 Activate the virual environment:
 ```
 Windows:
-venv/Scripts/activate
+.venv/Scripts/activate
 Linux/Mac
-source venv/bin/activate
+source .venv/bin/activate
 ```
 Deactivate the virtual environment:
 ```

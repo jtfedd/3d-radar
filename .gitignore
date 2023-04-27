@@ -1,3 +1,6 @@
+# Mac system files
+**/.DS_Store
+
 # Compiled python files
 *.pyc
 
@@ -6,3 +9,6 @@
 
 # Cached data file
 **/cached_data/*
+
+# Virtual environment
+.venv/*
