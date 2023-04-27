@@ -33,3 +33,17 @@ Once you have your virtual environment activated, run the following command to f
 ```
 pip install -r requirements.txt
 ```
+
+### Testing
+
+This project uses [unittest](https://docs.python.org/3/library/unittest.html) for unit testing.
+
+To run all tests in the project:
+```
+python -m unittest
+```
+
+To run individual test files:
+```
+python -m unittest <path/to/test/file.py>
+```
