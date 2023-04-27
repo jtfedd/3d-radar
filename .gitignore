@@ -6,3 +6,6 @@
 
 # Cached data file
 **/cached_data/*
+
+# Virtual environment
+venv/*
