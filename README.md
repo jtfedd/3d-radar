@@ -6,7 +6,7 @@ This is a project to build a 3d rendering program which can visualize full 3d ne
 
 ### Python
 
-This project is written in [Python](https://www.python.org/). It is currently developed with Python 3.10; your milage may vary with other version.
+This project is written in [Python](https://www.python.org/). It is currently developed with Python 3.10; your milage may vary with other versions.
 
 ### Set up a virtual environment
 
@@ -46,4 +46,11 @@ python -m unittest
 To run individual test files:
 ```
 python -m unittest <path/to/test/file.py>
+```
+
+### Running
+
+To run the program simply run
+```
+python render_volume.py
 ```
