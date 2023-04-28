@@ -1,7 +1,8 @@
 from src.model.serializable import Serializable
+from src.util.object_equals import ObjectEquals
 import struct
 
-class DataPoint(Serializable):
+class DataPoint(Serializable, ObjectEquals):
     @staticmethod
     def byteFormat():
         return '<4d'
@@ -14,11 +15,6 @@ class DataPoint(Serializable):
     def fromSerial(cls, buffer, offset):
         x, y, z, reflectivity = struct.unpack_from(cls.byteFormat(), buffer, offset)
         return cls(x, y, z, reflectivity), offset + cls.byteSize()
-    
-    def __eq__(self, other):
-        if not isinstance(other, DataPoint):
-            return NotImplemented
-        return self.x == other.x and self.y == other.y and self.z == other.z and self.reflectivity == other.reflectivity
 
     def __init__(self, x, y, z, reflectivity):
         self.x = x
