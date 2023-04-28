@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
 
+import struct
+
 class Serializable(ABC):
-    @staticmethod
-    @abstractmethod
-    def byteSize() -> int:
-        pass
-    
     @staticmethod
     @abstractmethod
     def byteFormat() -> str:
         pass
+
+    @classmethod
+    def byteSize(cls):
+        return struct.calcsize(cls.byteFormat())
 
     @abstractmethod
     def writeBytes(self, buffer, offset) -> int:

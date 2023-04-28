@@ -29,3 +29,4 @@ class TestDataPoint(unittest.TestCase):
 
         self.assertEqual(input, output)
         self.assertEqual(writeOffset, readOffset)
+        self.assertNotEqual(offset, writeOffset)

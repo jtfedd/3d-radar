@@ -6,10 +6,6 @@ class DataPoint(Serializable):
     def byteFormat():
         return '<4d'
     
-    @staticmethod
-    def byteSize():
-        return struct.calcsize(DataPoint.byteFormat())
-    
     def writeBytes(self, buffer, offset):
         struct.pack_into(self.byteFormat(), buffer, offset, self.x, self.y, self.z, self.reflectivity)
         return offset + self.byteSize()
