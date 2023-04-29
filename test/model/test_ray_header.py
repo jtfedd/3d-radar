@@ -1,27 +1,27 @@
-from src.model.data_point import DataPoint
+from src.model.ray_header import RayHeader
 import random
 
 import unittest
 
 class TestDataPoint(unittest.TestCase):
     def test_serialize(self):
-        input = DataPoint(1, 2, 3, 10)
+        input = RayHeader(1, 2)
         bytes = input.serialize()
-        output = DataPoint.deserialize(bytes)
+        output = RayHeader.deserialize(bytes)
 
         self.assertEqual(input, output)
 
     def test_serialize_floats(self):
-        input = DataPoint(1.1112, 2.32123, 42, 0.111222229)
+        input = RayHeader(1.1112, 2.32123)
         bytes = input.serialize()
-        output = DataPoint.deserialize(bytes)
+        output = RayHeader.deserialize(bytes)
 
         self.assertEqual(input, output)
 
     def test_serialize_offset(self):
-        input = DataPoint(1, 2, 3, 10)
+        input = RayHeader(1, 2.32423)
         buffer = bytearray(random.randbytes(100))
-        offset = 21
+        offset = 42
 
         writeOffset = input.writeBytes(buffer, offset)
         output, readOffset = input.fromSerial(buffer, offset)
