@@ -14,7 +14,8 @@ class RayHeader(Serializable, ObjectEquals):
     @classmethod
     def fromSerial(cls, buffer, offset):
         azimuth, elevation = struct.unpack_from(cls.byteFormat(), buffer, offset)
-        return cls(azimuth, elevation), offset + cls.byteSize()
+        obj = cls(azimuth, elevation)
+        return obj, offset + obj.byteSize()
 
     @classmethod
     def fromLevel2Data(cls, level2Ray):

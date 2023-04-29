@@ -14,7 +14,8 @@ class DataPoint(Serializable, ObjectEquals):
     @classmethod
     def fromSerial(cls, buffer, offset):
         x, y, z, reflectivity = struct.unpack_from(cls.byteFormat(), buffer, offset)
-        return cls(x, y, z, reflectivity), offset + cls.byteSize()
+        obj = cls(x, y, z, reflectivity)
+        return obj, offset + obj.byteSize()
 
     def __init__(self, x, y, z, reflectivity):
         self.x = x

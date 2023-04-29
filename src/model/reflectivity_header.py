@@ -14,7 +14,8 @@ class ReflectivityHeader(Serializable, ObjectEquals):
     @classmethod
     def fromSerial(cls, buffer, offset):
         numGates, gateWidth, firstGate = struct.unpack_from(cls.byteFormat(), buffer, offset)
-        return cls(numGates, gateWidth, firstGate), offset + cls.byteSize()
+        obj = cls(numGates, gateWidth, firstGate)
+        return obj, offset + obj.byteSize()
 
     @classmethod
     def fromLevel2Data(cls, level2Ray):

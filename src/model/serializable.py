@@ -8,9 +8,8 @@ class Serializable(ABC):
     def byteFormat() -> str:
         pass
 
-    @classmethod
-    def byteSize(cls):
-        return struct.calcsize(cls.byteFormat())
+    def byteSize(self):
+        return struct.calcsize(self.byteFormat())
 
     @abstractmethod
     def writeBytes(self, buffer, offset) -> int:

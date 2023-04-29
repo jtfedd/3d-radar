@@ -1,10 +1,53 @@
+from src.model.serializable import Serializable
+from src.util.object_equals import ObjectEquals
 from src.model.ray_header import RayHeader
 from src.model.reflectivity_header import ReflectivityHeader
 from src.model.data_point import DataPoint
 import numpy as np
+import struct
 import math
 
-class Ray:
+class Ray(Serializable, ObjectEquals):
+    @staticmethod
+    def byteFormat():
+        return '<i'
+    
+    def byteSize(self):
+        size = struct.calcsize(self.byteFormat())
+        size +=  self.header.byteSize() 
+        size += self.reflectivityHeader.byteSize()
+        for point in self.dataPoints:
+            size += point.byteSize()
+        return size
+    
+    def writeBytes(self, buffer, offset):
+        pointer = offset
+        struct.pack_into(self.byteFormat(), buffer, pointer, len(self.dataPoints))
+        pointer += struct.calcsize(self.byteFormat())
+
+        pointer = self.header.writeBytes(buffer, pointer)
+        pointer = self.reflectivityHeader.writeBytes(buffer, pointer)
+        for dataPoint in self.dataPoints:
+            pointer = dataPoint.writeBytes(buffer, pointer)
+
+        return pointer
+    
+    @classmethod
+    def fromSerial(cls, buffer, offset):
+        pointer = offset
+        numPoints = struct.unpack_from(cls.byteFormat(), buffer, pointer)[0]
+        pointer += struct.calcsize(cls.byteFormat())
+
+        header, pointer = RayHeader.fromSerial(buffer, pointer)
+        reflectivityHeader, pointer = ReflectivityHeader.fromSerial(buffer, pointer)
+        dataPoints = []
+        for _ in range(numPoints):
+            dataPoint, pointer = DataPoint.fromSerial(buffer, pointer)
+            dataPoints.append(dataPoint)
+
+        obj = cls(header, reflectivityHeader, dataPoints)
+        return obj, offset + obj.byteSize()
+
     @classmethod
     def fromLevel2Data(cls, level2Ray):
         dataPoints = []
