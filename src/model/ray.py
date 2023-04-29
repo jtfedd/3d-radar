@@ -14,7 +14,7 @@ class Ray(Serializable, ObjectEquals):
     
     def byteSize(self):
         size = struct.calcsize(self.byteFormat())
-        size +=  self.header.byteSize() 
+        size += self.header.byteSize() 
         size += self.reflectivityHeader.byteSize()
         for point in self.dataPoints:
             size += point.byteSize()
