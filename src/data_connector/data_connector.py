@@ -1,5 +1,6 @@
+from src.model.scan import Scan
+
 import blosc
-import pickle
 import os
 
 class DataConnector:
@@ -13,17 +14,17 @@ class DataConnector:
         self.provider = provider
 
     def load(self, request):
-        data, cached = self.loadCached(request)
+        scan, cached = self.loadCached(request)
         if cached:
-            return data
+            return scan
 
-        data = self.provider.load(request)
-        self.saveCached(request, data)
+        scan = self.provider.load(request)
+        self.saveCached(request, scan)
 
-        return data
+        return scan
 
     def getFilepath(self, request):
-        fileName = request.cacheKey() + '.pickle'
+        fileName = request.cacheKey() + '.dat'
         return os.path.join(self.cacheDir, fileName)
     
     def loadCached(self, request):
@@ -38,19 +39,19 @@ class DataConnector:
             compressed_data = f.read()
         
         decompressed_data = blosc.decompress(compressed_data)
-        data = pickle.loads(decompressed_data)
+        scan = Scan.deserialize(decompressed_data)
         
         print('Read', filePath)
 
-        return data, True
+        return scan, True
     
-    def saveCached(self, request, data):
+    def saveCached(self, request, scan):
         filePath = self.getFilepath(request)
 
         print('Writing', filePath)
 
-        pickled_data = pickle.dumps(data)
-        compressed_data = blosc.compress(pickled_data)
+        decompressed_data = scan.serialize()
+        compressed_data = blosc.compress(decompressed_data)
 
         with open(filePath, 'wb') as f:
             f.write(compressed_data)
