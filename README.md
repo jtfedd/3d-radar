@@ -31,10 +31,7 @@ deactivate
 
 Once you have your virtual environment activated, run the following command to fetch the project dependencies:
 ```
-# Project requirements
 pip install -r requirements.txt
-# Dev requirements
-pip install -r requirements_dev.txt
 ```
 
 ### Testing
