@@ -1,5 +1,6 @@
 from src.model.ray import Ray
 
+
 class Sweep:
     def __init__(self, level2Sweep):
         self.rays = []
@@ -10,4 +11,3 @@ class Sweep:
     def foreach(self, f):
         for ray in self.rays:
             ray.foreach(f)
-        
