@@ -50,3 +50,15 @@ To run individual test files:
 ```
 python -m unittest <path/to/test/file.py>
 ```
+
+### Formatting
+
+The code in this project is formatted with [black](https://pypi.org/project/black/#description).
+
+Use the following commands to run the formatter:
+```
+# Format a specific file
+python -m black <path/to/file.py>
+# Format all files
+python -m black .
+```
