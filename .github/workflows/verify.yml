@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Verify Python Code
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
 
     strategy:
@@ -42,3 +42,7 @@ jobs:
     - name: Run unit tests
       run: |
         python -m unittest
+
+    - name: Check formatting
+      run: |
+        python -m black . --check
