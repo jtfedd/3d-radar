@@ -3,6 +3,7 @@ from test.model.testutils import newTestDataPoint, randomBytes
 
 import unittest
 
+
 class TestDataPoint(unittest.TestCase):
     def test_serialize(self):
         input = newTestDataPoint(y=2.32112233, reflectivity=0.111222233339)

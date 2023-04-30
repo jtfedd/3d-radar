@@ -9,8 +9,9 @@ import datetime
 
 import random
 
+
 def getData():
-    site = 'KVWX'
+    site = "KVWX"
     date = datetime.date(year=2019, month=6, day=26)
     time = datetime.time(hour=22, minute=11, second=5)
 
@@ -20,6 +21,7 @@ def getData():
     connector = DataConnector(provider)
 
     return connector.load(request)
+
 
 class Viewer(ShowBase):
     def __init__(self):
@@ -32,11 +34,11 @@ class Viewer(ShowBase):
         print("Processing min and max")
         self.minVal = 1000000000
         self.maxVal = -1000000000
-        scan.foreach(lambda p : self.processMinMax(p))
+        scan.foreach(lambda p: self.processMinMax(p))
         self.gradient = Gradient(self.minVal, self.maxVal)
 
         print("Building render volume")
-        scan.foreach(lambda p : self.renderCube(p))
+        scan.foreach(lambda p: self.renderCube(p))
 
         print("Final scene post-processing")
         self.radarBase.clearModelNodes()
@@ -59,6 +61,7 @@ class Viewer(ShowBase):
 
         cube.setPos(point.x, point.y, point.z)
         cube.setColorScale(self.gradient.value(point.reflectivity))
+
 
 app = Viewer()
 app.run()

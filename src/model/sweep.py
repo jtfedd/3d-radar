@@ -3,17 +3,18 @@ from src.util.object_equals import ObjectEquals
 from src.model.ray import Ray
 import struct
 
+
 class Sweep(Serializable, ObjectEquals):
     @staticmethod
     def byteFormat():
-        return '<i'
-    
+        return "<i"
+
     def byteSize(self):
         size = struct.calcsize(self.byteFormat())
         for ray in self.rays:
             size += ray.byteSize()
         return size
-    
+
     def writeBytes(self, buffer, offset):
         pointer = offset
         struct.pack_into(
@@ -26,9 +27,9 @@ class Sweep(Serializable, ObjectEquals):
 
         for ray in self.rays:
             pointer = ray.writeBytes(buffer, pointer)
-        
+
         return pointer
-    
+
     @classmethod
     def fromSerial(cls, buffer, offset):
         pointer = offset
@@ -58,4 +59,3 @@ class Sweep(Serializable, ObjectEquals):
     def foreach(self, f):
         for ray in self.rays:
             ray.foreach(f)
-        

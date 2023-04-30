@@ -2,9 +2,11 @@ from src.util.object_equals import ObjectEquals
 
 import unittest
 
+
 class TestObject(ObjectEquals):
     def __init__(self, x):
         self.x = x
+
 
 class TestObjectEquals(unittest.TestCase):
     def test_objectEquals(self):

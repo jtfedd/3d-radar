@@ -3,6 +3,7 @@ from test.model.testutils import newTestSweep, randomBytes
 
 import unittest
 
+
 class TestSweep(unittest.TestCase):
     def test_serialize(self):
         input = newTestSweep()
@@ -10,7 +11,7 @@ class TestSweep(unittest.TestCase):
         output = Sweep.deserialize(bytes)
 
         self.assertEqual(input, output)
-    
+
     def test_serialize_offset(self):
         input = newTestSweep()
         buffer = randomBytes(10000)

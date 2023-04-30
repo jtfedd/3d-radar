@@ -3,6 +3,7 @@ from test.model.testutils import newTestRay, randomBytes
 
 import unittest
 
+
 class TestDataPoint(unittest.TestCase):
     def test_serialize(self):
         input = newTestRay()

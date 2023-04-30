@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import struct
 
+
 class Serializable(ABC):
     @staticmethod
     @abstractmethod

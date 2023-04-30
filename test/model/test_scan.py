@@ -3,6 +3,7 @@ from test.model.testutils import newTestScan, randomBytes
 
 import unittest
 
+
 class TestScan(unittest.TestCase):
     def test_serialize(self):
         input = newTestScan()
@@ -10,7 +11,7 @@ class TestScan(unittest.TestCase):
         output = Scan.deserialize(bytes)
 
         self.assertEqual(input, output)
-    
+
     def test_serialize_offset(self):
         input = newTestScan()
         buffer = randomBytes(50000)

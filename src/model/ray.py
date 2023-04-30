@@ -7,19 +7,20 @@ import numpy as np
 import struct
 import math
 
+
 class Ray(Serializable, ObjectEquals):
     @staticmethod
     def byteFormat():
-        return '<i'
-    
+        return "<i"
+
     def byteSize(self):
         size = struct.calcsize(self.byteFormat())
-        size += self.header.byteSize() 
+        size += self.header.byteSize()
         size += self.reflectivityHeader.byteSize()
         for point in self.dataPoints:
             size += point.byteSize()
         return size
-    
+
     def writeBytes(self, buffer, offset):
         pointer = offset
         struct.pack_into(self.byteFormat(), buffer, pointer, len(self.dataPoints))
@@ -31,7 +32,7 @@ class Ray(Serializable, ObjectEquals):
             pointer = dataPoint.writeBytes(buffer, pointer)
 
         return pointer
-    
+
     @classmethod
     def fromSerial(cls, buffer, offset):
         pointer = offset
@@ -61,16 +62,16 @@ class Ray(Serializable, ObjectEquals):
         cos_az = math.cos(math.radians(header.azimuth))
         sin_az = math.sin(math.radians(header.azimuth))
 
-        reflectivityData = level2Ray[4][b'REF'][1]
+        reflectivityData = level2Ray[4][b"REF"][1]
         for i, reflectivity in enumerate(reflectivityData):
             if np.isnan(reflectivity):
                 continue
 
             rng = reflectivityHeader.range(i)
 
-            x = rng*cos_el*sin_az
-            y = rng*cos_el*cos_az
-            z = rng*sin_el
+            x = rng * cos_el * sin_az
+            y = rng * cos_el * cos_az
+            z = rng * sin_el
 
             dataPoints.append(DataPoint(x, y, z, reflectivity))
 
