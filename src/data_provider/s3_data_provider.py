@@ -34,6 +34,6 @@ class S3DataProvider(DataProvider):
         print("Parsed", key)
 
         print("Post-processing", key)
-        scan = Scan(f, request.station, request.date, request.time)
+        scan = Scan.fromLevel2Data(f, request.station, request.date, request.time)
 
         return scan
