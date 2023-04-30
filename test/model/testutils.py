@@ -2,7 +2,10 @@ from src.model.data_point import DataPoint
 from src.model.ray_header import RayHeader
 from src.model.reflectivity_header import ReflectivityHeader
 from src.model.ray import Ray
+from src.model.sweep import Sweep
+from src.model.scan import Scan
 import random
+import datetime
 
 def randomBytes(x):
     return bytearray(random.randbytes(x))
@@ -23,3 +26,19 @@ def newTestRay(numPoints = 10, salt=1):
     for i in range(numPoints):
         points.append(newTestDataPoint(reflectivity=3+i*salt))
     return Ray(header, reflectivityHeader, points)
+
+def newTestSweep(numRays = 10, salt = 1):
+    rays = []
+    for i in range(numRays):
+        rays.append(newTestRay(salt=i+salt))
+    return Sweep(rays)
+
+def newTestScan(numSweeps = 10, salt = 1):
+    date = datetime.date(year=2005+salt, month=(3+salt)%12+1, day=(7*salt)%28+1)
+    time = datetime.time(hour=(5+salt)%12+1, minute=(11*salt)%60, second=(13*salt)%60+1)
+    station = random.choice(['KDMX', 'KAMX'])
+
+    sweeps = []
+    for i in range(numSweeps):
+        sweeps.append(newTestSweep(salt=i+salt))
+    return Scan(sweeps, station, date, time)
