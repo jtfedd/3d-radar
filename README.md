@@ -52,10 +52,13 @@ python -m unittest <path/to/test/file.py>
 
 The code in this project is formatted with [black](https://pypi.org/project/black/#description).
 
-Use the following commands to run the formatter:
+To format all files:
 ```
-# Format a specific file
-python -m black <path/to/file.py>
-# Format all files
 python -m black .
 ```
+
+To format individual files:
+```
+python -m black <path/to/file.py>
+```
+
