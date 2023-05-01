@@ -78,7 +78,7 @@ def deserializeScan(buffer, offset=0):
 
 
 def deserializeSweep(buffer, offset=0):
-    (numRays) = struct.unpack_from(sweepFormat, buffer, offset)
+    numRays = struct.unpack_from(sweepFormat, buffer, offset)[0]
     offset += sweepFormatBytes
 
     rays = []
@@ -95,7 +95,7 @@ def deserializeRay(buffer, offset=0):
     )
     offset += rayFormatBytes
 
-    reflectivity = np.frombuffer(buffer, offset=offset)
+    reflectivity = np.frombuffer(buffer[offset : offset + numRefBytes])
     offset += numRefBytes
 
     return Ray(azimuth, elevation, first, spacing, reflectivity), offset

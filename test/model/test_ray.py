@@ -1,5 +1,5 @@
 from src.model.ray import Ray
-from test.model.testutils import newTestRay, randomBytes
+from test.testutils.models import newTestRay, randomBytes
 
 import unittest
 

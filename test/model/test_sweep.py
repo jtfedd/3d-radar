@@ -1,5 +1,5 @@
 from src.model.sweep import Sweep
-from test.model.testutils import newTestSweep, randomBytes
+from test.testutils.models import newTestSweep, randomBytes
 
 import unittest
 

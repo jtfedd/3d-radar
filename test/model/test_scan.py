@@ -1,5 +1,5 @@
 from src.model.scan import Scan
-from test.model.testutils import newTestScan, randomBytes
+from test.testutils.models import newTestScan, randomBytes
 
 import unittest
 
