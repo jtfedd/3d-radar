@@ -1,87 +1,53 @@
-from src.model.serializable import Serializable
-from src.util.object_equals import ObjectEquals
-from src.model.ray_header import RayHeader
-from src.model.reflectivity_header import ReflectivityHeader
 from src.model.data_point import DataPoint
 import numpy as np
-import struct
 import math
 
 
-class Ray(Serializable, ObjectEquals):
-    @staticmethod
-    def byteFormat():
-        return "<i"
-
-    def byteSize(self):
-        size = struct.calcsize(self.byteFormat())
-        size += self.header.byteSize()
-        size += self.reflectivityHeader.byteSize()
-        for point in self.dataPoints:
-            size += point.byteSize()
-        return size
-
-    def writeBytes(self, buffer, offset):
-        pointer = offset
-        struct.pack_into(self.byteFormat(), buffer, pointer, len(self.dataPoints))
-        pointer += struct.calcsize(self.byteFormat())
-
-        pointer = self.header.writeBytes(buffer, pointer)
-        pointer = self.reflectivityHeader.writeBytes(buffer, pointer)
-        for dataPoint in self.dataPoints:
-            pointer = dataPoint.writeBytes(buffer, pointer)
-
-        return pointer
-
-    @classmethod
-    def fromSerial(cls, buffer, offset):
-        pointer = offset
-        numPoints = struct.unpack_from(cls.byteFormat(), buffer, pointer)[0]
-        pointer += struct.calcsize(cls.byteFormat())
-
-        header, pointer = RayHeader.fromSerial(buffer, pointer)
-        reflectivityHeader, pointer = ReflectivityHeader.fromSerial(buffer, pointer)
-        dataPoints = []
-        for _ in range(numPoints):
-            dataPoint, pointer = DataPoint.fromSerial(buffer, pointer)
-            dataPoints.append(dataPoint)
-
-        obj = cls(header, reflectivityHeader, dataPoints)
-        return obj, offset + obj.byteSize()
-
+class Ray:
     @classmethod
     def fromLevel2Data(cls, level2Ray):
-        dataPoints = []
+        header = level2Ray[0]
+        azimuth = math.radians(header.az_angle)
+        elevation = math.radians(header.el_angle)
 
-        header = RayHeader.fromLevel2Data(level2Ray)
-        reflectivityHeader = ReflectivityHeader.fromLevel2Data(level2Ray)
+        reflectivity_header = level2Ray[4][b"REF"][0]
+        first = reflectivity_header.first_gate
+        spacing = reflectivity_header.gate_width
 
-        cos_el = math.cos(math.radians(header.elevation))
-        sin_el = math.sin(math.radians(header.elevation))
+        reflectivity = level2Ray[4][b"REF"][1]
 
-        cos_az = math.cos(math.radians(header.azimuth))
-        sin_az = math.sin(math.radians(header.azimuth))
+        return cls(azimuth, elevation, first, spacing, reflectivity)
 
-        reflectivityData = level2Ray[4][b"REF"][1]
-        for i, reflectivity in enumerate(reflectivityData):
-            if np.isnan(reflectivity):
-                continue
+    def __init__(self, azimuth, elevation, first, spacing, reflectivityData):
+        self.azimuth = azimuth
+        self.elevation = elevation
 
-            rng = reflectivityHeader.range(i)
+        self.first = first
+        self.spacing = spacing
 
-            x = rng * cos_el * sin_az
-            y = rng * cos_el * cos_az
-            z = rng * sin_el
+        self.reflectivity = reflectivityData
 
-            dataPoints.append(DataPoint(x, y, z, reflectivity))
-
-        return cls(header, reflectivityHeader, dataPoints)
-
-    def __init__(self, header, reflectivityHeader, dataPoints):
-        self.header = header
-        self.reflectivityHeader = reflectivityHeader
-        self.dataPoints = dataPoints
+    def range(self, i):
+        return self.first + self.spacing * i
 
     def foreach(self, f):
-        for point in self.dataPoints:
-            f(point)
+        sin_az = math.sin(self.azimuth)
+        cos_az = math.cos(self.azimuth)
+
+        sin_el = math.sin(self.elevation)
+        cos_el = math.cos(self.elevation)
+
+        x_factor = cos_el * sin_az
+        y_factor = cos_el * cos_az
+        z_factor = sin_el
+
+        for i, value in enumerate(self.reflectivity):
+            if np.isnan(value):
+                continue
+
+            dist = self.range(i)
+            x = dist * x_factor
+            y = dist * y_factor
+            z = dist * z_factor
+
+            f(DataPoint(x, y, z, value))
