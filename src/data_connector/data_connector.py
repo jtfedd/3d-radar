@@ -54,9 +54,6 @@ class DataConnector:
         decompressed_data = serializeScan(scan)
         compressed_data = blosc.compress(decompressed_data)
 
-        print(len(decompressed_data))
-        print(len(compressed_data))
-
         with open(filePath, "wb") as f:
             f.write(compressed_data)
 
