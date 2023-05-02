@@ -47,10 +47,10 @@ class Viewer(ShowBase):
         print("Done!")
 
     def processMinMax(self, point):
-        if point.reflectivity < self.minVal:
-            self.minVal = point.reflectivity
-        if point.reflectivity > self.maxVal:
-            self.maxVal = point.reflectivity
+        if point.value < self.minVal:
+            self.minVal = point.value
+        if point.value > self.maxVal:
+            self.maxVal = point.value
 
     def renderCube(self, point):
         if random.randrange(0, 100) != 1:
@@ -60,7 +60,7 @@ class Viewer(ShowBase):
         cube.reparentTo(self.radarBase)
 
         cube.setPos(point.x, point.y, point.z)
-        cube.setColorScale(self.gradient.value(point.reflectivity))
+        cube.setColorScale(self.gradient.value(point.value))
 
 
 app = Viewer()

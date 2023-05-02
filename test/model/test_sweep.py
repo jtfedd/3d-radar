@@ -1,26 +1,28 @@
 from src.model.sweep import Sweep
-from test.model.testutils import newTestSweep, randomBytes
 
 import unittest
 
 
+class TestRay:
+    def __init__(self):
+        self.foreachCalled = False
+        self.foreachCalledWith = None
+
+    def foreach(self, f):
+        self.foreachCalled = True
+        self.foreachCalledWith = f
+
+
 class TestSweep(unittest.TestCase):
-    def test_serialize(self):
-        input = newTestSweep()
-        bytes = input.serialize()
-        output = Sweep.deserialize(bytes)
+    def test_foreach(self):
+        rays = [TestRay() for _ in range(10)]
+        sweep = Sweep(rays)
 
-        self.assertEqual(input, output)
+        def myfunc(p):
+            pass
 
-    def test_serialize_offset(self):
-        input = newTestSweep()
-        buffer = randomBytes(10000)
-        offset = 123
+        sweep.foreach(myfunc)
 
-        writeOffset = input.writeBytes(buffer, offset)
-        output, readOffset = Sweep.fromSerial(buffer, offset)
-
-        self.assertEqual(input, output)
-        self.assertEqual(writeOffset, readOffset)
-        self.assertNotEqual(offset, writeOffset)
-        self.assertEqual(writeOffset - offset, input.byteSize())
+        for ray in rays:
+            self.assertTrue(ray.foreachCalled)
+            self.assertEqual(ray.foreachCalledWith, myfunc)
