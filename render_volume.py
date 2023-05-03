@@ -35,9 +35,9 @@ class Viewer(ShowBase):
         scan = getData()
 
         print("Processing min and max")
-        self.minVal = -100
-        self.maxVal = 100
-        # scan.foreach(lambda p: self.processMinMax(p))
+        self.minVal = 1000000000
+        self.maxVal = -1000000000
+        scan.foreach(lambda p: self.processMinMax(p))
         self.gradient = Gradient(self.minVal, self.maxVal)
 
         print("Building render volume")
@@ -56,7 +56,7 @@ class Viewer(ShowBase):
             self.maxVal = point.value
 
     def renderCube(self, point):
-        if random.randrange(0, 10000) != 1:
+        if random.randrange(0, 100) != 1:
             return
 
         cube = self.loader.loadModel("assets/cube.glb")
