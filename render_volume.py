@@ -1,5 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 
+from src.camera.camera_control import CameraControl
 from src.gradient import Gradient
 from src.data_connector.data_connector import DataConnector
 from src.data_provider.s3_data_provider import S3DataProvider
@@ -27,14 +28,16 @@ class Viewer(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         self.setBackgroundColor(0, 0, 0, 1)
+        self.cameraControl = CameraControl(self)
+
         self.radarBase = self.render.attachNewNode("radar")
 
         scan = getData()
 
         print("Processing min and max")
-        self.minVal = 1000000000
-        self.maxVal = -1000000000
-        scan.foreach(lambda p: self.processMinMax(p))
+        self.minVal = -100
+        self.maxVal = 100
+        # scan.foreach(lambda p: self.processMinMax(p))
         self.gradient = Gradient(self.minVal, self.maxVal)
 
         print("Building render volume")
@@ -53,7 +56,7 @@ class Viewer(ShowBase):
             self.maxVal = point.value
 
     def renderCube(self, point):
-        if random.randrange(0, 100) != 1:
+        if random.randrange(0, 10000) != 1:
             return
 
         cube = self.loader.loadModel("assets/cube.glb")
