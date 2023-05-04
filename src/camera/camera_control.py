@@ -1,28 +1,30 @@
 from direct.showbase.ShowBase import ShowBase
 from direct.showbase.DirectObject import DirectObject
+from panda3d.core import Vec3
 
 
 class CameraControl(DirectObject):
-    def __init__(self, base: ShowBase):
+    def __init__(self, base: ShowBase, enable=True):
         self.base = base
 
         # Disable the built-in mouse camera control
         self.base.disableMouse()
 
         # Consts
-        self.movementFactor = 50
-        self.rotateFactor = 80
+        self.movementFactor = 0.15
+        self.rotateFactor = 0.3
         self.zoomFactor = 1.2
 
         # Set up state
         self.x = 0
         self.y = 0
-        self.lastX = 0
-        self.lastY = 0
 
-        self.pitch = 0
+        self.pitch = 30
         self.heading = 0
-        self.zoom = 100
+        self.zoom = 300
+
+        self.lastMouseX = 0
+        self.lastMouseY = 0
 
         # Set up nodes
         self.slider = base.render.attachNewNode("camera-slider")
@@ -36,21 +38,40 @@ class CameraControl(DirectObject):
         self.updatePositions()
 
         # Set up events
-        self.lastMouseX = 0
-        self.lastMouseY = 0
-
         self.dragging = False
+        self.rotating = False
+
+        if enable:
+            self.enable()
+
+        base.task_mgr.add(self.update, "camera-update")
+
+    def enable(self):
         self.accept("mouse1", self.handleDragStart)
         self.accept("mouse1-up", self.handleDragStop)
 
-        self.rotating = False
         self.accept("mouse3", self.handleRotateStart)
         self.accept("mouse3-up", self.handleRotateStop)
 
         self.accept("wheel_up", self.handleZoomIn)
         self.accept("wheel_down", self.handleZoomOut)
 
-        base.task_mgr.add(self.update, "camera-update")
+    def disable(self):
+        self.dragging = False
+        self.rotating = False
+        self.ignoreAll()
+
+    def overridePositions(self, x=None, y=None, pitch=None, heading=None, zoom=None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        if pitch is not None:
+            self.pitch = pitch
+        if heading is not None:
+            self.heading = heading
+        if zoom is not None:
+            self.zoom = zoom
 
     def update(self, task):
         self.handleMouseUpdate()
@@ -59,16 +80,47 @@ class CameraControl(DirectObject):
         return task.cont
 
     def updatePositions(self):
-        # Apply x and y as relative properties
-        self.slider.setX(self.slider, self.x - self.lastX)
-        self.slider.setY(self.slider, self.y - self.lastY)
-        self.lastX = self.x
-        self.lastY = self.y
+        if self.pitch > 90:
+            self.pitch = 90
+        if self.pitch < -90:
+            self.pitch = -90
 
-        # Apply heading, pitch, and zoom as absolute properties
+        self.slider.setX(self.x)
+        self.slider.setY(self.y)
+
         self.slider.setH(self.heading)
         self.pivot.setP(-self.pitch)
         self.mount.setY(-self.zoom)
+
+    def handleMouseUpdate(self):
+        mouseX = self.lastMouseX
+        mouseY = self.lastMouseY
+
+        if self.base.mouseWatcherNode.hasMouse():
+            mouseX = self.base.mouseWatcherNode.getMouseX()
+            mouseY = self.base.mouseWatcherNode.getMouseY()
+
+            winX, winY = self.base.getSize()
+            mouseX *= winX / 2
+            mouseY *= winY / 2
+
+        dX = mouseX - self.lastMouseX
+        dY = mouseY - self.lastMouseY
+
+        if self.dragging:
+            moveDX = -dX * self.movementFactor * self.zoomFactor
+            moveDY = -dY * self.movementFactor * self.zoomFactor
+            newPos = self.base.render.getRelativePoint(
+                self.slider, Vec3(moveDX, moveDY, 0)
+            )
+            self.x = newPos.x
+            self.y = newPos.y
+        elif self.rotating:
+            self.heading += -dX * self.rotateFactor
+            self.pitch += -dY * self.rotateFactor
+
+        self.lastMouseX = mouseX
+        self.lastMouseY = mouseY
 
     def handleDragStart(self):
         self.dragging = True
@@ -87,24 +139,3 @@ class CameraControl(DirectObject):
 
     def handleZoomOut(self):
         self.zoom = self.zoom * self.zoomFactor
-
-    def handleMouseUpdate(self):
-        mouseX = self.lastMouseX
-        mouseY = self.lastMouseY
-
-        if self.base.mouseWatcherNode.hasMouse():
-            mouseX = self.base.mouseWatcherNode.getMouseX()
-            mouseY = self.base.mouseWatcherNode.getMouseY()
-
-        dX = mouseX - self.lastMouseX
-        dY = mouseY - self.lastMouseY
-
-        if self.dragging:
-            self.x += -dX * self.movementFactor
-            self.y += -dY * self.movementFactor
-        elif self.rotating:
-            self.pitch += -dY * self.rotateFactor
-            self.heading += -dX * self.rotateFactor
-
-        self.lastMouseX = mouseX
-        self.lastMouseY = mouseY
