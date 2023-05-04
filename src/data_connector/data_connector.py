@@ -1,4 +1,4 @@
-from src.model.scan import Scan
+from src.model.serialization.serialization import serializeScan, deserializeScan
 
 import blosc
 import os
@@ -40,7 +40,7 @@ class DataConnector:
             compressed_data = f.read()
 
         decompressed_data = blosc.decompress(compressed_data)
-        scan = Scan.deserialize(decompressed_data)
+        scan, _ = deserializeScan(decompressed_data)
 
         print("Read", filePath)
 
@@ -51,7 +51,7 @@ class DataConnector:
 
         print("Writing", filePath)
 
-        decompressed_data = scan.serialize()
+        decompressed_data = serializeScan(scan)
         compressed_data = blosc.compress(decompressed_data)
 
         with open(filePath, "wb") as f:

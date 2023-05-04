@@ -1,26 +1,35 @@
 from src.model.scan import Scan
-from test.model.testutils import newTestScan, randomBytes
+from test.testutils.models import newTestScan
 
+import datetime
 import unittest
 
 
+class TestSweep:
+    def __init__(self):
+        self.foreachCalled = False
+        self.foreachCalledWith = None
+
+    def foreach(self, f):
+        self.foreachCalled = True
+        self.foreachCalledWith = f
+
+
 class TestScan(unittest.TestCase):
-    def test_serialize(self):
-        input = newTestScan()
-        bytes = input.serialize()
-        output = Scan.deserialize(bytes)
+    def test_foreach(self):
+        sweeps = [TestSweep() for _ in range(10)]
+        scan = Scan(sweeps, "KABC", datetime.date(2023, 5, 2), datetime.time(5, 40, 23))
 
-        self.assertEqual(input, output)
+        def myfunc(p):
+            pass
 
-    def test_serialize_offset(self):
-        input = newTestScan()
-        buffer = randomBytes(50000)
-        offset = 123
+        scan.foreach(myfunc)
 
-        writeOffset = input.writeBytes(buffer, offset)
-        output, readOffset = Scan.fromSerial(buffer, offset)
+        for sweep in sweeps:
+            self.assertTrue(sweep.foreachCalled)
+            self.assertEqual(sweep.foreachCalledWith, myfunc)
 
-        self.assertEqual(input, output)
-        self.assertEqual(writeOffset, readOffset)
-        self.assertNotEqual(offset, writeOffset)
-        self.assertEqual(writeOffset - offset, input.byteSize())
+    def test_points(self):
+        scan = newTestScan()
+        points = scan.points()
+        self.assertEqual(len(points), 1000)

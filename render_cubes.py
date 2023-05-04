@@ -1,5 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 
+from src.camera.camera_control import CameraControl
 from src.gradient import Gradient
 from src.data_connector.data_connector import DataConnector
 from src.data_provider.s3_data_provider import S3DataProvider
@@ -27,6 +28,8 @@ class Viewer(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         self.setBackgroundColor(0, 0, 0, 1)
+        self.cameraControl = CameraControl(self)
+
         self.radarBase = self.render.attachNewNode("radar")
 
         scan = getData()
@@ -47,10 +50,10 @@ class Viewer(ShowBase):
         print("Done!")
 
     def processMinMax(self, point):
-        if point.reflectivity < self.minVal:
-            self.minVal = point.reflectivity
-        if point.reflectivity > self.maxVal:
-            self.maxVal = point.reflectivity
+        if point.value < self.minVal:
+            self.minVal = point.value
+        if point.value > self.maxVal:
+            self.maxVal = point.value
 
     def renderCube(self, point):
         if random.randrange(0, 100) != 1:
@@ -60,7 +63,7 @@ class Viewer(ShowBase):
         cube.reparentTo(self.radarBase)
 
         cube.setPos(point.x, point.y, point.z)
-        cube.setColorScale(self.gradient.value(point.reflectivity))
+        cube.setColorScale(self.gradient.value(point.value))
 
 
 app = Viewer()
