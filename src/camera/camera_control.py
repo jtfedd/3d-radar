@@ -11,7 +11,7 @@ class CameraControl(DirectObject):
         self.base.disableMouse()
 
         # Consts
-        self.movementFactor = 0.15
+        self.movementFactor = 0.0015
         self.rotateFactor = 0.3
         self.zoomFactor = 1.2
 
@@ -108,14 +108,15 @@ class CameraControl(DirectObject):
         dY = mouseY - self.lastMouseY
 
         if self.dragging:
-            moveDX = -dX * self.movementFactor * self.zoomFactor
-            moveDY = -dY * self.movementFactor * self.zoomFactor
+            moveDX = -dX * self.movementFactor * self.zoom
+            moveDY = -dY * self.movementFactor * self.zoom
             newPos = self.base.render.getRelativePoint(
                 self.slider, Vec3(moveDX, moveDY, 0)
             )
             self.x = newPos.x
             self.y = newPos.y
-        elif self.rotating:
+
+        if self.rotating:
             self.heading += -dX * self.rotateFactor
             self.pitch += -dY * self.rotateFactor
 
