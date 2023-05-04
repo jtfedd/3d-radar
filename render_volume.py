@@ -1,5 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 
+from src.camera.camera_control import CameraControl
 from src.gradient import Gradient
 from src.data_connector.data_connector import DataConnector
 from src.data_provider.s3_data_provider import S3DataProvider
@@ -27,6 +28,8 @@ class Viewer(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         self.setBackgroundColor(0, 0, 0, 1)
+        self.cameraControl = CameraControl(self)
+
         self.radarBase = self.render.attachNewNode("radar")
 
         scan = getData()
