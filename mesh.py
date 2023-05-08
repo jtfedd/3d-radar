@@ -48,22 +48,13 @@ class App(ShowBase):
         vertex = GeomVertexWriter(vdata, "vertex")
         normal = GeomVertexWriter(vdata, "normal")
 
-        normals = np.zeros(vertices.shape)
+        normals = np.copy(vertices)
 
         for row in vertices:
             vertex.addData3(row[0], row[1], row[2])
 
         prim = GeomTriangles(Geom.UHStatic)
         for row in triangles:
-            vec1 = vertices[row[2]] - vertices[row[0]]
-            vec2 = vertices[row[1]] - vertices[row[0]]
-
-            xp = np.cross(vec1, vec2)
-
-            normals[row[0]] += xp
-            normals[row[1]] += xp
-            normals[row[2]] += xp
-
             prim.addVertices(row[2], row[1], row[0])
             prim.closePrimitive()
 
