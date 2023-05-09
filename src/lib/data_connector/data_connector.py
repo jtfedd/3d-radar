@@ -1,4 +1,4 @@
-from src.model.serialization.serialization import serializeScan, deserializeScan
+from lib.model.serialization.serialization import serializeScan, deserializeScan
 
 import blosc
 import os

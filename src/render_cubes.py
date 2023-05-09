@@ -1,10 +1,10 @@
 from direct.showbase.ShowBase import ShowBase
 
-from src.camera.camera_control import CameraControl
-from src.gradient import Gradient
-from src.data_connector.data_connector import DataConnector
-from src.data_provider.s3_data_provider import S3DataProvider
-from src.data_connector.request import Request
+from lib.camera.camera_control import CameraControl
+from lib.gradient.gradient import Gradient
+from lib.data_connector.data_connector import DataConnector
+from lib.data_provider.s3_data_provider import S3DataProvider
+from lib.data_connector.request import Request
 
 import datetime
 
@@ -59,7 +59,7 @@ class Viewer(ShowBase):
         if random.randrange(0, 100) != 1:
             return
 
-        cube = self.loader.loadModel("assets/cube.glb")
+        cube = self.loader.loadModel("../assets/cube.glb")
         cube.reparentTo(self.radarBase)
 
         cube.setPos(point.x, point.y, point.z)

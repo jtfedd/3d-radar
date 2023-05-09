@@ -41,6 +41,7 @@ jobs:
 
     - name: Run unit tests
       run: |
+        cd src
         python -m unittest
 
     - name: Check formatting

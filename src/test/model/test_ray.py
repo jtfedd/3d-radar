@@ -1,4 +1,4 @@
-from src.model.ray import Ray
+from lib.model.ray import Ray
 import numpy as np
 
 import unittest

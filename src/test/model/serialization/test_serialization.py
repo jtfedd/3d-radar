@@ -1,4 +1,4 @@
-from src.model.serialization import serialization
+from lib.model.serialization import serialization
 from test.testutils.models import *
 import unittest
 

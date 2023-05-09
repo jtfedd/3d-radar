@@ -12,3 +12,6 @@
 
 # Virtual environment
 .venv/*
+
+# VSCode config
+.vscode/*
