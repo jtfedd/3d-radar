@@ -1,4 +1,4 @@
-from src.model.sweep import Sweep
+from model.sweep import Sweep
 
 
 class Scan:

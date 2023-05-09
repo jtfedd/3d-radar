@@ -1,10 +1,10 @@
 import boto3
 import botocore
 
-from src.data_provider.data_provider import DataProvider
+from data_provider.data_provider import DataProvider
 
 from metpy.io import Level2File
-from src.model.scan import Scan
+from model.scan import Scan
 
 
 class S3DataProvider(DataProvider):

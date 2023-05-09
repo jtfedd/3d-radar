@@ -1,4 +1,4 @@
-from src.model.data_point import DataPoint
+from model.data_point import DataPoint
 import numpy as np
 import math
 
