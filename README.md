@@ -29,27 +29,25 @@ deactivate
 ```
 ### Dependencies
 
-Once you have your virtual environment activated, run the following command to fetch the project dependencies:
+Dependencies for the project are managed using `pip`.
+
+To install all dependencies:
 ```
-pip install -r requirements.txt
+make install
 ```
 
 ### Testing
 
 This project uses [unittest](https://docs.python.org/3/library/unittest.html) for unit testing.
 
-Unit tests must be run from the `/src` directory.
-```
-cd src
-```
-
 To run all tests in the project:
 ```
-python -m unittest
+make test
 ```
 
 To run individual test files:
 ```
+cd src
 python -m unittest <path/to/test/file.py>
 ```
 
@@ -57,13 +55,7 @@ python -m unittest <path/to/test/file.py>
 
 The code in this project is formatted with [black](https://pypi.org/project/black/#description).
 
-To format all files:
+To format all code:
 ```
-python -m black .
+make format
 ```
-
-To format individual files:
-```
-python -m black <path/to/file.py>
-```
-
