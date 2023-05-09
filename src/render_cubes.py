@@ -1,10 +1,10 @@
 from direct.showbase.ShowBase import ShowBase
 
-from camera.camera_control import CameraControl
-from gradient.gradient import Gradient
-from data_connector.data_connector import DataConnector
-from data_provider.s3_data_provider import S3DataProvider
-from data_connector.request import Request
+from lib.camera.camera_control import CameraControl
+from lib.gradient.gradient import Gradient
+from lib.data_connector.data_connector import DataConnector
+from lib.data_provider.s3_data_provider import S3DataProvider
+from lib.data_connector.request import Request
 
 import datetime
 

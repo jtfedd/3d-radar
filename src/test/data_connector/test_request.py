@@ -1,4 +1,4 @@
-from data_connector.request import Request
+from lib.data_connector.request import Request
 import datetime
 
 import unittest

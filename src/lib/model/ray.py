@@ -1,4 +1,4 @@
-from model.data_point import DataPoint
+from lib.model.data_point import DataPoint
 import numpy as np
 import math
 

@@ -38,6 +38,11 @@ pip install -r requirements.txt
 
 This project uses [unittest](https://docs.python.org/3/library/unittest.html) for unit testing.
 
+Unit tests must be run from the `/src` directory.
+```
+cd src
+```
+
 To run all tests in the project:
 ```
 python -m unittest

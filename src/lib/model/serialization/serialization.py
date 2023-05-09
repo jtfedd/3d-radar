@@ -1,6 +1,6 @@
-from model.scan import Scan
-from model.sweep import Sweep
-from model.ray import Ray
+from lib.model.scan import Scan
+from lib.model.sweep import Sweep
+from lib.model.ray import Ray
 import struct
 import datetime
 import numpy as np

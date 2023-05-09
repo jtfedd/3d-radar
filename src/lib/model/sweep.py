@@ -1,4 +1,4 @@
-from model.ray import Ray
+from lib.model.ray import Ray
 
 
 class Sweep:

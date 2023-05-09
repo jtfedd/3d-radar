@@ -1,7 +1,7 @@
-from model.data_point import DataPoint
-from model.ray import Ray
-from model.sweep import Sweep
-from model.scan import Scan
+from lib.model.data_point import DataPoint
+from lib.model.ray import Ray
+from lib.model.sweep import Sweep
+from lib.model.scan import Scan
 import random
 import datetime
 import numpy as np

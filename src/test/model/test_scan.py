@@ -1,4 +1,4 @@
-from model.scan import Scan
+from lib.model.scan import Scan
 from test.testutils.models import newTestScan
 
 import datetime

@@ -1,7 +1,7 @@
 from direct.showbase.ShowBase import ShowBase
 
-from geometry import mesh_sharp
-from geometry import mesh_smooth
+from lib.geometry import mesh_sharp
+from lib.geometry import mesh_smooth
 
 import numpy as np
 import mcubes
