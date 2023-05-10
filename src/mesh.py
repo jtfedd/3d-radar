@@ -31,7 +31,15 @@ class App(ShowBase):
 
         # Extract the 0-isosurface
         vertices, triangles = mcubes.marching_cubes(u, 0)
-        geomNode = mesh_sharp.trianglesToGeometry(vertices, triangles)
+
+        # The vertices that come from marching cubes are "wound" the wrong way, causing
+        # the faces to all be facing inward instead of outward.
+        # If we swap columns 1 and 2, leaving column 0 in place, this reverses the order
+        # and causes the faces to be "wound" the correct way. This makes the rest of
+        # the code a little less confusing.
+        triangles[:, [1, 2]] = triangles[:, [2, 1]]
+
+        geomNode = mesh_smooth.trianglesToGeometry(vertices, triangles)
         nodePath = self.render.attachNewNode(geomNode)
 
         # Render a cube for comparison
