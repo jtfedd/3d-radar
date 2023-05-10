@@ -5,10 +5,14 @@ from panda3d.core import GeomTriangles
 from panda3d.core import GeomNode
 from panda3d.core import Geom
 
+from lib.geometry.vector import angle
+
 import numpy as np
 
 
-# WIP generates smooth geometry
+# This algorithm will generate smoothed geometry by sharing vertices between
+# faces and calculating a shared normal for a vertex that is shared by multiple
+# faces. This results in a mesh that looks smooth.
 def trianglesToGeometry(vertices, triangles):
     # Not all of the vertices are unique. This means there are sometimes
     # multiple vertices at the same location, but they will not share normals.
@@ -41,10 +45,11 @@ def trianglesToGeometry(vertices, triangles):
 
     prim = GeomTriangles(Geom.UHStatic)
     for row in triangles:
-        vec1 = vertices[row[1]] - vertices[row[0]]
-        vec2 = vertices[row[2]] - vertices[row[0]]
+        p1 = vertices[row[0]]
+        p2 = vertices[row[1]]
+        p3 = vertices[row[2]]
 
-        norm = np.cross(vec1, vec2)
+        norm = np.cross(p2 - p1, p3 - p1)
         length = np.linalg.norm(norm)
 
         # We can ignore faces that have zero area
@@ -52,9 +57,17 @@ def trianglesToGeometry(vertices, triangles):
             continue
 
         norm /= length
-        normals[row[0]] += norm
-        normals[row[1]] += norm
-        normals[row[2]] += norm
+
+        # Making the normals proportional to the angle of the face at that point
+        # should help make it even more smooth. However it's still not perfect
+        # and it might not be worth the performance hit for large meshes
+        a1 = angle(p2 - p1, p3 - p1)
+        a2 = angle(p3 - p2, p1 - p2)
+        a3 = angle(p1 - p3, p2 - p3)
+
+        normals[row[0]] += norm * a1
+        normals[row[1]] += norm * a2
+        normals[row[2]] += norm * a3
 
         prim.addVertices(row[0], row[1], row[2])
         prim.closePrimitive()

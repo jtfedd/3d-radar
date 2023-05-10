@@ -39,7 +39,7 @@ class App(ShowBase):
         # the code a little less confusing.
         triangles[:, [1, 2]] = triangles[:, [2, 1]]
 
-        geomNode = mesh_sharp.trianglesToGeometry(vertices, triangles)
+        geomNode = mesh_smooth.trianglesToGeometry(vertices, triangles)
         nodePath = self.render.attachNewNode(geomNode)
 
         # Render a cube for comparison
