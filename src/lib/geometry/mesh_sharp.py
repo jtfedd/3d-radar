@@ -21,8 +21,8 @@ def trianglesToGeometry(vertices, triangles):
 
     i = 0
     for row in triangles:
-        vec1 = vertices[row[2]] - vertices[row[0]]
-        vec2 = vertices[row[1]] - vertices[row[0]]
+        vec1 = vertices[row[1]] - vertices[row[0]]
+        vec2 = vertices[row[2]] - vertices[row[0]]
 
         norm = np.cross(vec1, vec2)
         length = np.linalg.norm(norm)
@@ -42,7 +42,7 @@ def trianglesToGeometry(vertices, triangles):
         normal.addData3(norm[0], norm[1], norm[2])
         normal.addData3(norm[0], norm[1], norm[2])
 
-        primitives.addVertices(i, i + 2, i + 1)
+        primitives.addVertices(i, i + 1, i + 2)
         primitives.closePrimitive()
 
         i += 3
