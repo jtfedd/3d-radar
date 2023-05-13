@@ -1,8 +1,8 @@
 from panda3d.core import GeomVertexData
 from panda3d.core import GeomVertexFormat
-from panda3d.core import GeomVertexWriter
 from panda3d.core import GeomTriangles
 from panda3d.core import GeomNode
+from panda3d.core import GeomEnums
 from panda3d.core import Geom
 
 import numpy as np
@@ -12,14 +12,14 @@ import numpy as np
 # The vertices for each face will have the normal of the face.
 # This results in a mesh that looks "sharp" and each face is flat.
 def trianglesToGeometry(vertices, triangles):
-    vdata = GeomVertexData("name", GeomVertexFormat.getV3n3(), Geom.UHStatic)
-    vdata.setNumRows(triangles.shape[0] * 3)
+    numVertices = triangles.shape[0] * 3
+    numFaces = triangles.shape[0]
 
-    vertex = GeomVertexWriter(vdata, "vertex")
-    normal = GeomVertexWriter(vdata, "normal")
-    primitives = GeomTriangles(Geom.UHStatic)
+    vertexData = np.empty((numVertices, 6), dtype=np.float32)
+    facesData = np.empty((numFaces, 3), dtype=np.uint16)
 
-    i = 0
+    vertexIndex = 0
+    faceIndex = 0
     for row in triangles:
         vec1 = vertices[row[1]] - vertices[row[0]]
         vec2 = vertices[row[2]] - vertices[row[0]]
@@ -34,21 +34,51 @@ def trianglesToGeometry(vertices, triangles):
 
         norm /= length
 
-        vertex.addData3(vertices[row[0]][0], vertices[row[0]][1], vertices[row[0]][2])
-        vertex.addData3(vertices[row[1]][0], vertices[row[1]][1], vertices[row[1]][2])
-        vertex.addData3(vertices[row[2]][0], vertices[row[2]][1], vertices[row[2]][2])
+        vertexData[vertexIndex] = [
+            vertices[row[0]][0],
+            vertices[row[0]][1],
+            vertices[row[0]][2],
+            norm[0],
+            norm[1],
+            norm[2],
+        ]
+        vertexData[vertexIndex + 1] = [
+            vertices[row[1]][0],
+            vertices[row[1]][1],
+            vertices[row[1]][2],
+            norm[0],
+            norm[1],
+            norm[2],
+        ]
+        vertexData[vertexIndex + 2] = [
+            vertices[row[2]][0],
+            vertices[row[2]][1],
+            vertices[row[2]][2],
+            norm[0],
+            norm[1],
+            norm[2],
+        ]
 
-        normal.addData3(norm[0], norm[1], norm[2])
-        normal.addData3(norm[0], norm[1], norm[2])
-        normal.addData3(norm[0], norm[1], norm[2])
+        facesData[faceIndex] = [vertexIndex, vertexIndex + 1, vertexIndex + 2]
 
-        primitives.addVertices(i, i + 1, i + 2)
-        primitives.closePrimitive()
+        vertexIndex += 3
+        faceIndex += 1
 
-        i += 3
+    vdata = GeomVertexData("vdata", GeomVertexFormat.getV3n3(), Geom.UHStatic)
+    vdata.uncleanSetNumRows(numVertices)
+    vArray = vdata.modifyArray(0)
+    vView = memoryview(vArray).cast("B").cast("f")
+    vView[:] = vertexData.flatten()
+
+    trisData = GeomTriangles(Geom.UHStatic)
+    trisData.setIndexType(GeomEnums.NT_uint16)
+    trisArray = trisData.modifyVertices()
+    trisArray.uncleanSetNumRows(numFaces * 3)
+    tView = memoryview(trisArray).cast("B").cast("H")
+    tView[:] = facesData.flatten()
 
     geom = Geom(vdata)
-    geom.addPrimitive(primitives)
+    geom.addPrimitive(trisData)
 
     node = GeomNode("gnode")
     node.addGeom(geom)
