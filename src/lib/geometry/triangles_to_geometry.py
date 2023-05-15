@@ -5,6 +5,8 @@ from panda3d.core import GeomNode
 from panda3d.core import GeomEnums
 from panda3d.core import Geom
 
+import numpy as np
+
 
 # Take oriented vertices and triangles and generate Panda3D geometry
 def trianglesToGeometry(vertices, triangles):
@@ -12,14 +14,14 @@ def trianglesToGeometry(vertices, triangles):
     vertexData.uncleanSetNumRows(len(vertices))
     vertexDataArray = vertexData.modifyArray(0)
     vertexDataView = memoryview(vertexDataArray).cast("B").cast("f")
-    vertexDataView[:] = vertices.flatten()
+    vertexDataView[:] = vertices.flatten().astype(dtype=np.float32)
 
     trianglesData = GeomTriangles(Geom.UHStatic)
     trianglesData.setIndexType(GeomEnums.NT_uint16)
     trianglesDataArray = trianglesData.modifyVertices()
     trianglesDataArray.uncleanSetNumRows(len(triangles) * 3)
     trianglesDataView = memoryview(trianglesDataArray).cast("B").cast("H")
-    trianglesDataView[:] = triangles.flatten()
+    trianglesDataView[:] = triangles.flatten().astype(dtype=np.uint16)
 
     geom = Geom(vertexData)
     geom.addPrimitive(trianglesData)

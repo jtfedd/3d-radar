@@ -34,7 +34,7 @@ def orientVertices(vertices, triangles):
     vertexData[:, :3] = vertices
     vertexData[:, 3:] = normals
 
-    return vertexData, triangles.astype(dtype=np.uint16)
+    return vertexData, triangles
 
 
 def normalize(A):
