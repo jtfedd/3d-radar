@@ -1,56 +1,41 @@
-from panda3d.core import GeomVertexData
-from panda3d.core import GeomVertexFormat
-from panda3d.core import GeomVertexWriter
-from panda3d.core import GeomTriangles
-from panda3d.core import GeomNode
-from panda3d.core import Geom
-
 import numpy as np
 
 
-# This algorithm will generate vertices with normals that are specific per face.
-# The vertices for each face will have the normal of the face.
-# This results in a mesh that looks "sharp" and each face is flat.
-def trianglesToGeometry(vertices, triangles):
-    vdata = GeomVertexData("name", GeomVertexFormat.getV3n3(), Geom.UHStatic)
-    vdata.setNumRows(triangles.shape[0] * 3)
+# This algorithm takes unoriented vertices and a list of triangles, and generates
+# oriented vertices (postition + normal) and updated triangles.
+# For flat shaded geometry, this means we calculate the normal for each triangle and
+# generate a new set of vertices for each triangle which has that normal.
+# Then we generate a new set of triangles to point to the new vertices.
+def orientVertices(vertices, triangles):
+    # Calculate two vectors for each triangle
+    vec1 = vertices[triangles[:, 1]] - vertices[triangles[:, 0]]
+    vec2 = vertices[triangles[:, 2]] - vertices[triangles[:, 0]]
 
-    vertex = GeomVertexWriter(vdata, "vertex")
-    normal = GeomVertexWriter(vdata, "normal")
-    primitives = GeomTriangles(Geom.UHStatic)
+    # Calculate the cross product for each triangle
+    norm = np.cross(vec1, vec2)
+    length = np.linalg.norm(norm, axis=1)
 
-    i = 0
-    for row in triangles:
-        vec1 = vertices[row[1]] - vertices[row[0]]
-        vec2 = vertices[row[2]] - vertices[row[0]]
+    # Generate a mask for triangles which are actually visible
+    # If the normal vector has a length of zero, it means the triangle
+    # has zero area, which means it is invisible.
+    mask = length > 0
 
-        norm = np.cross(vec1, vec2)
-        length = np.linalg.norm(norm)
+    # Normalize the normal vectors, using the mask to only affect normals
+    # that are not zero-length
+    norm[mask] /= length[mask][:, np.newaxis]
 
-        # Ignore faces that have zero area.
-        # We can't calculate normals for them and they won't render.
-        if length == 0:
-            continue
+    # Generate an array to hold the vertex position and normal data
+    vertexData = np.empty((len(triangles) * 3, 6), dtype=np.float32)
 
-        norm /= length
+    # Fill the vertex position data
+    vertexData[:, :3] = vertices[triangles].reshape(-1, 3)
 
-        vertex.addData3(vertices[row[0]][0], vertices[row[0]][1], vertices[row[0]][2])
-        vertex.addData3(vertices[row[1]][0], vertices[row[1]][1], vertices[row[1]][2])
-        vertex.addData3(vertices[row[2]][0], vertices[row[2]][1], vertices[row[2]][2])
+    # Fill the normal data by repeating each normal 3 times, one for each vertex
+    vertexData[:, 3:] = np.repeat(norm, 3, axis=0)
 
-        normal.addData3(norm[0], norm[1], norm[2])
-        normal.addData3(norm[0], norm[1], norm[2])
-        normal.addData3(norm[0], norm[1], norm[2])
+    # All of the vertices are just sequential now, so generate a list of triangles
+    # that references the vertices in sequential order
+    triangleData = np.arange(len(triangles) * 3).reshape(-1, 3).astype(np.uint16)
 
-        primitives.addVertices(i, i + 1, i + 2)
-        primitives.closePrimitive()
-
-        i += 3
-
-    geom = Geom(vdata)
-    geom.addPrimitive(primitives)
-
-    node = GeomNode("gnode")
-    node.addGeom(geom)
-
-    return node
+    # Only return the triangles and corresponding vertices that are visible
+    return vertexData[np.repeat(mask, 3)], triangleData[mask]

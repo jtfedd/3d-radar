@@ -1,10 +1,11 @@
 from direct.showbase.ShowBase import ShowBase
 
-from lib.geometry import mesh_sharp
-from lib.geometry import mesh_smooth
+from lib.geometry import marching_cubes
 
 import numpy as np
-import mcubes
+import perlin_numpy
+
+import timeit
 
 from panda3d.core import DirectionalLight, AmbientLight
 
@@ -28,19 +29,38 @@ class App(ShowBase):
         # Create a data volume (30 x 30 x 30)
         X, Y, Z = np.mgrid[:30, :30, :30]
         u = (X - 15) ** 2 + (Y - 15) ** 2 + (Z - 15) ** 2 - 8**2
+        u = u.astype(dtype=float)
 
-        # Extract the 0-isosurface
-        vertices, triangles = mcubes.marching_cubes(u, 0)
+        # Generate some noise
+        noise = perlin_numpy.generate_perlin_noise_3d(u.shape, (6, 6, 6))
+        u += noise * 75
 
-        # The vertices that come from marching cubes are "wound" the wrong way, causing
-        # the faces to all be facing inward instead of outward.
-        # If we swap columns 1 and 2, leaving column 0 in place, this reverses the order
-        # and causes the faces to be "wound" the correct way. This makes the rest of
-        # the code a little less confusing.
-        triangles[:, [1, 2]] = triangles[:, [2, 1]]
+        num = 100
 
-        geomNode = mesh_smooth.trianglesToGeometry(vertices, triangles)
-        nodePath = self.render.attachNewNode(geomNode)
+        print(
+            "Sharp",
+            timeit.timeit(
+                lambda: marching_cubes.getGeometry(u, 0, smooth=False), number=num
+            )
+            / num,
+        )
+
+        print(
+            "Smooth",
+            timeit.timeit(
+                lambda: marching_cubes.getGeometry(u, 0, smooth=True), number=num
+            )
+            / num,
+        )
+
+        sharp_geom = marching_cubes.getGeometry(u, 0, smooth=False)
+        sharp_node = self.render.attachNewNode(sharp_geom)
+        sharp_node.setZ(-15)
+
+        smooth_geom = marching_cubes.getGeometry(u, 0, smooth=True)
+        smooth_node = self.render.attachNewNode(smooth_geom)
+        smooth_node.setX(30)
+        smooth_node.setZ(-15)
 
         # Render a cube for comparison
         cube = self.loader.loadModel("../assets/cube.glb")
