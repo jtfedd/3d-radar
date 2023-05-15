@@ -35,7 +35,7 @@ def orientVertices(vertices, triangles):
 
     # All of the vertices are just sequential now, so generate a list of triangles
     # that references the vertices in sequential order
-    triangleData = np.arange(len(triangles) * 3).reshape(-1, 3).astype(np.uint16)
+    triangleData = np.arange(len(triangles) * 3).reshape(-1, 3)
 
     # Only return the triangles and corresponding vertices that are visible
     return vertexData[np.repeat(mask, 3)], triangleData[mask]
