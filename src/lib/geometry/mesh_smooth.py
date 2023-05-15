@@ -1,19 +1,10 @@
-from panda3d.core import GeomVertexData
-from panda3d.core import GeomVertexFormat
-from panda3d.core import GeomVertexWriter
-from panda3d.core import GeomTriangles
-from panda3d.core import GeomNode
-from panda3d.core import Geom
-
-from lib.geometry.vector import angle
-
 import numpy as np
 
 
-# This algorithm will generate smoothed geometry by sharing vertices between
-# faces and calculating a shared normal for a vertex that is shared by multiple
-# faces. This results in a mesh that looks smooth.
-def trianglesToGeometry(vertices, triangles):
+# Removes duplicate vertices and triangles from the provided list.
+# This is necessary for generating smooth geometry because the vertices
+# need to be shared in order for smooth normals to be generated.
+def deduplicate(vertices, triangles):
     # Not all of the vertices are unique. This means there are sometimes
     # multiple vertices at the same location, but they will not share normals.
     # Remove duplicate vertices before continuing.
@@ -27,59 +18,51 @@ def trianglesToGeometry(vertices, triangles):
     # Remove triangles that are the same.
     unique_triangles = np.unique(mapped_triangles, axis=0)
 
-    # Replace our input with the refined output
-    vertices = unique_vertices
-    triangles = unique_triangles
+    return unique_vertices, unique_triangles
 
-    # Generate the geometry
-    vdata = GeomVertexData("name", GeomVertexFormat.getV3n3(), Geom.UHStatic)
-    vdata.setNumRows(vertices.shape[0])
 
-    vertexWriter = GeomVertexWriter(vdata, "vertex")
-    normalWriter = GeomVertexWriter(vdata, "normal")
+# This algorithm takes unoriented vertices and a list of triangles, and generates
+# oriented vertices (position + normal) and updated triangles.
+# For smooth shaded geometry, this means we calculate the normal for each triangle and
+# add it to the normal of each vertex of the triangle, proportional to the angle at that vertex.
+def orientVertices(vertices, triangles):
+    vertices, triangles = deduplicate(vertices, triangles)
+    normals = calcNormals(vertices, triangles)
 
+    vertexData = np.empty((len(vertices), 6), dtype=np.float32)
+    vertexData[:, :3] = vertices
+    vertexData[:, 3:] = normals
+
+    return vertexData, triangles.astype(dtype=np.uint16)
+
+
+def normalize(A):
+    length = np.linalg.norm(A, axis=1)
+    mask = length > 0
+    A[mask] /= length[mask][:, np.newaxis]
+    return A
+
+
+def calcNormals(vertices, triangles):
+    # Vectors between all the vertices of each triangle
+    vec1 = normalize(vertices[triangles[:, 1]] - vertices[triangles[:, 0]])
+    vec2 = normalize(vertices[triangles[:, 2]] - vertices[triangles[:, 0]])
+    vec3 = normalize(vertices[triangles[:, 2]] - vertices[triangles[:, 1]])
+
+    # Calculate the normal for each triangle
+    norm = normalize(np.cross(vec1, vec2))
+
+    # Calculate the angles at each vertex for each triangle
+    # np.einsum("ij, ij->i", vec1, vec2) calculates the dot products
+    # for the corresponding vectors in each list
+    a1 = np.arccos(np.einsum("ij, ij->i", vec1, vec2))[:, np.newaxis]
+    a2 = np.arccos(np.einsum("ij, ij->i", vec3, -vec1))[:, np.newaxis]
+    a3 = np.arccos(np.einsum("ij, ij->i", -vec2, -vec3))[:, np.newaxis]
+
+    # Add all of the normals together at each vertex
     normals = np.zeros(vertices.shape)
+    np.add.at(normals, triangles[:, 0], norm * a1)
+    np.add.at(normals, triangles[:, 1], norm * a2)
+    np.add.at(normals, triangles[:, 2], norm * a3)
 
-    for row in vertices:
-        vertexWriter.addData3(row[0], row[1], row[2])
-
-    prim = GeomTriangles(Geom.UHStatic)
-    for row in triangles:
-        p1 = vertices[row[0]]
-        p2 = vertices[row[1]]
-        p3 = vertices[row[2]]
-
-        norm = np.cross(p2 - p1, p3 - p1)
-        length = np.linalg.norm(norm)
-
-        # We can ignore faces that have zero area
-        if length == 0:
-            continue
-
-        norm /= length
-
-        # Making the normals proportional to the angle of the face at that point
-        # should help make it even more smooth. However it's still not perfect
-        # and it might not be worth the performance hit for large meshes
-        a1 = angle(p2 - p1, p3 - p1)
-        a2 = angle(p3 - p2, p1 - p2)
-        a3 = angle(p1 - p3, p2 - p3)
-
-        normals[row[0]] += norm * a1
-        normals[row[1]] += norm * a2
-        normals[row[2]] += norm * a3
-
-        prim.addVertices(row[0], row[1], row[2])
-        prim.closePrimitive()
-
-    normals /= np.linalg.norm(normals, axis=1)[:, np.newaxis]
-    for row in normals:
-        normalWriter.addData3(row[0], row[1], row[2])
-
-    geom = Geom(vdata)
-    geom.addPrimitive(prim)
-
-    node = GeomNode("gnode")
-    node.addGeom(geom)
-
-    return node
+    return normalize(normals)

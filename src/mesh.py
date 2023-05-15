@@ -1,9 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 
-from lib.geometry import mesh_sharp
-from lib.geometry import mesh_smooth
 from lib.geometry import marching_cubes
-from lib.camera.camera_control import CameraControl
 
 import numpy as np
 import perlin_numpy
@@ -38,26 +35,29 @@ class App(ShowBase):
         noise = perlin_numpy.generate_perlin_noise_3d(u.shape, (6, 6, 6))
         u += noise * 75
 
-        # Extract the 0-isosurface
-        vertices, triangles = marching_cubes.getIsosurface(u, 0)
+        num = 100
 
         print(
+            "Sharp",
             timeit.timeit(
-                lambda: mesh_sharp.trianglesToGeometry(vertices, triangles), number=100
+                lambda: marching_cubes.getGeometry(u, 0, smooth=False), number=num
             )
+            / num,
         )
 
         print(
+            "Smooth",
             timeit.timeit(
-                lambda: mesh_smooth.trianglesToGeometry(vertices, triangles), number=100
+                lambda: marching_cubes.getGeometry(u, 0, smooth=True), number=num
             )
+            / num,
         )
 
-        sharp_geom = mesh_sharp.trianglesToGeometry(vertices, triangles)
+        sharp_geom = marching_cubes.getGeometry(u, 0, smooth=False)
         sharp_node = self.render.attachNewNode(sharp_geom)
         sharp_node.setZ(-15)
 
-        smooth_geom = mesh_smooth.trianglesToGeometry(vertices, triangles)
+        smooth_geom = marching_cubes.getGeometry(u, 0, smooth=True)
         smooth_node = self.render.attachNewNode(smooth_geom)
         smooth_node.setX(30)
         smooth_node.setZ(-15)
