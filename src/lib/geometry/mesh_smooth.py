@@ -23,8 +23,9 @@ def deduplicate(vertices, triangles):
 
 # This algorithm takes unoriented vertices and a list of triangles, and generates
 # oriented vertices (position + normal) and updated triangles.
-# For smooth shaded geometry, this means we calculate the normal for each triangle and
-# add it to the normal of each vertex of the triangle, proportional to the angle at that vertex.
+# For smooth shaded geometry, this means we calculate the normal for each triangle as
+# the sum of the weighted normals of the triangles around the vertex, where the weights
+# are calculated as the angles of the triangle at the vertex
 def orientVertices(vertices, triangles):
     vertices, triangles = deduplicate(vertices, triangles)
     normals = calcNormals(vertices, triangles)
