@@ -18,3 +18,7 @@ format: ## Format code
 .PHONY: test
 test: ## Run tests
 	@cd src && python -m unittest
+
+.PHONY: clean
+clean: ## Remove all cached data files, config files, etc.
+	rm -rf src/lib/data_connector/cached_data/*
