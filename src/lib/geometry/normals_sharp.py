@@ -38,4 +38,7 @@ def orientVertices(vertices, triangles):
     triangleData = np.arange(len(triangles) * 3).reshape(-1, 3)
 
     # Only return the triangles and corresponding vertices that are visible
-    return vertexData[np.repeat(mask, 3)], triangleData[mask]
+    # THIS DOESN'T ACTUALLY WORK, WE WOULD NEED TO REMAP VERTICES
+    # return vertexData[np.repeat(mask, 3)], triangleData[mask]
+
+    return vertexData, triangleData
