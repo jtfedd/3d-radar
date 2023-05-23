@@ -3,6 +3,8 @@ from lib.model.serialization.serialization import serializeScan, deserializeScan
 import blosc
 import os
 
+useCaching = False
+
 
 class DataConnector:
     def __init__(self, provider):
@@ -29,6 +31,9 @@ class DataConnector:
         return os.path.join(self.cacheDir, fileName)
 
     def loadCached(self, request):
+        if not useCaching:
+            return None, False
+
         filePath = self.getFilepath(request)
 
         if not os.path.exists(filePath):
@@ -47,6 +52,9 @@ class DataConnector:
         return scan, True
 
     def saveCached(self, request, scan):
+        if not useCaching:
+            return
+
         filePath = self.getFilepath(request)
 
         print("Writing", filePath)
