@@ -8,11 +8,9 @@ from lib.geometry import marching_cubes
 
 from panda3d.core import DirectionalLight, AmbientLight
 
+import numpy as np
 import mcubes
-
-
 import datetime
-
 import random
 
 
@@ -51,17 +49,11 @@ class Viewer(ShowBase):
 
         scan = getData()
 
-        scan.printInfo()
+        data = scan.reflectivityMatrix()
+        data = np.isnan(data)
 
-        # data = scan.reflectivityMatrix()
-        # print(data.shape)
-        # print(data)
-
-        # vertices, triangles = marching_cubes.getIsosurface(data, 0)
-        # mcubes.export_obj(vertices, triangles, "../test.obj")
-
-        # sharp_geom = marching_cubes.getGeometry(data, 0, smooth=False)
-        # sharp_node = self.render.attachNewNode(sharp_geom)
+        sharp_geom = marching_cubes.getGeometry(data, 0.5, smooth=False)
+        sharp_node = self.render.attachNewNode(sharp_geom)
 
         print("Done!")
 
