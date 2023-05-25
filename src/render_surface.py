@@ -5,13 +5,13 @@ from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
 from lib.data_connector.request import Request
 from lib.geometry import marching_cubes
+from lib.geometry import reshape
+from lib.geometry import triangles_to_geometry
 
 from panda3d.core import DirectionalLight, AmbientLight
 
 import numpy as np
-import mcubes
 import datetime
-import random
 
 
 def getData():
@@ -35,7 +35,7 @@ class Viewer(ShowBase):
 
         # Make some light
         dlight = DirectionalLight("dlight")
-        dlight.setColor((0.8, 0.8, 0.5, 1))
+        dlight.setColor((1, 1, 1, 1))
         dlnp = self.render.attachNewNode(dlight)
         dlnp.setHpr(0, -60, 0)
         self.render.setLight(dlnp)
@@ -52,8 +52,11 @@ class Viewer(ShowBase):
         data = scan.reflectivityMatrix()
         data = np.isnan(data)
 
-        sharp_geom = marching_cubes.getGeometry(data, 0.5, smooth=False)
-        sharp_node = self.render.attachNewNode(sharp_geom)
+        vertices, triangles = marching_cubes.getIsosurface(data, 0.5)
+        vertices = reshape.reshape(vertices, scan)
+
+        geom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
+        node = self.render.attachNewNode(geom)
 
         print("Done!")
 

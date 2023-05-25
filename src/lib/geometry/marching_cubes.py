@@ -1,8 +1,3 @@
-from lib.geometry import normals_sharp
-from lib.geometry import normals_smooth
-from lib.geometry import triangles_to_geometry
-
-
 import mcubes
 
 
@@ -17,14 +12,3 @@ def getIsosurface(data, value):
     triangles[:, [1, 2]] = triangles[:, [2, 1]]
 
     return vertices, triangles
-
-
-def getGeometry(data, value, smooth=False):
-    vertices, triangles = getIsosurface(data, value)
-
-    if smooth:
-        vertices, triangles = normals_smooth.orientVertices(vertices, triangles)
-    else:
-        vertices, triangles = normals_sharp.orientVertices(vertices, triangles)
-
-    return triangles_to_geometry.trianglesToGeometry(vertices, triangles)

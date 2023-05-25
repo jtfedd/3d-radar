@@ -70,3 +70,16 @@ class Scan:
     def reflectivityMatrix(self):
         sweeps = [sweep.reflectivityMatrix() for sweep in self.sweeps]
         return np.stack(sweeps)
+
+    def getElevations(self):
+        return [sweep.elevation for sweep in self.sweeps]
+
+    def getAzimuths(self):
+        return np.linspace(0, 359.5, 720)
+
+    def getRanges(self):
+        return np.linspace(
+            self.sweeps[0].rays[0].first,
+            self.sweeps[0].rays[0].first + 2000 * self.sweeps[0].rays[0].spacing,
+            2001,
+        )

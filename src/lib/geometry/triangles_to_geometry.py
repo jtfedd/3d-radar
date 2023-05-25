@@ -5,7 +5,19 @@ from panda3d.core import GeomNode
 from panda3d.core import GeomEnums
 from panda3d.core import Geom
 
+from lib.geometry import normals_sharp
+from lib.geometry import normals_smooth
+
 import numpy as np
+
+
+def getGeometry(vertices, triangles, smooth=False):
+    if smooth:
+        vertices, triangles = normals_smooth.orientVertices(vertices, triangles)
+    else:
+        vertices, triangles = normals_sharp.orientVertices(vertices, triangles)
+
+    return trianglesToGeometry(vertices, triangles)
 
 
 # Take oriented vertices and triangles and generate Panda3D geometry
