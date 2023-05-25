@@ -12,7 +12,6 @@ import unittest
 def newTestRay(numPoints=10, salt=1):
     return Ray(
         0.2 * salt,
-        0.3 * salt,
         5 + salt,
         0.5 * salt,
         np.random.uniform(low=-30, high=70, size=(numPoints,)),
@@ -23,7 +22,7 @@ def newTestSweep(numRays=10, salt=1):
     rays = []
     for i in range(numRays):
         rays.append(newTestRay(salt=i + salt))
-    return Sweep(rays)
+    return Sweep(0.3 * salt, rays)
 
 
 def newTestScan(numSweeps=10, salt=1):
@@ -46,7 +45,6 @@ def assertRaysEqual(t: unittest.TestCase, first: Ray, second: Ray):
     t.assertIsInstance(second, Ray)
 
     t.assertAlmostEqual(first.azimuth, second.azimuth)
-    t.assertAlmostEqual(first.elevation, second.elevation)
     t.assertAlmostEqual(first.first, second.first)
     t.assertAlmostEqual(first.spacing, second.spacing)
 
@@ -65,6 +63,8 @@ def assertRaysEqual(t: unittest.TestCase, first: Ray, second: Ray):
 def assertSweepsEqual(t: unittest.TestCase, first: Sweep, second: Sweep):
     t.assertIsInstance(first, Sweep)
     t.assertIsInstance(second, Sweep)
+
+    t.assertAlmostEqual(first.elevation, second.elevation)
 
     t.assertEqual(len(first.rays), len(second.rays))
 

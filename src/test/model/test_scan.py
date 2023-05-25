@@ -9,6 +9,7 @@ class TestSweep:
     def __init__(self):
         self.foreachCalled = False
         self.foreachCalledWith = None
+        self.elevation = 0
 
     def foreach(self, f):
         self.foreachCalled = True

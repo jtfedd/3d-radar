@@ -6,8 +6,8 @@ import datetime
 import numpy as np
 
 scanFormat = "<H6B4s"
-sweepFormat = "<H"
-rayFormat = "<4dI"
+sweepFormat = "<dH"
+rayFormat = "<3dI"
 scanFormatBytes = struct.calcsize(scanFormat)
 sweepFormatBytes = struct.calcsize(sweepFormat)
 rayFormatBytes = struct.calcsize(rayFormat)
@@ -32,7 +32,7 @@ def serializeScan(scan):
 
 
 def serializeSweep(sweep):
-    buffer = struct.pack(sweepFormat, len(sweep.rays))
+    buffer = struct.pack(sweepFormat, sweep.elevation, len(sweep.rays))
     for ray in sweep.rays:
         buffer += serializeRay(ray)
     return buffer
@@ -43,7 +43,6 @@ def serializeRay(ray):
     buffer = struct.pack(
         rayFormat,
         ray.azimuth,
-        ray.elevation,
         ray.first,
         ray.spacing,
         len(refBytes),
@@ -78,7 +77,7 @@ def deserializeScan(buffer, offset=0):
 
 
 def deserializeSweep(buffer, offset=0):
-    numRays = struct.unpack_from(sweepFormat, buffer, offset)[0]
+    (elevation, numRays) = struct.unpack_from(sweepFormat, buffer, offset)
     offset += sweepFormatBytes
 
     rays = []
@@ -86,11 +85,11 @@ def deserializeSweep(buffer, offset=0):
         ray, offset = deserializeRay(buffer, offset)
         rays.append(ray)
 
-    return Sweep(rays), offset
+    return Sweep(elevation, rays), offset
 
 
 def deserializeRay(buffer, offset=0):
-    (azimuth, elevation, first, spacing, numRefBytes) = struct.unpack_from(
+    (azimuth, first, spacing, numRefBytes) = struct.unpack_from(
         rayFormat, buffer, offset
     )
     offset += rayFormatBytes
@@ -98,4 +97,4 @@ def deserializeRay(buffer, offset=0):
     reflectivity = np.frombuffer(buffer[offset : offset + numRefBytes])
     offset += numRefBytes
 
-    return Ray(azimuth, elevation, first, spacing, reflectivity), offset
+    return Ray(azimuth, first, spacing, reflectivity), offset
