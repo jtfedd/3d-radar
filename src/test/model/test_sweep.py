@@ -1,6 +1,7 @@
 from lib.model.sweep import Sweep
 
 import unittest
+import math
 
 
 class TestRay:
@@ -25,4 +26,4 @@ class TestSweep(unittest.TestCase):
 
         for ray in rays:
             self.assertTrue(ray.foreachCalled)
-            self.assertEqual(ray.foreachCalledWith, (0.4, myfunc))
+            self.assertEqual(ray.foreachCalledWith, (math.radians(0.4), myfunc))
