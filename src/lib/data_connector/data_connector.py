@@ -3,7 +3,7 @@ from lib.model.serialization.serialization import serializeScan, deserializeScan
 import blosc
 import os
 
-useCaching = False
+useCaching = True
 
 
 class DataConnector:
