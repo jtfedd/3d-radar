@@ -41,6 +41,8 @@ class Ray:
         return self.first + self.spacing * i
 
     def foreach(self, elevation, f):
+        elevation = math.radians(elevation)
+
         sin_az = math.sin(self.azimuth)
         cos_az = math.cos(self.azimuth)
 
