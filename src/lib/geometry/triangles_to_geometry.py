@@ -5,7 +5,19 @@ from panda3d.core import GeomNode
 from panda3d.core import GeomEnums
 from panda3d.core import Geom
 
+from lib.geometry import normals_sharp
+from lib.geometry import normals_smooth
+
 import numpy as np
+
+
+def getGeometry(vertices, triangles, smooth=False):
+    if smooth:
+        vertices, triangles = normals_smooth.orientVertices(vertices, triangles)
+    else:
+        vertices, triangles = normals_sharp.orientVertices(vertices, triangles)
+
+    return trianglesToGeometry(vertices, triangles)
 
 
 # Take oriented vertices and triangles and generate Panda3D geometry
@@ -17,11 +29,15 @@ def trianglesToGeometry(vertices, triangles):
     vertexDataView[:] = vertices.flatten().astype(dtype=np.float32)
 
     trianglesData = GeomTriangles(Geom.UHStatic)
-    trianglesData.setIndexType(GeomEnums.NT_uint16)
+    trianglesData.setIndexType(GeomEnums.NT_uint32)
     trianglesDataArray = trianglesData.modifyVertices()
     trianglesDataArray.uncleanSetNumRows(len(triangles) * 3)
-    trianglesDataView = memoryview(trianglesDataArray).cast("B").cast("H")
-    trianglesDataView[:] = triangles.flatten().astype(dtype=np.uint16)
+    trianglesDataView = memoryview(trianglesDataArray).cast("B").cast("I")
+
+    trianglesFlat = triangles.flatten().astype(dtype=np.uint32)
+    trianglesView = memoryview(trianglesFlat).cast("B").cast("I")
+
+    trianglesDataView[:] = trianglesView
 
     geom = Geom(vertexData)
     geom.addPrimitive(trianglesData)

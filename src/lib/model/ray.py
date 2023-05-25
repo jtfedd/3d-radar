@@ -8,7 +8,6 @@ class Ray:
     def fromLevel2Data(cls, level2Ray):
         header = level2Ray[0]
         azimuth = math.radians(header.az_angle)
-        elevation = math.radians(header.el_angle)
 
         reflectivity_header = level2Ray[4][b"REF"][0]
         first = reflectivity_header.first_gate
@@ -16,11 +15,22 @@ class Ray:
 
         reflectivity = level2Ray[4][b"REF"][1]
 
-        return cls(azimuth, elevation, first, spacing, reflectivity)
+        # TODO this is a bit of a hack to make all of the rays the same length.
+        # This should be cleaned up later
+        reflectivity = np.pad(
+            reflectivity,
+            (1, 2000 - reflectivity.shape[0]),
+            mode="constant",
+            constant_values=(np.nan),
+        )
 
-    def __init__(self, azimuth, elevation, first, spacing, reflectivityData):
+        # Account for the nan added to the start of the reflectivity list
+        first = first - spacing
+
+        return cls(azimuth, first, spacing, reflectivity)
+
+    def __init__(self, azimuth, first, spacing, reflectivityData):
         self.azimuth = azimuth
-        self.elevation = elevation
 
         self.first = first
         self.spacing = spacing
@@ -30,12 +40,12 @@ class Ray:
     def range(self, i):
         return self.first + self.spacing * i
 
-    def foreach(self, f):
+    def foreach(self, elevation, f):
         sin_az = math.sin(self.azimuth)
         cos_az = math.cos(self.azimuth)
 
-        sin_el = math.sin(self.elevation)
-        cos_el = math.cos(self.elevation)
+        sin_el = math.sin(elevation)
+        cos_el = math.cos(elevation)
 
         x_factor = cos_el * sin_az
         y_factor = cos_el * cos_az

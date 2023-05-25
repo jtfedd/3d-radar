@@ -6,17 +6,17 @@ import unittest
 
 class TestDataPoint(unittest.TestCase):
     def test_range(self):
-        ray = Ray(0, 0, 0.5, 1.6, [])
+        ray = Ray(0, 0.5, 1.6, [])
 
         self.assertEqual(ray.range(0), 0.5)
         self.assertEqual(ray.range(1), 2.1)
         self.assertEqual(ray.range(10), 16.5)
 
     def test_foreach(self):
-        ray = Ray(1, 0.2, 1, 1, np.asarray([1, 2, np.nan, 3]))
+        ray = Ray(1, 1, 1, np.asarray([1, 2, np.nan, 3]))
 
         collectedPoints = []
-        ray.foreach(lambda p: collectedPoints.append(p))
+        ray.foreach(0.2, lambda p: collectedPoints.append(p))
 
         self.assertEqual(len(collectedPoints), 3)
 
