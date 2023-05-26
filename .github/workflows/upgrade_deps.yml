@@ -1,0 +1,31 @@
+name: Upgrade Python Dependencies
+
+on:
+    schedule:
+        - cron: '0 13 * * 6'
+
+jobs:
+    upgrade-deps:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out the branch
+              uses: actions/checkout@v3
+
+            - name: Set Up Python 3.10
+              uses: actions/setup-python@v3
+              with:
+                python-version: 3.10
+                
+            - name: Upgrade Dependencies
+              run: |
+                sed -i 's/==/>=/g' requirements.txt
+                python -m pip install --upgrade -r requirements.txt
+                python -m pip freeze > requirements.txt
+
+            - name: Check for changes
+              run: |
+                git diff --quiet
+                echo "::set-output name=has_changes::$(git diff --quiet || echo true)"
+
+            
