@@ -24,8 +24,26 @@ jobs:
                 python -m pip freeze > requirements.txt
 
             - name: Check for changes
+              id: check_changes
               run: |
                 git diff --quiet
                 echo "::set-output name=has_changes::$(git diff --quiet || echo true)"
 
-            
+            - name: Exit if no changes
+              run: |
+                if [ "${{ steps.check_changes.outputs.has_changes }}" != "true" ]; then
+                  echo "No changes found. Exiting without creating a pull request."
+                  exit 0
+                fi
+
+            - name: Create Pull Request
+              uses: peter-evans/create-pull-request@v3
+              with:
+                token: ${{ secrets.UPDATE_DEPS_TOKEN }}
+                base: main
+                branch: update-deps
+                branch-suffix: timestamp
+                commit-message: update-deps
+                title: Automated Dependency Upgrade
+                body: |
+                  Automatic update of dependencies
