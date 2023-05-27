@@ -36,6 +36,13 @@ To install all dependencies:
 make install
 ```
 
+To upgrade all dependencies:
+```
+make upgrade
+```
+
+Dependencies will also be automatically upgraded weekly by a [workflow](https://github.com/jtfedd/3d-radar/actions/workflows/upgrade_deps.yml).
+
 ### Testing
 
 This project uses [unittest](https://docs.python.org/3/library/unittest.html) for unit testing.
