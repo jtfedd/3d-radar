@@ -9,16 +9,22 @@ help: ## Displays this help page
 
 .PHONY: install
 install: ## Install dependencies
-	@python -m pip install -r requirements.txt
+	python -m pip install -r requirements.txt
+
+.PHONY: upgrade
+upgrade: ## Upgrades all dependencies
+	sed -i 's/==/>=/g' requirements.txt
+	python -m pip install --upgrade -r requirements.txt
+	python -m pip freeze > requirements.txt
 
 .PHONY: format
 format: ## Format code
-	@python -m black .
+	python -m black .
 
 .PHONY: test
 test: ## Run tests
-	@cd src && python -m unittest
+	cd src && python -m unittest
 
 .PHONY: clean
 clean: ## Remove all cached data files, config files, etc.
-	rm -rf src/lib/data_connector/cached_data/*
+	rm -rfv src/lib/data_connector/cached_data/*
