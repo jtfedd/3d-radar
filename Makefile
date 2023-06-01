@@ -21,9 +21,17 @@ upgrade: ## Upgrades all dependencies
 format: ## Format code
 	python -m black .
 
+.PHONY: format-check
+format-check: ## Check code format
+	python -m black . --check
+
 .PHONY: packages
 packages: ## Ensure that all packages have an __init__ file
 	python tool/scripts/verify_packages.py
+
+.PHONY: packages-check
+packages-check: ## Check for packages with a missing __init__ file
+	python tool/scripts/verify_packages.py --check
 
 .PHONY: test
 test: ## Run tests
