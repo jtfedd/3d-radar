@@ -1,7 +1,7 @@
 black==23.3.0
 blosc==1.11.1
-boto3==1.26.142
-botocore==1.29.142
+boto3==1.26.144
+botocore==1.29.144
 certifi==2023.5.7
 charset-normalizer==3.1.0
 click==8.1.3
@@ -18,7 +18,7 @@ mypy-extensions==1.0.0
 numpy==1.24.3
 packaging==23.1
 Panda3D==1.10.13
-pandas==2.0.1
+pandas==2.0.2
 pathspec==0.11.1
 perlin-numpy @ git+https://github.com/pvigier/perlin-numpy@5e26837db14042e51166eb6cad4c0df2c1907016
 Pillow==9.5.0
