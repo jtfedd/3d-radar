@@ -1,4 +1,3 @@
-from lib.model.data_point import DataPoint
 import numpy as np
 import math
 
@@ -60,4 +59,4 @@ class Ray:
             y = dist * y_factor
             z = dist * z_factor
 
-            f(DataPoint(x, y, z, value))
+            f(x, y, z, value)

@@ -37,11 +37,11 @@ class Viewer(ShowBase):
         print("Processing min and max")
         self.minVal = 1000000000
         self.maxVal = -1000000000
-        scan.foreach(lambda p: self.processMinMax(p))
+        scan.foreach(lambda _, __, ___, p: self.processMinMax(p))
         self.gradient = Gradient(self.minVal, self.maxVal)
 
         print("Building render volume")
-        scan.foreach(lambda p: self.renderCube(p))
+        scan.foreach(self.renderCube)
 
         print("Final scene post-processing")
         self.radarBase.clearModelNodes()
@@ -49,21 +49,21 @@ class Viewer(ShowBase):
 
         print("Done!")
 
-    def processMinMax(self, point):
-        if point.value < self.minVal:
-            self.minVal = point.value
-        if point.value > self.maxVal:
-            self.maxVal = point.value
+    def processMinMax(self, value):
+        if value < self.minVal:
+            self.minVal = value
+        if value > self.maxVal:
+            self.maxVal = value
 
-    def renderCube(self, point):
+    def renderCube(self, x, y, z, value):
         if random.randrange(0, 100) != 1:
             return
 
         cube = self.loader.loadModel("../assets/cube.glb")
         cube.reparentTo(self.radarBase)
 
-        cube.setPos(point.x, point.y, point.z)
-        cube.setColorScale(self.gradient.value(point.value))
+        cube.setPos(x, y, z)
+        cube.setColorScale(self.gradient.value(value))
 
 
 app = Viewer()
