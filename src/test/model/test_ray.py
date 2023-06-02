@@ -23,7 +23,7 @@ class TestDataPoint(unittest.TestCase):
         self.assertAlmostEqual(collectedPoints[0].x, 0.8246975884333746)
         self.assertAlmostEqual(collectedPoints[0].y, 0.5295322319119196)
         self.assertAlmostEqual(collectedPoints[0].z, 0.19866933079506122)
-        self.assertAlmostEqual(collectedPoints[0].value, 1)
+        self.assertAlmostEqual(collectedPoints[0].value, 2)
 
         self.assertAlmostEqual(collectedPoints[1].x, 1.6493951768667492)
         self.assertAlmostEqual(collectedPoints[1].y, 1.0590644638238391)

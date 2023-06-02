@@ -20,7 +20,7 @@ class Sweep:
 
     def foreach(self, f):
         for ray in self.rays:
-            ray.foreach(np.deg2rad(self.elevation), f)
+            ray.foreach(np.deg2rad(self.elevation) + 1, f)
 
     def reflectivityMatrix(self):
         rays = np.stack(tuple(ray.reflectivity for ray in self.rays))
