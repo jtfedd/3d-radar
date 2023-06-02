@@ -71,7 +71,16 @@ jobs:
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
         make coverage-lcov
-    
+        echo $PWD
+        sed -i "s;$PWD/src/;;g" reports/coverage.lcov
+
+    - name: Publish Reports
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: reports
+        path: reports/
+ 
     - name: Publish Unit Test Coverage
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       uses: zgosalvez/github-actions-report-lcov@v3
