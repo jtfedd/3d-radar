@@ -40,7 +40,7 @@ jobs:
 
     - name: Upgrade Pip
       run: |
-        python -m pip install --upgrade pip
+        make upgrade-pip
 
     - name: Install Dependencies
       run: |
@@ -64,16 +64,14 @@ jobs:
     - name: Run Unit Tests With Coverage
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
-        cd src
-        python -m coverage run --source=lib --data-file=../reports/.coverage -m xmlrunner -o ../reports
+        make test-xml-coverage
 
     - name: Generate LCOV report
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
-        cd reports
-        python -m coverage lcov
+        make coverage-lcov
     
-    - name: Report Coverage
+    - name: Publish Unit Test Coverage
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       uses: zgosalvez/github-actions-report-lcov@v3
       with:
@@ -84,10 +82,9 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         update-comment: true
 
-    - name: Report Unit Tests
+    - name: Publish Unit Test Results
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
-      uses: dorny/test-reporter@v1
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
-        name: Unit Tests
-        path: reports/TEST-*.xml
-        reporter: jest-junit
+        files: |
+          reports/TEST-*.xml
