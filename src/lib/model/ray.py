@@ -31,18 +31,18 @@ class Ray:
 
     def __init__(self, azimuth, first, spacing, reflectivityData):
         self.azimuth = azimuth
+
         self.first = first
         self.spacing = spacing
+
         self.reflectivity = reflectivityData
 
     def range(self, i):
         return self.first + self.spacing * i
 
     def foreach(self, elevation, f):
-        azimuth = self.azimuth
-
-        sin_az = math.sin(azimuth)
-        cos_az = math.cos(azimuth)
+        sin_az = math.sin(self.azimuth)
+        cos_az = math.cos(self.azimuth)
 
         sin_el = math.sin(elevation)
         cos_el = math.cos(elevation)
