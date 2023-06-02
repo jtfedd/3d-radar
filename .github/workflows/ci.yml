@@ -72,7 +72,7 @@ jobs:
       run: |
         make coverage-lcov
         echo $PWD
-        sed -i "s;$PWD/src/;;g" reports/coverage.lcov
+        sed -i "s;$PWD/;;g" reports/coverage.lcov
 
     - name: Publish Reports
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
@@ -87,7 +87,6 @@ jobs:
       with:
         coverage-files: reports/coverage.lcov
         artifact-name: code-coverage-report
-        working-directory: src
         minimum-coverage: 0
         github-token: ${{ secrets.GITHUB_TOKEN }}
         update-comment: true
