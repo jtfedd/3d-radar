@@ -37,6 +37,14 @@ packages-check: ## Check for packages with a missing __init__ file
 test: ## Run tests
 	cd src && python -m unittest
 
+.PHONY: test-coverage
+test-coverage: ## Run tests and report coverage
+	cd src && python -m coverage run --source=lib -m unittest && python -m coverage report && rm .coverage
+
+.PHONY: test-coverage-html
+test-coverage-html: ## Run tests and generate html coverage report
+	cd src && python -m coverage run --source=lib -m unittest && python -m coverage html
+
 .PHONY: clean
 clean: ## Remove all cached data files, config files, etc.
 	rm -rfv src/lib/data_connector/cached_data/*
