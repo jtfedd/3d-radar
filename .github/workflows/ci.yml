@@ -52,29 +52,29 @@ jobs:
         echo "Setup Complete"
 
     - name: Check Packages
-      if: !cancelled() && steps.setup.conclusion == 'success'
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
         make packages-check
 
     - name: Check Formatting 
-      if: !cancelled() && steps.setup.conclusion == 'success'
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
         make format-check
 
     - name: Run Unit Tests With Coverage
-      if: !cancelled() && steps.setup.conclusion == 'success'
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
         cd src
         python -m coverage run --source=lib --data-file=../reports/.coverage -m xmlrunner -o ../reports
 
     - name: Generate LCOV report
-      if: !cancelled() && steps.setup.conclusion == 'success'
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
         cd reports
         python -m coverage lcov
     
     - name: Report Coverage
-      if: !cancelled() && steps.setup.conclusion == 'success'
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       uses: zgosalvez/github-actions-report-lcov@v3
       with:
         coverage-files: reports/coverage.lcov
@@ -84,7 +84,7 @@ jobs:
         update-comment: true
 
     - name: Report Unit Tests
-      if: !cancelled() && steps.setup.conclusion == 'success'
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       uses: dorny/test-reporter@v1
       with:
         name: Unit Tests
