@@ -68,6 +68,9 @@ def run():
     for file in files:
         print(file)
 
+    plural = "s" if len(files) != 1 else ""
+    print("Found " + str(len(files)) + " package" + plural + " missing __init__.py")
+
     if check:
         if len(files) > 0:
             sys.exit(1)

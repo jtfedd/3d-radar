@@ -15,3 +15,6 @@
 
 # VSCode config
 .vscode/*
+
+# Test Reports
+reports/*

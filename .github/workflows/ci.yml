@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+    - name: Check out the branch
+      uses: actions/checkout@v3
+
+    - name: Setup LCOV
+      uses: hrishikesh-kadam/setup-lcov@v1
+
+    - name: Set Up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Display Python Version
+      run: python -c "import sys; print(sys.version)"
+
+    - name: Cache Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Upgrade Pip
+      run: |
+        make upgrade-pip
+
+    - name: Install Dependencies
+      run: |
+        make install
+
+    - name: Complete Setup
+      id: setup
+      run: |
+        echo "Setup Complete"
+
+    - name: Check Packages
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make packages-check
+
+    - name: Check Formatting 
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make format-check
+
+    - name: Run Unit Tests With Coverage
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make test-xml-coverage
+
+    - name: Generate LCOV report
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make coverage-lcov
+    
+    - name: Publish Unit Test Coverage
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      uses: zgosalvez/github-actions-report-lcov@v3
+      with:
+        coverage-files: reports/coverage.lcov
+        artifact-name: code-coverage-report
+        working-directory: src
+        minimum-coverage: 0
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        update-comment: true
+
+    - name: Publish Unit Test Results
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: |
+          reports/TEST-*.xml
