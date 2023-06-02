@@ -20,7 +20,6 @@ def deduplicate(vertices, triangles):
 
     return unique_vertices, unique_triangles
 
-
 # This algorithm takes unoriented vertices and a list of triangles, and generates
 # oriented vertices (position + normal) and updated triangles.
 # For smooth shaded geometry, this means we calculate the normal for each triangle as
@@ -31,7 +30,7 @@ def orientVertices(vertices, triangles):
     normals = calcNormals(vertices, triangles)
 
     vertexData = np.empty((len(vertices), 6), dtype=np.float32)
-    vertexData[:, :3] = vertices
+    vertexData[:, :3]=vertices
     vertexData[:, 3:] = normals
 
     return vertexData, triangles
