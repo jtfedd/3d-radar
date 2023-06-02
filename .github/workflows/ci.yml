@@ -72,7 +72,7 @@ jobs:
       run: |
         make coverage-lcov
         echo $PWD
-        sed -i "s;$PWD/;;g" reports/coverage.lcov
+        sed -i "s;$PWD/src/;;g" reports/coverage.lcov
 
     - name: Publish Reports
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
