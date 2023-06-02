@@ -63,6 +63,7 @@ coverage-html: ## Generate html coverage report from a previous test coverage ru
 
 .PHONY: coverage-lcov
 coverage-lcov: ## Generage lcov report from a previous test coverage run
+	cd reports && python -m coverage lcov
 
 .PHONY: clean
 clean: ## Remove all cached data files, config files, etc.
