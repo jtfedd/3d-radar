@@ -1,13 +1,13 @@
 import boto3
 import botocore
 
-from lib.data_provider.data_provider import DataProvider
+from lib.data_provider.abstract_data_provider import AbstractDataProvider
 
 from metpy.io import Level2File
 from lib.model.scan import Scan
 
 
-class S3DataProvider(DataProvider):
+class S3DataProvider(AbstractDataProvider):
     def __init__(self):
         config = botocore.client.Config(
             signature_version=botocore.UNSIGNED, user_agent_extra="Resource"

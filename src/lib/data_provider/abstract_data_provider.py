@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class DataProvider(ABC):
+class AbstractDataProvider(ABC):
     @abstractmethod
     def load(self, request):
         pass
