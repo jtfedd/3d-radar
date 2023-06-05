@@ -3,11 +3,9 @@ from lib.model.serialization.serialization import serializeScan, deserializeScan
 import blosc
 import os
 
-useCaching = True
-
 
 class DataConnector:
-    def __init__(self, provider):
+    def __init__(self, provider, useCaching=True):
         scriptDir = os.path.abspath(os.path.dirname(__file__))
         self.cacheDir = os.path.join(scriptDir, "cached_data")
 
@@ -15,26 +13,27 @@ class DataConnector:
             os.makedirs(self.cacheDir)
 
         self.provider = provider
+        self.useCaching = useCaching
 
-    def load(self, request):
-        scan, cached = self.loadCached(request)
+    def load(self, record):
+        scan, cached = self.loadCached(record)
         if cached:
             return scan
 
-        scan = self.provider.load(request)
-        self.saveCached(request, scan)
+        scan = self.provider.load(record)
+        self.saveCached(record, scan)
 
         return scan
 
-    def getFilepath(self, request):
-        fileName = request.cacheKey() + ".dat"
+    def getFilepath(self, record):
+        fileName = record.cacheKey() + ".dat"
         return os.path.join(self.cacheDir, fileName)
 
-    def loadCached(self, request):
-        if not useCaching:
+    def loadCached(self, record):
+        if not self.useCaching:
             return None, False
 
-        filePath = self.getFilepath(request)
+        filePath = self.getFilepath(record)
 
         if not os.path.exists(filePath):
             return None, False
@@ -51,11 +50,11 @@ class DataConnector:
 
         return scan, True
 
-    def saveCached(self, request, scan):
-        if not useCaching:
+    def saveCached(self, record, scan):
+        if not self.useCaching:
             return
 
-        filePath = self.getFilepath(request)
+        filePath = self.getFilepath(record)
 
         print("Writing", filePath)
 

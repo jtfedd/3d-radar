@@ -9,22 +9,6 @@ import numpy as np
 import unittest
 
 
-def newTestRay(numPoints=10, salt=1):
-    return Ray(
-        0.2 * salt,
-        5 + salt,
-        0.5 * salt,
-        np.random.uniform(low=-30, high=70, size=(numPoints,)),
-    )
-
-
-def newTestSweep(numRays=10, salt=1):
-    rays = []
-    for i in range(numRays):
-        rays.append(newTestRay(salt=i + salt))
-    return Sweep(0.3 * salt, rays)
-
-
 def newTestScan(numSweeps=10, salt=1):
     date = datetime.date(
         year=2005 + salt, month=(3 + salt) % 12 + 1, day=(7 * salt) % 28 + 1

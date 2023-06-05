@@ -4,7 +4,7 @@ import datetime
 import unittest
 
 
-class TestRequest(unittest.TestCase):
+class TestRecord(unittest.TestCase):
     def test_AWS_small_numbers(self):
         time = datetime.datetime(2019, 2, 4, hour=5, minute=2, second=9)
         record = Record("KDMX", time)

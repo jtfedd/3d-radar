@@ -2,9 +2,9 @@ import boto3
 import botocore
 
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
+from lib.model.from_metpy.scan_from_metpy import scanFromLevel2Data
 
 from metpy.io import Level2File
-from lib.model.scan import Scan
 
 
 class S3DataProvider(AbstractDataProvider):
@@ -16,8 +16,8 @@ class S3DataProvider(AbstractDataProvider):
 
         self.bucket = s3.Bucket("noaa-nexrad-level2")
 
-    def load(self, request):
-        key = request.awsKey()
+    def load(self, record):
+        key = record.awsKey()
         print("Fetching from s3:", key)
 
         # There may be multiple matching objects because file formats have changed in the past.
@@ -34,6 +34,7 @@ class S3DataProvider(AbstractDataProvider):
         print("Parsed", key)
 
         print("Post-processing", key)
-        scan = Scan.fromLevel2Data(f, request.station, request.date, request.time)
+        scan = scanFromLevel2Data(record, f)
+        print("Post-processing finished", key)
 
         return scan

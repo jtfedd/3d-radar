@@ -4,7 +4,7 @@ from lib.camera.camera_control import CameraControl
 from lib.gradient.gradient import Gradient
 from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
-from lib.data_connector.request import Request
+from lib.model.record import Record
 
 import datetime
 
@@ -16,12 +16,21 @@ def getData():
     date = datetime.date(year=2019, month=6, day=26)
     time = datetime.time(hour=22, minute=11, second=5)
 
-    request = Request(site, date, time)
+    dt = datetime.datetime(
+        year=2019,
+        month=6,
+        day=26,
+        hour=22,
+        minute=11,
+        second=5,
+    )
+
+    record = Record(site, dt)
 
     provider = S3DataProvider()
     connector = DataConnector(provider)
 
-    return connector.load(request)
+    return connector.load(record)
 
 
 class Viewer(ShowBase):
