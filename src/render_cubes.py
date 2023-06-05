@@ -5,18 +5,19 @@ from lib.gradient.gradient import Gradient
 from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
 from lib.model.record import Record
+from lib.model.scan import Scan
 
 import datetime
 
 import random
 
+import numpy as np
+
 
 def getData():
     site = "KVWX"
-    date = datetime.date(year=2019, month=6, day=26)
-    time = datetime.time(hour=22, minute=11, second=5)
 
-    dt = datetime.datetime(
+    time = datetime.datetime(
         year=2019,
         month=6,
         day=26,
@@ -25,7 +26,7 @@ def getData():
         second=5,
     )
 
-    record = Record(site, dt)
+    record = Record(site, time)
 
     provider = S3DataProvider()
     connector = DataConnector(provider)
@@ -44,13 +45,14 @@ class Viewer(ShowBase):
         scan = getData()
 
         print("Processing min and max")
-        self.minVal = 1000000000
-        self.maxVal = -1000000000
-        scan.foreach(lambda _, __, ___, p: self.processMinMax(p))
-        self.gradient = Gradient(self.minVal, self.maxVal)
+        mask = np.isfinite(scan.reflectivity)
+        min = np.min(scan.reflectivity[mask])
+        max = np.max(scan.reflectivity[mask])
+
+        self.gradient = Gradient(min, max)
 
         print("Building render volume")
-        scan.foreach(self.renderCube)
+        self.renderCubes(scan)
 
         print("Final scene post-processing")
         self.radarBase.clearModelNodes()
@@ -58,11 +60,30 @@ class Viewer(ShowBase):
 
         print("Done!")
 
-    def processMinMax(self, value):
-        if value < self.minVal:
-            self.minVal = value
-        if value > self.maxVal:
-            self.maxVal = value
+    def renderCubes(self, scan: Scan):
+        azimuths = np.deg2rad(scan.azimuths)
+        elevations = np.deg2rad(scan.elevations)
+
+        sin_az = np.sin(azimuths)
+        cos_az = np.cos(azimuths)
+
+        sin_el = np.sin(elevations)
+        cos_el = np.cos(elevations)
+
+        for i in range(len(elevations)):
+            for j in range(len(azimuths)):
+                x_factor = cos_el[i] * sin_az[j]
+                y_factor = cos_el[i] * cos_az[j]
+                z_factor = sin_el[i]
+                for k, rng in enumerate(scan.ranges):
+                    if np.isnan(scan.reflectivity[i][j][k]):
+                        continue
+
+                    x = rng * x_factor
+                    y = rng * y_factor
+                    z = rng * z_factor
+
+                    self.renderCube(x, y, z, scan.reflectivity[i][j][k])
 
     def renderCube(self, x, y, z, value):
         if random.randrange(0, 100) != 1:
