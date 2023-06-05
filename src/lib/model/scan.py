@@ -19,7 +19,3 @@ class Scan:
 
         self.reflectivity = reflectivity
         self.velocity = velocity
-
-    def foreach(self, f):
-        for sweep in self.sweeps:
-            sweep.foreach(f)
