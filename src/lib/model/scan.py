@@ -1,5 +1,4 @@
 from lib.model.record import Record
-import numpy as np
 
 
 class Scan:
