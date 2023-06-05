@@ -4,28 +4,19 @@ import unittest
 
 
 class TestSerialization(unittest.TestCase):
-    def test_serialize_ray(self):
-        input = newTestRay()
-        bytes = serialization.serializeRay(input)
-        self.assertEqual(len(bytes), 108)
+    def test_serialize_record(self):
+        input = newTestRecord()
+        bytes = serialization.serializeRecord(input)
+        self.assertEqual(len(bytes), 12)
 
-        output, size = serialization.deserializeRay(bytes)
-        assertRaysEqual(self, input, output)
-        self.assertEqual(size, len(bytes))
-
-    def test_serialize_sweep(self):
-        input = newTestSweep()
-        bytes = serialization.serializeSweep(input)
-        self.assertEqual(len(bytes), 1090)
-
-        output, size = serialization.deserializeSweep(bytes)
-        assertSweepsEqual(self, input, output)
+        output, size = serialization.deserializeRecord(bytes)
+        assertRecordsEqual(self, input, output)
         self.assertEqual(size, len(bytes))
 
     def test_serialize_scan(self):
         input = newTestScan()
         bytes = serialization.serializeScan(input)
-        self.assertEqual(len(bytes), 10912)
+        self.assertEqual(len(bytes), 16008912)
 
         output, size = serialization.deserializeScan(bytes)
         assertScansEqual(self, input, output)

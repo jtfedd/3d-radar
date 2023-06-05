@@ -47,7 +47,7 @@ def serializeRecord(record: Record):
 
 def deserializeRecord(buffer, offset=0):
     unixTime, stationBytes = struct.unpack_from(recordFormat, buffer, offset=offset)
-    station = stationBytes.rstrip(b"\x00").decode("utf_8")
+    station = stationBytes.rstrip(b"\x00").decode("utf-8")
     time = datetime.datetime.fromtimestamp(unixTime, tz=datetime.timezone.utc)
 
     return Record(station, time), offset + recordFormatSize
@@ -63,6 +63,7 @@ def deserializeScan(buffer, offset=0):
         reflectivitySize,
         velocitySize,
     ) = struct.unpack_from(scanFormat, buffer, offset)
+
     offset += scanFormatSize
 
     elevations, offset = deserializeArray(buffer, offset, elevationSize)
@@ -70,6 +71,10 @@ def deserializeScan(buffer, offset=0):
     ranges, offset = deserializeArray(buffer, offset, rangesSize)
     reflectivity, offset = deserializeArray(buffer, offset, reflectivitySize)
     velocity, offset = deserializeArray(buffer, offset, velocitySize)
+
+    shape = (len(elevations), len(azimuths), len(ranges))
+    reflectivity = reflectivity.reshape(shape)
+    velocity = velocity.reshape(shape)
 
     return Scan(record, elevations, azimuths, ranges, reflectivity, velocity), offset
 

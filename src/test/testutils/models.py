@@ -1,69 +1,63 @@
-from lib.model.data_point import DataPoint
-from lib.model.ray import Ray
-from lib.model.sweep import Sweep
+from lib.model.record import Record
 from lib.model.scan import Scan
-import random
 import datetime
 import numpy as np
 
 import unittest
 
 
-def newTestScan(numSweeps=10, salt=1):
-    date = datetime.date(
-        year=2005 + salt, month=(3 + salt) % 12 + 1, day=(7 * salt) % 28 + 1
+def newTestRecord():
+    time = datetime.datetime(
+        2019,
+        6,
+        26,
+        hour=22,
+        minute=11,
+        second=5,
+        tzinfo=datetime.timezone.utc,
     )
-    time = datetime.time(
-        hour=(5 + salt) % 12 + 1, minute=(11 * salt) % 60, second=(13 * salt) % 60 + 1
-    )
-    station = random.choice(["KDMX", "KAMX"])
 
-    sweeps = []
-    for i in range(numSweeps):
-        sweeps.append(newTestSweep(salt=i + salt))
-    return Scan(sweeps, station, date, time)
+    return Record("KDMX", time)
 
 
-def assertRaysEqual(t: unittest.TestCase, first: Ray, second: Ray):
-    t.assertIsInstance(first, Ray)
-    t.assertIsInstance(second, Ray)
-
-    t.assertAlmostEqual(first.azimuth, second.azimuth)
-    t.assertAlmostEqual(first.first, second.first)
-    t.assertAlmostEqual(first.spacing, second.spacing)
-
-    t.assertEqual(len(first.reflectivity), len(second.reflectivity))
-    for i in range(len(first.reflectivity)):
-        firstValue = first.reflectivity[i]
-        secondValue = second.reflectivity[i]
-
-        t.assertEqual(np.isnan(firstValue), np.isnan(secondValue))
-        if np.isnan(firstValue):
-            continue
-
-        t.assertAlmostEqual(firstValue, secondValue)
+def newTestScan():
+    record = newTestRecord()
+    elevations = np.random.uniform(low=0, high=100, size=(10))
+    azimuths = np.random.uniform(low=0, high=100, size=(100))
+    ranges = np.random.uniform(low=0, high=100, size=(1000))
+    reflectivity = np.random.uniform(low=-25, high=75, size=(10, 100, 1000))
+    velocity = np.random.uniform(low=-100, high=100, size=(10, 100, 1000))
+    return Scan(record, elevations, azimuths, ranges, reflectivity, velocity)
 
 
-def assertSweepsEqual(t: unittest.TestCase, first: Sweep, second: Sweep):
-    t.assertIsInstance(first, Sweep)
-    t.assertIsInstance(second, Sweep)
+def assertRecordsEqual(t: unittest.TestCase, first: Record, second: Record):
+    t.assertIsInstance(first, Record)
+    t.assertIsInstance(second, Record)
 
-    t.assertAlmostEqual(first.elevation, second.elevation)
-
-    t.assertEqual(len(first.rays), len(second.rays))
-
-    for i in range(len(first.rays)):
-        assertRaysEqual(t, first.rays[i], second.rays[i])
+    t.assertEqual(first.station, second.station)
+    t.assertEqual(first.time, second.time)
 
 
 def assertScansEqual(t: unittest.TestCase, first: Scan, second: Scan):
     t.assertIsInstance(first, Scan)
     t.assertIsInstance(second, Scan)
 
-    t.assertEqual(first.date, second.date)
-    t.assertEqual(first.time, second.time)
-    t.assertEqual(first.station, second.station)
-    t.assertEqual(len(first.sweeps), len(second.sweeps))
+    assertRecordsEqual(t, first.record, second.record)
 
-    for i in range(len(first.sweeps)):
-        assertSweepsEqual(t, first.sweeps[i], second.sweeps[i])
+    assertArraysAlmostEqual(t, first.elevations, second.elevations)
+    assertArraysAlmostEqual(t, first.azimuths, second.azimuths)
+    assertArraysAlmostEqual(t, first.ranges, second.ranges)
+    assertArraysAlmostEqual(t, first.reflectivity, second.reflectivity)
+    assertArraysAlmostEqual(t, first.velocity, second.velocity)
+
+
+def assertArraysAlmostEqual(t: unittest.TestCase, first, second):
+    t.assertEqual(first.shape, second.shape)
+
+    if len(first.shape) > 1:
+        for i in range(len(first)):
+            assertArraysAlmostEqual(t, first[i], second[i])
+        return
+
+    for i in range(len(first)):
+        t.assertAlmostEqual(first[i], second[i])
