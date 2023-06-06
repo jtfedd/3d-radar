@@ -1,100 +1,83 @@
 from lib.model.scan import Scan
-from lib.model.sweep import Sweep
-from lib.model.ray import Ray
+from lib.model.record import Record
 import struct
 import datetime
 import numpy as np
 
-scanFormat = "<H6B4s"
-sweepFormat = "<dH"
-rayFormat = "<3dI"
-scanFormatBytes = struct.calcsize(scanFormat)
-sweepFormatBytes = struct.calcsize(sweepFormat)
-rayFormatBytes = struct.calcsize(rayFormat)
+recordFormat = "<d4s"
+scanFormat = "<5I"
+recordFormatSize = struct.calcsize(recordFormat)
+scanFormatSize = struct.calcsize(scanFormat)
 
 
-def serializeScan(scan):
-    buffer = struct.pack(
+def serializeScan(scan: Scan):
+    buffer = serializeRecord(scan.record)
+
+    elevationBytes = scan.elevations.tobytes()
+    azimuthBytes = scan.azimuths.tobytes()
+    rangesBytes = scan.ranges.tobytes()
+    reflectivityBytes = scan.reflectivity.tobytes()
+    velocityBytes = scan.velocity.tobytes()
+
+    buffer += struct.pack(
         scanFormat,
-        scan.date.year,
-        scan.date.month,
-        scan.date.day,
-        scan.time.hour,
-        scan.time.minute,
-        scan.time.second,
-        len(scan.sweeps),
-        bytes(scan.station, "utf-8"),
+        len(elevationBytes),
+        len(azimuthBytes),
+        len(rangesBytes),
+        len(reflectivityBytes),
+        len(velocityBytes),
     )
-    for sweep in scan.sweeps:
-        buffer += serializeSweep(sweep)
+
+    buffer += elevationBytes
+    buffer += azimuthBytes
+    buffer += rangesBytes
+    buffer += reflectivityBytes
+    buffer += velocityBytes
 
     return buffer
 
 
-def serializeSweep(sweep):
-    buffer = struct.pack(sweepFormat, sweep.elevation, len(sweep.rays))
-    for ray in sweep.rays:
-        buffer += serializeRay(ray)
-    return buffer
-
-
-def serializeRay(ray):
-    refBytes = ray.reflectivity.tobytes()
-    buffer = struct.pack(
-        rayFormat,
-        ray.azimuth,
-        ray.first,
-        ray.spacing,
-        len(refBytes),
+def serializeRecord(record: Record):
+    return struct.pack(
+        recordFormat,
+        int(record.time.timestamp()),
+        bytes(record.station, "utf-8"),
     )
-    buffer += refBytes
-    return buffer
+
+
+def deserializeRecord(buffer, offset=0):
+    unixTime, stationBytes = struct.unpack_from(recordFormat, buffer, offset=offset)
+    station = stationBytes.rstrip(b"\x00").decode("utf-8")
+    time = datetime.datetime.fromtimestamp(unixTime, tz=datetime.timezone.utc)
+
+    return Record(station, time), offset + recordFormatSize
 
 
 def deserializeScan(buffer, offset=0):
+    record, offset = deserializeRecord(buffer, offset)
+
     (
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        second,
-        numSweeps,
-        stationBytes,
+        elevationSize,
+        azimuthSize,
+        rangesSize,
+        reflectivitySize,
+        velocitySize,
     ) = struct.unpack_from(scanFormat, buffer, offset)
-    offset += scanFormatBytes
 
-    station = stationBytes.rstrip(b"\x00").decode("utf_8")
-    date = datetime.date(year=year, month=month, day=day)
-    time = datetime.time(hour=hour, minute=minute, second=second)
+    offset += scanFormatSize
 
-    sweeps = []
-    for _ in range(numSweeps):
-        sweep, offset = deserializeSweep(buffer, offset)
-        sweeps.append(sweep)
+    elevations, offset = deserializeArray(buffer, offset, elevationSize)
+    azimuths, offset = deserializeArray(buffer, offset, azimuthSize)
+    ranges, offset = deserializeArray(buffer, offset, rangesSize)
+    reflectivity, offset = deserializeArray(buffer, offset, reflectivitySize)
+    velocity, offset = deserializeArray(buffer, offset, velocitySize)
 
-    return Scan(sweeps, station, date, time), offset
+    shape = (len(elevations), len(azimuths), len(ranges))
+    reflectivity = reflectivity.reshape(shape)
+    velocity = velocity.reshape(shape)
 
-
-def deserializeSweep(buffer, offset=0):
-    (elevation, numRays) = struct.unpack_from(sweepFormat, buffer, offset)
-    offset += sweepFormatBytes
-
-    rays = []
-    for _ in range(numRays):
-        ray, offset = deserializeRay(buffer, offset)
-        rays.append(ray)
-
-    return Sweep(elevation, rays), offset
+    return Scan(record, elevations, azimuths, ranges, reflectivity, velocity), offset
 
 
-def deserializeRay(buffer, offset=0):
-    (azimuth, first, spacing, numRefBytes) = struct.unpack_from(
-        rayFormat, buffer, offset
-    )
-    offset += rayFormatBytes
-
-    reflectivity = np.frombuffer(buffer[offset : offset + numRefBytes])
-    offset += numRefBytes
-
-    return Ray(azimuth, first, spacing, reflectivity), offset
+def deserializeArray(buffer, offset, size):
+    return np.frombuffer(buffer[offset : offset + size]), offset + size

@@ -3,7 +3,7 @@ from direct.showbase.ShowBase import ShowBase
 from lib.camera.camera_control import CameraControl
 from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
-from lib.data_connector.request import Request
+from lib.model.record import Record
 from lib.geometry import marching_cubes
 from lib.geometry import reshape
 from lib.geometry import triangles_to_geometry
@@ -16,15 +16,22 @@ import datetime
 
 def getData():
     site = "KVWX"
-    date = datetime.date(year=2019, month=6, day=26)
-    time = datetime.time(hour=22, minute=11, second=5)
+    time = datetime.datetime(
+        2019,
+        6,
+        26,
+        hour=22,
+        minute=11,
+        second=5,
+        tzinfo=datetime.timezone.utc,
+    )
 
-    request = Request(site, date, time)
+    record = Record(site, time)
 
     provider = S3DataProvider()
     connector = DataConnector(provider)
 
-    return connector.load(request)
+    return connector.load(record)
 
 
 class Viewer(ShowBase):
@@ -49,7 +56,7 @@ class Viewer(ShowBase):
 
         scan = getData()
 
-        data = scan.reflectivityMatrix()
+        data = scan.reflectivity
         data = np.isnan(data)
 
         vertices, triangles = marching_cubes.getIsosurface(data, 0.5)

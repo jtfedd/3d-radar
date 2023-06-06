@@ -1,14 +1,11 @@
+from lib.model.scan import Scan
 import numpy as np
 
 
-def reshape(vertices, scan):
-    elevations = np.deg2rad(np.array(scan.getElevations()))
-    azimuths = np.deg2rad(np.array(scan.getAzimuths()))
-    ranges = np.array(scan.getRanges())
-
-    elevation = interpolate(vertices[:, 0], elevations)
-    azimuth = interpolate(vertices[:, 1], azimuths)
-    rng = interpolate(vertices[:, 2], ranges)
+def reshape(vertices, scan: Scan):
+    elevation = interpolate(vertices[:, 0], np.deg2rad(scan.elevations))
+    azimuth = interpolate(vertices[:, 1], np.deg2rad(scan.azimuths))
+    rng = interpolate(vertices[:, 2], scan.ranges)
 
     sin_el = np.sin(elevation)
     cos_el = np.cos(elevation)

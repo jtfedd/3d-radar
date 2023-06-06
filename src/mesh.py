@@ -1,6 +1,7 @@
 from direct.showbase.ShowBase import ShowBase
 
 from lib.geometry import marching_cubes
+from lib.geometry import triangles_to_geometry
 
 import numpy as np
 import perlin_numpy
@@ -37,10 +38,15 @@ class App(ShowBase):
 
         num = 100
 
+        vertices, triangles = marching_cubes.getIsosurface(u, 0)
+
         print(
             "Sharp",
             timeit.timeit(
-                lambda: marching_cubes.getGeometry(u, 0, smooth=False), number=num
+                lambda: triangles_to_geometry.getGeometry(
+                    vertices, triangles, smooth=False
+                ),
+                number=num,
             )
             / num,
         )
@@ -48,16 +54,23 @@ class App(ShowBase):
         print(
             "Smooth",
             timeit.timeit(
-                lambda: marching_cubes.getGeometry(u, 0, smooth=True), number=num
+                lambda: triangles_to_geometry.getGeometry(
+                    vertices, triangles, smooth=True
+                ),
+                number=num,
             )
             / num,
         )
 
-        sharp_geom = marching_cubes.getGeometry(u, 0, smooth=False)
+        sharp_geom = triangles_to_geometry.getGeometry(
+            vertices, triangles, smooth=False
+        )
         sharp_node = self.render.attachNewNode(sharp_geom)
         sharp_node.setZ(-15)
 
-        smooth_geom = marching_cubes.getGeometry(u, 0, smooth=True)
+        smooth_geom = triangles_to_geometry.getGeometry(
+            vertices, triangles, smooth=True
+        )
         smooth_node = self.render.attachNewNode(smooth_geom)
         smooth_node.setX(30)
         smooth_node.setZ(-15)
