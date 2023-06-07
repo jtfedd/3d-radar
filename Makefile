@@ -29,6 +29,13 @@ format: ## Format code
 format-check: ## Check code format
 	python -m black . --check
 
+.PHONY: lint
+lint: ## Check for lints
+	@RC=0; \
+    pylint src tool || RC=1; \
+    flake8 src tool || RC=1; \
+    exit $$RC
+
 .PHONY: packages
 packages: ## Ensure that all packages have an __init__ file
 	python tool/scripts/verify_packages.py
