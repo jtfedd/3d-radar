@@ -20,9 +20,9 @@ class S3DataProvider(AbstractDataProvider):
         key = record.awsKey()
         print("Fetching from s3:", key)
 
-        # There may be multiple matching objects because file formats have changed in the past.
-        # The key should be unique enough to guarantee that any duplicates are different formats
-        # of the same data. We should be fine to load the first one.
+        # There may be multiple matching objects because file formats have changed in
+        # the past. The key should be unique enough to guarantee that any duplicates are
+        # different formats of the same data. We should be fine to load the first one.
         obj = list(self.bucket.objects.filter(Prefix=key))[0]
         print("Reading from s3:", obj.key)
 

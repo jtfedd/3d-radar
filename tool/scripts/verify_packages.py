@@ -1,5 +1,6 @@
 import pathlib
-import sys, getopt
+import sys
+import getopt
 
 ignore = ["__pycache__", "cached_data"]
 

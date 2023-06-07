@@ -1,5 +1,6 @@
 from lib.model.serialization import serialization
-from test.testutils.models import *
+from test.testutils.models import newTestRecord, assertRecordsEqual
+from test.testutils.models import newTestScan, assertScansEqual
 import unittest
 
 
