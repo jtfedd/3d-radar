@@ -1,3 +1,4 @@
+astroid==2.15.5
 black==23.3.0
 blosc==1.11.1
 boto3==1.26.146
@@ -9,12 +10,17 @@ colorama==0.4.6
 contourpy==1.0.7
 coverage==7.2.7
 cycler==0.11.0
+dill==0.3.6
+flake8==6.0.0
 fonttools==4.39.4
 idna==3.4
+isort==5.12.0
 jmespath==1.0.1
 kiwisolver==1.4.4
+lazy-object-proxy==1.9.0
 lxml==4.9.2
 matplotlib==3.7.1
+mccabe==0.7.0
 MetPy==1.5.0
 mypy-extensions==1.0.0
 numpy==1.24.3
@@ -27,6 +33,9 @@ Pillow==9.5.0
 Pint==0.22
 platformdirs==3.5.1
 pooch==1.7.0
+pycodestyle==2.10.0
+pyflakes==3.0.1
+pylint==2.17.4
 PyMCubes==0.1.4
 pyparsing==3.0.9
 pyproj==3.5.0
@@ -37,9 +46,11 @@ s3transfer==0.6.1
 scipy==1.10.1
 six==1.16.0
 tomli==2.0.1
+tomlkit==0.11.8
 traitlets==5.9.0
 typing_extensions==4.6.3
 tzdata==2023.3
 unittest-xml-reporting==3.2.0
 urllib3==1.26.16
+wrapt==1.15.0
 xarray==2023.5.0
