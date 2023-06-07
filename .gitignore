@@ -16,5 +16,8 @@
 # VSCode config
 .vscode/*
 
+# PyCharm config
+.idea/*
+
 # Test Reports
 reports/*
