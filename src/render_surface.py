@@ -1,20 +1,20 @@
+"""Example script to render isosurface from scan data"""
+
+import datetime
+
+import numpy as np
 from direct.showbase.ShowBase import ShowBase
+from panda3d.core import AmbientLight, DirectionalLight
 
 from lib.camera.camera_control import CameraControl
 from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
+from lib.geometry import marching_cubes, reshape, triangles_to_geometry
 from lib.model.record import Record
-from lib.geometry import marching_cubes
-from lib.geometry import reshape
-from lib.geometry import triangles_to_geometry
-
-from panda3d.core import DirectionalLight, AmbientLight
-
-import numpy as np
-import datetime
 
 
-def getData():
+def get_data():
+    """Returns some default data for the sample app"""
     site = "KVWX"
     time = datetime.datetime(
         2019,
@@ -35,10 +35,12 @@ def getData():
 
 
 class Viewer(ShowBase):
+    """Example app"""
+
     def __init__(self):
         ShowBase.__init__(self)
         self.setBackgroundColor(0, 0, 0, 1)
-        self.cameraControl = CameraControl(self)
+        self.camera_control = CameraControl(self)
 
         # Make some light
         dlight = DirectionalLight("dlight")
@@ -52,9 +54,9 @@ class Viewer(ShowBase):
         alnp = self.render.attachNewNode(alight)
         self.render.setLight(alnp)
 
-        self.radarBase = self.render.attachNewNode("radar")
+        self.radar_base = self.render.attachNewNode("radar")
 
-        scan = getData()
+        scan = get_data()
 
         data = scan.reflectivity
         data = np.isnan(data)
@@ -63,7 +65,7 @@ class Viewer(ShowBase):
         vertices = reshape.reshape(vertices, scan)
 
         geom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
-        node = self.render.attachNewNode(geom)
+        self.render.attachNewNode(geom)
 
         print("Done!")
 

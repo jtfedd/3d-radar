@@ -1,14 +1,11 @@
-from direct.showbase.ShowBase import ShowBase
-
-from lib.geometry import marching_cubes
-from lib.geometry import triangles_to_geometry
+import timeit
 
 import numpy as np
 import perlin_numpy
+from direct.showbase.ShowBase import ShowBase
+from panda3d.core import AmbientLight, DirectionalLight
 
-import timeit
-
-from panda3d.core import DirectionalLight, AmbientLight
+from lib.geometry import marching_cubes, triangles_to_geometry
 
 
 class App(ShowBase):
