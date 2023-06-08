@@ -1,6 +1,10 @@
+"""Verify Packages script verifies that all packages in src have an __init__.py file"""
+
 import getopt
 import pathlib
 import sys
+
+from typing import List
 
 ignore = ["__pycache__", "cached_data"]
 
@@ -12,7 +16,12 @@ OPTIONS
     -c, --check: Run in check mode"""
 
 
-def checkPath(path: pathlib.Path):
+def checkPath(path: pathlib.Path) -> List[pathlib.Path]:
+    """Searches the path for missing __init__.py files
+
+    Recursively scans the given path and any subdirectories for
+    __init__.py files and returns the paths that are missing __init__.py
+    """
     if path.is_file():
         return []
 
@@ -32,7 +41,13 @@ def checkPath(path: pathlib.Path):
     return missingInitFiles
 
 
-def collectMissingInitFiles():
+def collectMissingInitFiles() -> List[pathlib.Path]:
+    """Searches for missing __init__.py files
+
+    Starts at the current file and moves up to the repo root.
+    Scans lib and test directories, and merges the results.
+    """
+
     filePath = pathlib.Path(__file__).absolute()
     srcPath = filePath.parents[2].joinpath("src")
 
@@ -45,25 +60,29 @@ def collectMissingInitFiles():
     return missingInitFiles
 
 
-def parseArgs():
+def parseArgs() -> bool:
+    """Parses the command line arguments and returns whether to run in check mode"""
+
     options, arguments = getopt.getopt(
         sys.argv[1:],
         "hc",
         ["help", "check"],
     )
     check = False
-    for o, a in options:
-        if o in ("-h", "--help"):
+    for option, _ in options:
+        if option in ("-h", "--help"):
             print(USAGE)
             sys.exit()
-        if o in ("-c", "--check"):
+        if option in ("-c", "--check"):
             check = True
     if len(arguments) > 2:
         raise SystemExit(USAGE)
     return check
 
 
-def run():
+def run() -> None:
+    """Runs the package checker"""
+
     check = parseArgs()
     files = collectMissingInitFiles()
     for file in files:
