@@ -39,8 +39,8 @@ lint: ## Check for lints
 	@RC=0; \
 	python -m mypy src tool || RC=1; \
 	python -m flake8 src tool || RC=1; \
-    python -m pylint src tool || RC=1; \
-    exit $$RC
+	python -m pylint src tool || RC=1; \
+	exit $$RC
 
 .PHONY: packages
 packages: ## Ensure that all packages have an __init__ file
