@@ -23,17 +23,23 @@ upgrade-pip: ## Upgrade pip
 
 .PHONY: format
 format: ## Format code
-	python -m black .
+	python -m black src tool
+	python -m isort src tool
 
 .PHONY: format-check
 format-check: ## Check code format
-	python -m black . --check
+	python -m black src tool --check
+
+.PHONY: import-check
+import-check: ## Check import order
+	python -m isort src tool --check
 
 .PHONY: lint
 lint: ## Check for lints
 	@RC=0; \
+	mypy src tool || RC=1; \
+	flake8 src tool || RC=1; \
     pylint src tool || RC=1; \
-    flake8 src tool || RC=1; \
     exit $$RC
 
 .PHONY: packages
