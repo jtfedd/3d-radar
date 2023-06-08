@@ -1,10 +1,9 @@
 import boto3
 import botocore
+from metpy.io import Level2File
 
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
 from lib.model.from_metpy.scan_from_metpy import scanFromLevel2Data
-
-from metpy.io import Level2File
 
 
 class S3DataProvider(AbstractDataProvider):

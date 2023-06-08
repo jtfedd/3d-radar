@@ -1,5 +1,5 @@
-from direct.showbase.ShowBase import ShowBase
 from direct.showbase.DirectObject import DirectObject
+from direct.showbase.ShowBase import ShowBase
 from panda3d.core import Vec3
 
 

@@ -1,14 +1,14 @@
-from panda3d.core import GeomVertexData
-from panda3d.core import GeomVertexFormat
-from panda3d.core import GeomTriangles
-from panda3d.core import GeomNode
-from panda3d.core import GeomEnums
-from panda3d.core import Geom
-
-from lib.geometry import normals_sharp
-from lib.geometry import normals_smooth
-
 import numpy as np
+from panda3d.core import (
+    Geom,
+    GeomEnums,
+    GeomNode,
+    GeomTriangles,
+    GeomVertexData,
+    GeomVertexFormat,
+)
+
+from lib.geometry import normals_sharp, normals_smooth
 
 
 def getGeometry(vertices, triangles, smooth=False):

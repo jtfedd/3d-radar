@@ -1,7 +1,8 @@
-from lib.model.serialization.serialization import serializeScan, deserializeScan
+import os
 
 import blosc
-import os
+
+from lib.model.serialization.serialization import deserializeScan, serializeScan
 
 
 class DataConnector:

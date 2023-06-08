@@ -1,17 +1,15 @@
-from direct.showbase.ShowBase import ShowBase
-
-from lib.camera.camera_control import CameraControl
-from lib.gradient.gradient import Gradient
-from lib.data_connector.data_connector import DataConnector
-from lib.data_provider.s3_data_provider import S3DataProvider
-from lib.model.record import Record
-from lib.model.scan import Scan
-
 import datetime
-
 import random
 
 import numpy as np
+from direct.showbase.ShowBase import ShowBase
+
+from lib.camera.camera_control import CameraControl
+from lib.data_connector.data_connector import DataConnector
+from lib.data_provider.s3_data_provider import S3DataProvider
+from lib.gradient.gradient import Gradient
+from lib.model.record import Record
+from lib.model.scan import Scan
 
 
 def getData():

@@ -1,7 +1,7 @@
-from lib.model.record import Record
 import datetime
-
 import unittest
+
+from lib.model.record import Record
 
 
 class TestRecord(unittest.TestCase):

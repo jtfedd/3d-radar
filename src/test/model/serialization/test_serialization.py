@@ -1,7 +1,12 @@
-from lib.model.serialization import serialization
-from test.testutils.models import newTestRecord, assertRecordsEqual
-from test.testutils.models import newTestScan, assertScansEqual
 import unittest
+from test.testutils.models import (
+    assertRecordsEqual,
+    assertScansEqual,
+    newTestRecord,
+    newTestScan,
+)
+
+from lib.model.serialization import serialization
 
 
 class TestSerialization(unittest.TestCase):

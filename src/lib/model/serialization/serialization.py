@@ -1,8 +1,10 @@
-from lib.model.scan import Scan
-from lib.model.record import Record
-import struct
 import datetime
+import struct
+
 import numpy as np
+
+from lib.model.record import Record
+from lib.model.scan import Scan
 
 recordFormat = "<d4s"
 scanFormat = "<5I"

@@ -1,5 +1,6 @@
-from lib.model.scan import Scan
 import numpy as np
+
+from lib.model.scan import Scan
 
 
 def reshape(vertices, scan: Scan):

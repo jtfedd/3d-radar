@@ -1,9 +1,10 @@
-from lib.model.record import Record
-from lib.model.scan import Scan
 import datetime
+import unittest
+
 import numpy as np
 
-import unittest
+from lib.model.record import Record
+from lib.model.scan import Scan
 
 
 def newTestRecord():

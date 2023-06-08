@@ -1,9 +1,10 @@
-from lib.model.scan import Scan
-from lib.model.record import Record
-import numpy as np
 import math
 
+import numpy as np
 from metpy.io import Level2File
+
+from lib.model.record import Record
+from lib.model.scan import Scan
 
 rayLength = 2000
 
