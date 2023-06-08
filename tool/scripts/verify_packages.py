@@ -3,7 +3,6 @@
 import getopt
 import pathlib
 import sys
-
 from typing import List
 
 ignore = ["__pycache__", "cached_data"]
