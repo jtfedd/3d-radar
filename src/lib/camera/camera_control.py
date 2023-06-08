@@ -1,10 +1,18 @@
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
+from direct.task import Task
 from panda3d.core import Vec3
 
 
 class CameraControl(DirectObject):
-    def __init__(self, base: ShowBase, enable=True):
+    DEFAULT_X = 0
+    DEFAULT_Y = 0
+
+    DEFAULT_PITCH = 30
+    DEFAULT_HEADING = 0
+    DEFAULT_ZOOM = 300
+
+    def __init__(self, base: ShowBase, enable: bool = True):
         self.base = base
 
         # Disable the built-in mouse camera control
@@ -16,15 +24,15 @@ class CameraControl(DirectObject):
         self.zoomFactor = 1.2
 
         # Set up state
-        self.x = 0
-        self.y = 0
+        self.x: float = self.DEFAULT_X
+        self.y: float = self.DEFAULT_Y
 
-        self.pitch = 30
-        self.heading = 0
-        self.zoom = 300
+        self.pitch: float = self.DEFAULT_PITCH
+        self.heading: float = self.DEFAULT_HEADING
+        self.zoom: float = self.DEFAULT_ZOOM
 
-        self.lastMouseX = 0
-        self.lastMouseY = 0
+        self.lastMouseX: float = 0
+        self.lastMouseY: float = 0
 
         # Set up nodes
         self.slider = base.render.attachNewNode("camera-slider")
@@ -46,7 +54,7 @@ class CameraControl(DirectObject):
 
         base.task_mgr.add(self.update, "camera-update")
 
-    def enable(self):
+    def enable(self) -> None:
         self.accept("mouse1", self.handleDragStart)
         self.accept("mouse1-up", self.handleDragStop)
 
@@ -56,16 +64,27 @@ class CameraControl(DirectObject):
         self.accept("wheel_up", self.handleZoomIn)
         self.accept("wheel_down", self.handleZoomOut)
 
-    def disable(self):
+    def disable(self) -> None:
         self.dragging = False
         self.rotating = False
         self.ignoreAll()
 
-    def overridePositions(self, x=None, y=None, pitch=None, heading=None, zoom=None):
+    def resetPosition(
+        self,
+        x: float = 0,
+        y: float = 0,
+    ) -> None:
         if x is not None:
             self.x = x
         if y is not None:
             self.y = y
+
+    def resetOrientation(
+        self,
+        pitch: float = 30,
+        heading: float = 0,
+        zoom: float = 300,
+    ) -> None:
         if pitch is not None:
             self.pitch = pitch
         if heading is not None:
@@ -73,13 +92,13 @@ class CameraControl(DirectObject):
         if zoom is not None:
             self.zoom = zoom
 
-    def update(self, task):
+    def update(self, task: Task.Task) -> int:
         self.handleMouseUpdate()
         self.updatePositions()
 
         return task.cont
 
-    def updatePositions(self):
+    def updatePositions(self) -> None:
         if self.pitch > 90:
             self.pitch = 90
         if self.pitch < -90:
@@ -92,7 +111,7 @@ class CameraControl(DirectObject):
         self.pivot.setP(-self.pitch)
         self.mount.setY(-self.zoom)
 
-    def handleMouseUpdate(self):
+    def handleMouseUpdate(self) -> None:
         mouseX = self.lastMouseX
         mouseY = self.lastMouseY
 
@@ -123,20 +142,20 @@ class CameraControl(DirectObject):
         self.lastMouseX = mouseX
         self.lastMouseY = mouseY
 
-    def handleDragStart(self):
+    def handleDragStart(self) -> None:
         self.dragging = True
 
-    def handleDragStop(self):
+    def handleDragStop(self) -> None:
         self.dragging = False
 
-    def handleRotateStart(self):
+    def handleRotateStart(self) -> None:
         self.rotating = True
 
-    def handleRotateStop(self):
+    def handleRotateStop(self) -> None:
         self.rotating = False
 
-    def handleZoomIn(self):
+    def handleZoomIn(self) -> None:
         self.zoom = self.zoom / self.zoomFactor
 
-    def handleZoomOut(self):
+    def handleZoomOut(self) -> None:
         self.zoom = self.zoom * self.zoomFactor

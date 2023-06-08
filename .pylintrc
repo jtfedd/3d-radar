@@ -1,4 +1,9 @@
 [MAIN]
+disable=
+      C0114, # missing-module-docstring
+      C0115, # missing-class-docstring
+      C0116, # missing-function-docstring
+      E0611, # no-name-in-module
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
@@ -122,7 +127,7 @@ argument-naming-style=snake_case
 #argument-rgx=
 
 # Naming style matching correct attribute names.
-attr-naming-style=snake_case
+attr-naming-style=camelCase
 
 # Regular expression matching correct attribute names. Overrides attr-naming-
 # style. If left empty, attribute names will be checked with the set naming
@@ -188,6 +193,9 @@ function-naming-style=camelCase
 good-names=i,
            j,
            k,
+           x,
+           y,
+           z,
            ex,
            Run,
            _
