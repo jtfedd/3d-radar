@@ -1,6 +1,7 @@
-import gzip
 import os
 from typing import Optional
+
+import blosc
 
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
 from lib.model.record import Record
@@ -44,10 +45,11 @@ class DataConnector:
 
         print("Reading", filePath)
 
-        with gzip.open(filePath, "rb") as file:
+        with open(filePath, "rb") as file:
             data = file.read()
 
-        scan, _ = deserializeScan(data)
+        decompressed = blosc.decompress(data)
+        scan, _ = deserializeScan(decompressed)
 
         print("Read", filePath)
 
@@ -62,8 +64,9 @@ class DataConnector:
         print("Writing", filePath)
 
         data = serializeScan(scan)
+        compressed = blosc.compress(data)
 
-        with gzip.open(filePath, "wb") as file:
-            file.write(data)
+        with open(filePath, "wb") as file:
+            file.write(compressed)
 
         print("Wrote", filePath)

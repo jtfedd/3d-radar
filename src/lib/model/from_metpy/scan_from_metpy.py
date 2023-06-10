@@ -140,7 +140,7 @@ def rayFromLevel2Data(
     first = reflectivityHeader.first_gate
     spacing = reflectivityHeader.gate_width
 
-    reflectivity = level2Ray[4][dataType][1]
+    reflectivity = level2Ray[4][dataType][1].astype(np.float32)
 
     # TODO this is a bit of a hack to make all of the rays the same length.
     # This should be cleaned up later
