@@ -17,11 +17,11 @@ SCAN_FORMAT_SIZE = struct.calcsize(SCAN_FORMAT)
 def serializeScan(scan: Scan) -> bytes:
     buffer = serializeRecord(scan.record)
 
-    elevationBytes = scan.elevations.tobytes()
-    azimuthBytes = scan.azimuths.tobytes()
-    rangesBytes = scan.ranges.tobytes()
-    reflectivityBytes = scan.reflectivity.tobytes()
-    velocityBytes = scan.velocity.tobytes()
+    elevationBytes = scan.elevations.astype(np.float32).tobytes()
+    azimuthBytes = scan.azimuths.astype(np.float32).tobytes()
+    rangesBytes = scan.ranges.astype(np.float32).tobytes()
+    reflectivityBytes = scan.reflectivity.astype(np.float32).tobytes()
+    velocityBytes = scan.velocity.astype(np.float32).tobytes()
 
     buffer += struct.pack(
         SCAN_FORMAT,

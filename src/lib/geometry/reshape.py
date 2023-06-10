@@ -29,7 +29,7 @@ def reshape(vertices: npt.NDArray[np.float32], scan: Scan) -> npt.NDArray[np.flo
 def interpolate(
     fractionalIndices: npt.NDArray[np.float32], valuemap: npt.NDArray[np.float32]
 ) -> npt.NDArray[np.float32]:
-    floor = np.floor(fractionalIndices).astype(dtype=np.float32)
+    floor = np.floor(fractionalIndices).astype(dtype=np.int32)
     diff = fractionalIndices - floor
 
     floorVal: npt.NDArray[np.float32] = valuemap[floor]
