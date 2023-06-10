@@ -119,7 +119,7 @@ unsafe-load-any-extension=no
 [BASIC]
 
 # Naming style matching correct argument names.
-argument-naming-style=snake_case
+argument-naming-style=camelCase
 
 # Regular expression matching correct argument names. Overrides argument-
 # naming-style. If left empty, argument names will be checked with the set
@@ -193,6 +193,9 @@ function-naming-style=camelCase
 good-names=i,
            j,
            k,
+           t,
+           u,
+           v,
            x,
            y,
            z,
