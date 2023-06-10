@@ -1,5 +1,5 @@
 import math
-from typing import Any, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -12,6 +12,30 @@ RAY_LENGTH = 2000
 
 REF = b"REF"
 VEL = b"VEL"
+
+# Elevation header has elevation angle
+# Sweeps is list of rays
+# Each ray has azimuth, start, spacing, index+azimuth spacing, data
+
+
+class RayData:
+    def __init__(
+        self,
+        azimuth: float,
+        start: float,
+        spacing: float,
+        data: npt.NDArray[np.float32],
+    ):
+        self.azimuth = azimuth
+        self.start = start
+        self.spacing = spacing
+        self.data = data
+
+
+class SweepData:
+    def __init__(self, elevation: float, rays: List[RayData]):
+        self.elevation = elevation
+        self.rays = rays
 
 
 def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
