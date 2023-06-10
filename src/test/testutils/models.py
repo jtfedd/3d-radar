@@ -2,12 +2,13 @@ import datetime
 import unittest
 
 import numpy as np
+import numpy.typing as npt
 
 from lib.model.record import Record
 from lib.model.scan import Scan
 
 
-def newTestRecord():
+def newTestRecord() -> Record:
     time = datetime.datetime(
         2019,
         6,
@@ -21,17 +22,21 @@ def newTestRecord():
     return Record("KDMX", time)
 
 
-def newTestScan():
+def newTestScan() -> Scan:
     record = newTestRecord()
-    elevations = np.random.uniform(low=0, high=100, size=(10))
-    azimuths = np.random.uniform(low=0, high=100, size=(100))
-    ranges = np.random.uniform(low=0, high=100, size=(1000))
-    reflectivity = np.random.uniform(low=-25, high=75, size=(10, 100, 1000))
-    velocity = np.random.uniform(low=-100, high=100, size=(10, 100, 1000))
+    elevations = np.random.uniform(low=0, high=100, size=10).astype(np.float32)
+    azimuths = np.random.uniform(low=0, high=100, size=100).astype(np.float32)
+    ranges = np.random.uniform(low=0, high=100, size=1000).astype(np.float32)
+    reflectivity = np.random.uniform(low=-25, high=75, size=(10, 100, 1000)).astype(
+        np.float32
+    )
+    velocity = np.random.uniform(low=-100, high=100, size=(10, 100, 1000)).astype(
+        np.float32
+    )
     return Scan(record, elevations, azimuths, ranges, reflectivity, velocity)
 
 
-def assertRecordsEqual(t: unittest.TestCase, first: Record, second: Record):
+def assertRecordsEqual(t: unittest.TestCase, first: Record, second: Record) -> None:
     t.assertIsInstance(first, Record)
     t.assertIsInstance(second, Record)
 
@@ -39,7 +44,7 @@ def assertRecordsEqual(t: unittest.TestCase, first: Record, second: Record):
     t.assertEqual(first.time, second.time)
 
 
-def assertScansEqual(t: unittest.TestCase, first: Scan, second: Scan):
+def assertScansEqual(t: unittest.TestCase, first: Scan, second: Scan) -> None:
     t.assertIsInstance(first, Scan)
     t.assertIsInstance(second, Scan)
 
@@ -52,13 +57,19 @@ def assertScansEqual(t: unittest.TestCase, first: Scan, second: Scan):
     assertArraysAlmostEqual(t, first.velocity, second.velocity)
 
 
-def assertArraysAlmostEqual(t: unittest.TestCase, first, second):
+def assertArraysAlmostEqual(
+    t: unittest.TestCase,
+    first: npt.NDArray[np.float32],
+    second: npt.NDArray[np.float32],
+) -> None:
     t.assertEqual(first.shape, second.shape)
 
+    elements = len(first)
+
     if len(first.shape) > 1:
-        for i in range(len(first)):
+        for i in range(elements):
             assertArraysAlmostEqual(t, first[i], second[i])
         return
 
-    for i in range(len(first)):
+    for i in range(elements):
         t.assertAlmostEqual(first[i], second[i])

@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 from panda3d.core import (
     Geom,
     GeomEnums,
@@ -11,7 +12,11 @@ from panda3d.core import (
 from lib.geometry import normals_sharp, normals_smooth
 
 
-def getGeometry(vertices, triangles, smooth=False):
+def getGeometry(
+    vertices: npt.NDArray[np.float32],
+    triangles: npt.NDArray[np.uint32],
+    smooth: bool = False,
+) -> GeomNode:
     if smooth:
         vertices, triangles = normals_smooth.orientVertices(vertices, triangles)
     else:
@@ -21,7 +26,9 @@ def getGeometry(vertices, triangles, smooth=False):
 
 
 # Take oriented vertices and triangles and generate Panda3D geometry
-def trianglesToGeometry(vertices, triangles):
+def trianglesToGeometry(
+    vertices: npt.NDArray[np.float32], triangles: npt.NDArray[np.uint32]
+) -> GeomNode:
     vertexData = GeomVertexData("vdata", GeomVertexFormat.getV3n3(), Geom.UHStatic)
     vertexData.uncleanSetNumRows(len(vertices))
     vertexDataArray = vertexData.modifyArray(0)

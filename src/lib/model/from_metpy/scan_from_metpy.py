@@ -1,20 +1,22 @@
 import math
+from typing import Any, List, Tuple
 
 import numpy as np
+import numpy.typing as npt
 from metpy.io import Level2File
 
 from lib.model.record import Record
 from lib.model.scan import Scan
 
-rayLength = 2000
+RAY_LENGTH = 2000
 
 REF = b"REF"
 VEL = b"VEL"
 
 
-def scanFromLevel2Data(record: Record, data: Level2File):
-    reflectivitySweeps = []
-    velocitySweeps = []
+def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
+    reflectivitySweeps: List[Tuple[float, npt.NDArray[np.float32]]] = []
+    velocitySweeps: List[Tuple[float, npt.NDArray[np.float32]]] = []
 
     for elevationHeader, sweep in zip(data.vcp_info.els, data.sweeps):
         elevation = elevationHeader.el_angle
@@ -109,13 +111,18 @@ def scanFromLevel2Data(record: Record, data: Level2File):
     velocityLayers.insert(0, emptyRef)
     velocityLayers.append(emptyRef)
 
-    elevations = reflectivityElevations
-    elevations.insert(0, 0)
-    elevations.append(elevations[-1] + elevations[-1] - elevations[-2])
-    elevations = np.array(elevations)
+    reflectivityElevations.insert(0, 0)
+    reflectivityElevations.append(
+        reflectivityElevations[-1]
+        + reflectivityElevations[-1]
+        - reflectivityElevations[-2]
+    )
+    elevations = np.array(reflectivityElevations, dtype=np.float32)
 
-    azimuths = np.linspace(0, 359.5, 720)
-    ranges = np.linspace(first, first + rayLength * spacing, rayLength + 1)
+    azimuths = np.linspace(0, 359.5, 720, dtype=np.float32)
+    ranges = np.linspace(
+        first, first + RAY_LENGTH * spacing, RAY_LENGTH + 1, dtype=np.float32
+    )
 
     reflectivity = np.stack(reflectivityLayers)
     velocity = np.stack(velocityLayers)
@@ -123,13 +130,15 @@ def scanFromLevel2Data(record: Record, data: Level2File):
     return Scan(record, elevations, azimuths, ranges, reflectivity, velocity)
 
 
-def rayFromLevel2Data(level2Ray, dataType):
+def rayFromLevel2Data(
+    level2Ray: Any, dataType: bytes
+) -> Tuple[float, float, float, npt.NDArray[np.float32]]:
     header = level2Ray[0]
     azimuth = math.radians(header.az_angle)
 
-    reflectivity_header = level2Ray[4][dataType][0]
-    first = reflectivity_header.first_gate
-    spacing = reflectivity_header.gate_width
+    reflectivityHeader = level2Ray[4][dataType][0]
+    first = reflectivityHeader.first_gate
+    spacing = reflectivityHeader.gate_width
 
     reflectivity = level2Ray[4][dataType][1]
 
@@ -137,7 +146,7 @@ def rayFromLevel2Data(level2Ray, dataType):
     # This should be cleaned up later
     reflectivity = np.pad(
         reflectivity,
-        (1, rayLength - reflectivity.shape[0]),
+        (1, RAY_LENGTH - reflectivity.shape[0]),
         mode="constant",
         constant_values=(np.nan),
     )

@@ -9,7 +9,7 @@ from lib.geometry import marching_cubes, triangles_to_geometry
 
 
 class App(ShowBase):
-    def __init__(self):
+    def __init__(self) -> None:
         ShowBase.__init__(self)
 
         # Make some light
@@ -25,8 +25,8 @@ class App(ShowBase):
         self.render.setLight(alnp)
 
         # Create a data volume (30 x 30 x 30)
-        X, Y, Z = np.mgrid[:30, :30, :30]
-        u = (X - 15) ** 2 + (Y - 15) ** 2 + (Z - 15) ** 2 - 8**2
+        x, y, z = np.mgrid[:30, :30, :30]
+        u = (x - 15) ** 2 + (y - 15) ** 2 + (z - 15) ** 2 - 8**2
         u = u.astype(dtype=float)
 
         # Generate some noise
@@ -59,22 +59,19 @@ class App(ShowBase):
             / num,
         )
 
-        sharp_geom = triangles_to_geometry.getGeometry(
-            vertices, triangles, smooth=False
-        )
-        sharp_node = self.render.attachNewNode(sharp_geom)
-        sharp_node.setZ(-15)
+        sharpGeom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
+        sharpNode = self.render.attachNewNode(sharpGeom)
+        sharpNode.setZ(-15)
 
-        smooth_geom = triangles_to_geometry.getGeometry(
-            vertices, triangles, smooth=True
-        )
-        smooth_node = self.render.attachNewNode(smooth_geom)
-        smooth_node.setX(30)
-        smooth_node.setZ(-15)
+        smoothGeom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=True)
+        smoothNode = self.render.attachNewNode(smoothGeom)
+        smoothNode.setX(30)
+        smoothNode.setZ(-15)
 
         # Render a cube for comparison
         cube = self.loader.loadModel("../assets/cube.glb")
-        cube.reparentTo(self.render)
+        if cube:
+            cube.reparentTo(self.render)
 
 
 app = App()

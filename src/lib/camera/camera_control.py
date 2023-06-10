@@ -99,10 +99,8 @@ class CameraControl(DirectObject):
         return task.cont
 
     def updatePositions(self) -> None:
-        if self.pitch > 90:
-            self.pitch = 90
-        if self.pitch < -90:
-            self.pitch = -90
+        self.pitch = min(self.pitch, 90)
+        self.pitch = max(self.pitch, -90)
 
         self.slider.setX(self.x)
         self.slider.setY(self.y)
@@ -123,12 +121,12 @@ class CameraControl(DirectObject):
             mouseX *= winX / 2
             mouseY *= winY / 2
 
-        dX = mouseX - self.lastMouseX
-        dY = mouseY - self.lastMouseY
+        deltaX = mouseX - self.lastMouseX
+        deltaY = mouseY - self.lastMouseY
 
         if self.dragging:
-            moveDX = -dX * self.movementFactor * self.zoom
-            moveDY = -dY * self.movementFactor * self.zoom
+            moveDX = -deltaX * self.movementFactor * self.zoom
+            moveDY = -deltaY * self.movementFactor * self.zoom
             newPos = self.base.render.getRelativePoint(
                 self.slider, Vec3(moveDX, moveDY, 0)
             )
@@ -136,8 +134,8 @@ class CameraControl(DirectObject):
             self.y = newPos.y
 
         if self.rotating:
-            self.heading += -dX * self.rotateFactor
-            self.pitch += -dY * self.rotateFactor
+            self.heading += -deltaX * self.rotateFactor
+            self.pitch += -deltaY * self.rotateFactor
 
         self.lastMouseX = mouseX
         self.lastMouseY = mouseY

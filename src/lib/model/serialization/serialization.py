@@ -1,18 +1,20 @@
 import datetime
 import struct
+from typing import Tuple
 
 import numpy as np
+import numpy.typing as npt
 
 from lib.model.record import Record
 from lib.model.scan import Scan
 
-recordFormat = "<d4s"
-scanFormat = "<5I"
-recordFormatSize = struct.calcsize(recordFormat)
-scanFormatSize = struct.calcsize(scanFormat)
+RECORD_FORMAT = "<d4s"
+SCAN_FORMAT = "<5I"
+RECORD_FORMAT_SIZE = struct.calcsize(RECORD_FORMAT)
+SCAN_FORMAT_SIZE = struct.calcsize(SCAN_FORMAT)
 
 
-def serializeScan(scan: Scan):
+def serializeScan(scan: Scan) -> bytes:
     buffer = serializeRecord(scan.record)
 
     elevationBytes = scan.elevations.tobytes()
@@ -22,7 +24,7 @@ def serializeScan(scan: Scan):
     velocityBytes = scan.velocity.tobytes()
 
     buffer += struct.pack(
-        scanFormat,
+        SCAN_FORMAT,
         len(elevationBytes),
         len(azimuthBytes),
         len(rangesBytes),
@@ -39,23 +41,23 @@ def serializeScan(scan: Scan):
     return buffer
 
 
-def serializeRecord(record: Record):
+def serializeRecord(record: Record) -> bytes:
     return struct.pack(
-        recordFormat,
+        RECORD_FORMAT,
         int(record.time.timestamp()),
         bytes(record.station, "utf-8"),
     )
 
 
-def deserializeRecord(buffer, offset=0):
-    unixTime, stationBytes = struct.unpack_from(recordFormat, buffer, offset=offset)
+def deserializeRecord(buffer: bytes, offset: int = 0) -> Tuple[Record, int]:
+    unixTime, stationBytes = struct.unpack_from(RECORD_FORMAT, buffer, offset=offset)
     station = stationBytes.rstrip(b"\x00").decode("utf-8")
     time = datetime.datetime.fromtimestamp(unixTime, tz=datetime.timezone.utc)
 
-    return Record(station, time), offset + recordFormatSize
+    return Record(station, time), offset + RECORD_FORMAT_SIZE
 
 
-def deserializeScan(buffer, offset=0):
+def deserializeScan(buffer: bytes, offset: int = 0) -> Tuple[Scan, int]:
     record, offset = deserializeRecord(buffer, offset)
 
     (
@@ -64,9 +66,9 @@ def deserializeScan(buffer, offset=0):
         rangesSize,
         reflectivitySize,
         velocitySize,
-    ) = struct.unpack_from(scanFormat, buffer, offset)
+    ) = struct.unpack_from(SCAN_FORMAT, buffer, offset)
 
-    offset += scanFormatSize
+    offset += SCAN_FORMAT_SIZE
 
     elevations, offset = deserializeArray(buffer, offset, elevationSize)
     azimuths, offset = deserializeArray(buffer, offset, azimuthSize)
@@ -81,5 +83,10 @@ def deserializeScan(buffer, offset=0):
     return Scan(record, elevations, azimuths, ranges, reflectivity, velocity), offset
 
 
-def deserializeArray(buffer, offset, size):
-    return np.frombuffer(buffer[offset : offset + size]), offset + size
+def deserializeArray(
+    buffer: bytes, offset: int, size: int
+) -> Tuple[npt.NDArray[np.float32], int]:
+    return (
+        np.frombuffer(buffer[offset : offset + size], dtype=np.float32),
+        offset + size,
+    )

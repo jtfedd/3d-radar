@@ -11,9 +11,10 @@ from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
 from lib.geometry import marching_cubes, reshape, triangles_to_geometry
 from lib.model.record import Record
+from lib.model.scan import Scan
 
 
-def get_data():
+def getData() -> Scan:
     """Returns some default data for the sample app"""
     site = "KVWX"
     time = datetime.datetime(
@@ -37,10 +38,10 @@ def get_data():
 class Viewer(ShowBase):
     """Example app"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         ShowBase.__init__(self)
         self.setBackgroundColor(0, 0, 0, 1)
-        self.camera_control = CameraControl(self)
+        self.cameraControl = CameraControl(self)
 
         # Make some light
         dlight = DirectionalLight("dlight")
@@ -54,9 +55,7 @@ class Viewer(ShowBase):
         alnp = self.render.attachNewNode(alight)
         self.render.setLight(alnp)
 
-        self.radar_base = self.render.attachNewNode("radar")
-
-        scan = get_data()
+        scan = getData()
 
         data = scan.reflectivity
         data = np.isnan(data)
