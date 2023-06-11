@@ -1,5 +1,6 @@
 import math
-from typing import List, Tuple
+from enum import Enum
+from typing import List
 
 import numpy as np
 import numpy.typing as npt
@@ -10,74 +11,112 @@ from lib.model.scan import Scan
 
 RAY_LENGTH = 2000
 
-REF = b"REF"
-VEL = b"VEL"
 
-# Elevation header has elevation angle
-# Sweeps is list of rays
-# Each ray has azimuth, start, spacing, index+azimuth spacing, data
+class DataType(Enum):
+    REFLECTIVITY = b"REF"
+    VELOCITY = b"VEL"
 
 
 class RayData:
     def __init__(
         self,
         azimuth: float,
-        start: float,
+        first: float,
         spacing: float,
         data: npt.NDArray[np.float32],
     ):
         self.azimuth = azimuth
-        self.start = start
+
         self.spacing = spacing
-        self.data = data
+        self.first = first - spacing
+
+        self.data = np.pad(
+            data,
+            (1, RAY_LENGTH - data.shape[0]),
+            mode="constant",
+            constant_values=(np.nan),
+        )
 
 
 class SweepData:
-    def __init__(self, elevation: float, rays: List[RayData]):
+    def __init__(
+        self, elevation: float, config: str, waveform: str, rays: List[RayData]
+    ):
         self.elevation = elevation
+        self.config = config
+        self.waveform = waveform
         self.rays = rays
+
+    def isConstantPhase(self) -> bool:
+        return self.config == "Constant Phase"
+
+    def isSplitPhase(self) -> bool:
+        return self.config == "SZ2 Phase"
+
+    def isReflectivitySweep(self) -> bool:
+        return self.isConstantPhase() or (
+            self.isSplitPhase() and self.waveform == "Contiguous Surveillance"
+        )
+
+    def isVelocitySweep(self) -> bool:
+        return self.isConstantPhase() or (
+            self.isSplitPhase() and ("Doppler" in self.waveform)
+        )
+
+    def isForDataType(self, dataType: DataType) -> bool:
+        match dataType:
+            case DataType.REFLECTIVITY:
+                return self.isReflectivitySweep()
+            case DataType.VELOCITY:
+                return self.isVelocitySweep()
+        return False
+
+
+def dataFromMetpy(level2File: Level2File, dataType: DataType) -> List[SweepData]:
+    sweeps: List[SweepData] = []
+
+    for elevationHeader, sweep in zip(level2File.vcp_info.els, level2File.sweeps):
+        elevation: float = elevationHeader.el_angle
+
+        if np.any(np.isclose(elevation, [sweep.elevation for sweep in sweeps])):
+            continue
+
+        config: str = elevationHeader.channel_config
+        waveform: str = elevationHeader.waveform
+
+        rays: List[RayData] = []
+
+        for ray in sweep:
+            if dataType not in ray[4]:
+                continue
+
+            header = ray[0]
+            reflectivityHeader = ray[4][dataType][0]
+
+            azimuth: float = math.radians(header.az_angle)
+            first: float = reflectivityHeader.first_gate
+            spacing: float = reflectivityHeader.gate_width
+            data: npt.NDArray[np.float32] = ray[4][dataType][1].astype(np.float32)
+
+            rays.append(RayData(azimuth, first, spacing, data))
+
+        rays = sorted(rays, key=lambda ray: ray.azimuth)
+        sweep = SweepData(elevation, config, waveform, rays)
+
+        if not sweep.isForDataType(dataType):
+            continue
+
+        sweeps.append(sweep)
+
+    return sorted(sweeps, key=lambda sweep: sweep.elevation)
 
 
 def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
-    reflectivitySweeps: List[Tuple[float, npt.NDArray[np.float32]]] = []
-    velocitySweeps: List[Tuple[float, npt.NDArray[np.float32]]] = []
+    reflectivitySweeps = dataFromMetpy(data, DataType.REFLECTIVITY)
+    velocitySweeps = dataFromMetpy(data, DataType.VELOCITY)
 
-    for elevationHeader, sweep in zip(data.vcp_info.els, data.sweeps):
-        elevation = elevationHeader.el_angle
-
-        # Some elevations have a constant phase, where reflectivity and velocity are
-        # recorded together. Others have a split phase, where reflectivity and velocity
-        # are recorded on separate passes.
-        isConstantPhase = elevationHeader.channel_config == "Constant Phase"
-        isSplitPhase = elevationHeader.channel_config == "SZ2 Phase"
-
-        # The third option is random phase, disregard
-        if not (isConstantPhase or isSplitPhase):
-            continue
-
-        waveform = elevationHeader.waveform
-        isReflectivitySweep = isConstantPhase or waveform == "Contiguous Surveillance"
-        isVelocitySweep = isConstantPhase or "Doppler" in waveform
-
-        if isReflectivitySweep:
-            # Skip any elevations for which we have already accepted a sweep
-            if np.any(np.isclose(elevation, [data[0] for data in reflectivitySweeps])):
-                continue
-
-            reflectivitySweeps.append((elevation, sweep))
-
-        if isVelocitySweep:
-            if np.any(np.isclose(elevation, [data[0] for data in velocitySweeps])):
-                continue
-
-            velocitySweeps.append((elevation, sweep))
-
-    # Sort sweeps by elevation angle
-    reflectivitySweeps = sorted(reflectivitySweeps)
-    velocitySweeps = sorted(velocitySweeps)
-
-    reflectivityElevations = [data[0] for data in reflectivitySweeps]
-    velocityElevations = [data[0] for data in velocitySweeps]
+    reflectivityElevations = [sweep.elevation for sweep in reflectivitySweeps]
+    velocityElevations = [sweep.elevation for sweep in velocitySweeps]
 
     if not np.allclose(reflectivityElevations, velocityElevations):
         raise Exception("Reflectivity and velocity data do not match")
@@ -85,48 +124,34 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
     reflectivityLayers = []
     velocityLayers = []
 
-    first = 0
-    spacing = 0
+    first: float = 0
+    spacing: float = 0
 
-    for data in reflectivitySweeps:
-        rays = []
-
-        for ray in data[1]:
-            rays.append(rayFromLevel2Data(ray, REF))
-
-        sweep = sorted(rays)
-        first = sweep[0][1]
-        spacing = sweep[0][2]
-        sweepReflectivity = np.stack(tuple(ray[3] for ray in sweep))
+    for sweep in reflectivitySweeps:
+        first = sweep.rays[0].first
+        spacing = sweep.rays[0].spacing
+        sweepReflectivity = np.stack(tuple(ray.data for ray in sweep.rays))
 
         # TODO this is a bit of a hack to make all of the sweeps have the same
         # number of rays. This should be cleaned up later
-        if len(sweep) < 500:
+        if len(sweep.rays) < 500:
             sweepReflectivity = np.repeat(sweepReflectivity, repeats=2, axis=0)
 
         reflectivityLayers.append(sweepReflectivity)
 
-    for data in velocitySweeps:
-        rays = []
+    for sweep in velocitySweeps:
+        first = sweep.rays[0].first
+        spacing = sweep.rays[0].spacing
+        sweepVelocity = np.stack(tuple(ray.data for ray in sweep.rays))
 
-        for ray in data[1]:
-            rays.append(rayFromLevel2Data(ray, VEL))
-
-        sweep = sorted(rays)
-        first = sweep[0][1]
-        spacing = sweep[0][2]
-        sweepVelocity = np.stack(tuple(ray[3] for ray in sweep))
-
-        # TODO this is a bit of a hack to make all of the sweeps have the same
-        # number of rays. This should be cleaned up later
-        if len(sweep) < 500:
+        if len(sweep.rays) < 500:
             sweepVelocity = np.repeat(sweepVelocity, repeats=2, axis=0)
 
         velocityLayers.append(sweepVelocity)
 
     # TODO this is a bit of a hack to get an empty sweep on the top and bottom.
     # This is necessary to generate closed geometry on the top and bottom.
-    emptyRef = np.empty(reflectivityLayers[0].shape)
+    emptyRef = np.empty(reflectivityLayers[0].shape, dtype=np.float32)
     emptyRef[:] = np.nan
 
     reflectivityLayers.insert(0, emptyRef)
@@ -152,30 +177,3 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
     velocity = np.stack(velocityLayers)
 
     return Scan(record, elevations, azimuths, ranges, reflectivity, velocity)
-
-
-def rayFromLevel2Data(
-    level2Ray: Any, dataType: bytes
-) -> Tuple[float, float, float, npt.NDArray[np.float32]]:
-    header = level2Ray[0]
-    azimuth = math.radians(header.az_angle)
-
-    reflectivityHeader = level2Ray[4][dataType][0]
-    first = reflectivityHeader.first_gate
-    spacing = reflectivityHeader.gate_width
-
-    reflectivity = level2Ray[4][dataType][1].astype(np.float32)
-
-    # TODO this is a bit of a hack to make all of the rays the same length.
-    # This should be cleaned up later
-    reflectivity = np.pad(
-        reflectivity,
-        (1, RAY_LENGTH - reflectivity.shape[0]),
-        mode="constant",
-        constant_values=(np.nan),
-    )
-
-    # Account for the nan added to the start of the reflectivity list
-    first = first - spacing
-
-    return azimuth, first, spacing, reflectivity
