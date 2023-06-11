@@ -22,7 +22,7 @@ class TestSerialization(unittest.TestCase):
     def testSerializeScan(self) -> None:
         scan = newTestScan()
         scanBytes = serialization.serializeScan(scan)
-        self.assertEqual(len(scanBytes), 16008912)
+        self.assertEqual(len(scanBytes), 8004472)
 
         output, size = serialization.deserializeScan(scanBytes)
         assertScansEqual(self, scan, output)
