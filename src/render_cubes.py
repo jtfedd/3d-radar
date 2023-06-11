@@ -1,35 +1,12 @@
-import datetime
 import random
 
 import numpy as np
 from direct.showbase.ShowBase import ShowBase
 
 from lib.camera.camera_control import CameraControl
-from lib.data_connector.data_connector import DataConnector
-from lib.data_provider.s3_data_provider import S3DataProvider
 from lib.gradient.gradient import Gradient
-from lib.model.record import Record
 from lib.model.scan import Scan
-
-
-def getData() -> Scan:
-    site = "KVWX"
-
-    time = datetime.datetime(
-        year=2019,
-        month=6,
-        day=26,
-        hour=22,
-        minute=11,
-        second=5,
-    )
-
-    record = Record(site, time)
-
-    provider = S3DataProvider()
-    connector = DataConnector(provider)
-
-    return connector.load(record)
+from lib.util.util import getData
 
 
 class Viewer(ShowBase):

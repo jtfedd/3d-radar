@@ -4,9 +4,9 @@ import numpy as np
 import numpy.typing as npt
 import perlin_numpy
 from direct.showbase.ShowBase import ShowBase
-from panda3d.core import AmbientLight, DirectionalLight
 
 from lib.geometry import marching_cubes, triangles_to_geometry
+from lib.util.util import defaultLight
 
 
 class App(ShowBase):
@@ -14,7 +14,7 @@ class App(ShowBase):
 
     def __init__(self) -> None:
         ShowBase.__init__(self)
-        self.setup()
+        defaultLight(self)
 
         u = self.makeData()
 
@@ -39,19 +39,6 @@ class App(ShowBase):
         cube = self.loader.loadModel("../assets/cube.glb")
         if cube:
             cube.reparentTo(self.render)
-
-    def setup(self) -> None:
-        # Make some light
-        dlight = DirectionalLight("dlight")
-        dlight.setColor((0.8, 0.8, 0.5, 1))
-        dlnp = self.render.attachNewNode(dlight)
-        dlnp.setHpr(0, -60, 0)
-        self.render.setLight(dlnp)
-
-        alight = AmbientLight("alight")
-        alight.setColor((0.2, 0.2, 0.2, 1))
-        alnp = self.render.attachNewNode(alight)
-        self.render.setLight(alnp)
 
     def makeData(self) -> npt.NDArray[np.float32]:
         # Create a data volume (30 x 30 x 30)

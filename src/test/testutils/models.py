@@ -10,12 +10,12 @@ from lib.model.scan import Scan
 
 def newTestRecord() -> Record:
     time = datetime.datetime(
-        2019,
-        6,
-        26,
-        hour=22,
-        minute=11,
-        second=5,
+        2020,
+        10,
+        20,
+        hour=1,
+        minute=10,
+        second=42,
         tzinfo=datetime.timezone.utc,
     )
 
