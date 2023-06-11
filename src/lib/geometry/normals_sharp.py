@@ -1,4 +1,7 @@
+from typing import Tuple
+
 import numpy as np
+import numpy.typing as npt
 
 
 # This algorithm takes unoriented vertices and a list of triangles, and generates
@@ -6,7 +9,9 @@ import numpy as np
 # For flat shaded geometry, this means we calculate the normal for each triangle and
 # generate a new set of vertices for each triangle which has that normal.
 # Then we generate a new set of triangles to point to the new vertices.
-def orientVertices(vertices, triangles):
+def orientVertices(
+    vertices: npt.NDArray[np.float32], triangles: npt.NDArray[np.uint32]
+) -> Tuple[npt.NDArray[np.float32], npt.NDArray[np.uint32]]:
     # Calculate two vectors for each triangle
     vec1 = vertices[triangles[:, 1]] - vertices[triangles[:, 0]]
     vec2 = vertices[triangles[:, 2]] - vertices[triangles[:, 0]]
@@ -35,6 +40,6 @@ def orientVertices(vertices, triangles):
 
     # All of the vertices are just sequential now, so generate a list of triangles
     # that references the vertices in sequential order
-    triangleData = np.arange(len(triangles) * 3).reshape(-1, 3)
+    triangleData = np.arange(len(triangles) * 3, dtype=np.uint32).reshape(-1, 3)
 
     return vertexData, triangleData
