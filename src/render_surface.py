@@ -32,6 +32,15 @@ class Viewer(ShowBase):
         node.setTransparency(TransparencyAttrib.MAlpha)
         node.setColorScale(1, 1, 1, 0.1)
 
+        minValue = np.nanmin(data)
+        data = np.nan_to_num(data, nan=float(minValue))
+        data = np.negative(data)
+
+        self.addIso(data, scan, 5, 0, 0, 1, 0.2)
+        self.addIso(data, scan, -10, 0, 1, 0, 0.3)
+        self.addIso(data, scan, -35, 1, 1, 0, 0.4)
+        self.addIso(data, scan, -60, 1, 0, 0, 0.5)
+
         print("Done!")
 
     def addIso(
