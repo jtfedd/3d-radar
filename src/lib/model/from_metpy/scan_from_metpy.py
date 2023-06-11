@@ -132,8 +132,7 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
         spacing = sweep.rays[0].spacing
         sweepReflectivity = np.stack(tuple(ray.data for ray in sweep.rays))
 
-        # TODO this is a bit of a hack to make all of the sweeps have the same
-        # number of rays. This should be cleaned up later
+        # A bit of a hack to make sure all sweeps have the same number of rays
         if len(sweep.rays) < 500:
             sweepReflectivity = np.repeat(sweepReflectivity, repeats=2, axis=0)
 
@@ -149,8 +148,7 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
 
         velocityLayers.append(sweepVelocity)
 
-    # TODO this is a bit of a hack to get an empty sweep on the top and bottom.
-    # This is necessary to generate closed geometry on the top and bottom.
+    # Add an empty sweep on the top and bottom
     emptyRef = np.empty(reflectivityLayers[0].shape, dtype=np.float32)
     emptyRef[:] = np.nan
 

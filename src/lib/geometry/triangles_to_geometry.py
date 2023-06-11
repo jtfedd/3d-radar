@@ -33,7 +33,11 @@ def trianglesToGeometry(
     vertexData.uncleanSetNumRows(len(vertices))
     vertexDataArray = vertexData.modifyArray(0)
     vertexDataView = memoryview(vertexDataArray).cast("B").cast("f")
-    vertexDataView[:] = vertices.flatten().astype(dtype=np.float32)
+
+    verticesFlat = vertices.flatten().astype(dtype=np.float32)
+    verticesView = memoryview(verticesFlat).cast("B").cast("f")
+
+    vertexDataView[:] = verticesView
 
     trianglesData = GeomTriangles(Geom.UHStatic)
     trianglesData.setIndexType(GeomEnums.NT_uint32)
