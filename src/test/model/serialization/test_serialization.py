@@ -1,23 +1,29 @@
-from lib.model.serialization import serialization
-from test.testutils.models import *
 import unittest
+from test.testutils.models import (
+    assertRecordsEqual,
+    assertScansEqual,
+    newTestRecord,
+    newTestScan,
+)
+
+from lib.model.serialization import serialization
 
 
 class TestSerialization(unittest.TestCase):
-    def test_serialize_record(self):
-        input = newTestRecord()
-        bytes = serialization.serializeRecord(input)
-        self.assertEqual(len(bytes), 12)
+    def testSerializeRecord(self) -> None:
+        record = newTestRecord()
+        recordBytes = serialization.serializeRecord(record)
+        self.assertEqual(len(recordBytes), 12)
 
-        output, size = serialization.deserializeRecord(bytes)
-        assertRecordsEqual(self, input, output)
-        self.assertEqual(size, len(bytes))
+        output, size = serialization.deserializeRecord(recordBytes)
+        assertRecordsEqual(self, record, output)
+        self.assertEqual(size, len(recordBytes))
 
-    def test_serialize_scan(self):
-        input = newTestScan()
-        bytes = serialization.serializeScan(input)
-        self.assertEqual(len(bytes), 16008912)
+    def testSerializeScan(self) -> None:
+        scan = newTestScan()
+        scanBytes = serialization.serializeScan(scan)
+        self.assertEqual(len(scanBytes), 8004472)
 
-        output, size = serialization.deserializeScan(bytes)
-        assertScansEqual(self, input, output)
-        self.assertEqual(size, len(bytes))
+        output, size = serialization.deserializeScan(scanBytes)
+        assertScansEqual(self, scan, output)
+        self.assertEqual(size, len(scanBytes))

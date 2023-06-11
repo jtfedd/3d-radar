@@ -1,54 +1,65 @@
-from direct.showbase.ShowBase import ShowBase
-
-from lib.geometry import marching_cubes
-from lib.geometry import triangles_to_geometry
-
-import numpy as np
-import perlin_numpy
-
 import timeit
 
-from panda3d.core import DirectionalLight, AmbientLight
+import numpy as np
+import numpy.typing as npt
+import perlin_numpy
+from direct.showbase.ShowBase import ShowBase
+
+from lib.geometry import marching_cubes, triangles_to_geometry
+from lib.util.util import defaultLight
 
 
 class App(ShowBase):
-    def __init__(self):
+    TIMING_ITERATIONS = 100
+
+    def __init__(self) -> None:
         ShowBase.__init__(self)
+        defaultLight(self)
 
-        # Make some light
-        dlight = DirectionalLight("dlight")
-        dlight.setColor((0.8, 0.8, 0.5, 1))
-        dlnp = self.render.attachNewNode(dlight)
-        dlnp.setHpr(0, -60, 0)
-        self.render.setLight(dlnp)
-
-        alight = AmbientLight("alight")
-        alight.setColor((0.2, 0.2, 0.2, 1))
-        alnp = self.render.attachNewNode(alight)
-        self.render.setLight(alnp)
-
-        # Create a data volume (30 x 30 x 30)
-        X, Y, Z = np.mgrid[:30, :30, :30]
-        u = (X - 15) ** 2 + (Y - 15) ** 2 + (Z - 15) ** 2 - 8**2
-        u = u.astype(dtype=float)
+        u = self.makeData()
 
         # Generate some noise
         noise = perlin_numpy.generate_perlin_noise_3d(u.shape, (6, 6, 6))
         u += noise * 75
 
-        num = 100
-
         vertices, triangles = marching_cubes.getIsosurface(u, 0)
 
+        self.doTiming(vertices, triangles)
+
+        sharpGeom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
+        sharpNode = self.render.attachNewNode(sharpGeom)
+        sharpNode.setZ(-15)
+
+        smoothGeom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=True)
+        smoothNode = self.render.attachNewNode(smoothGeom)
+        smoothNode.setX(30)
+        smoothNode.setZ(-15)
+
+        # Render a cube for comparison
+        cube = self.loader.loadModel("../assets/cube.glb")
+        if cube:
+            cube.reparentTo(self.render)
+
+    def makeData(self) -> npt.NDArray[np.float32]:
+        # Create a data volume (30 x 30 x 30)
+        x, y, z = np.mgrid[:30, :30, :30]
+        u: npt.NDArray[np.float32] = (
+            (x - 15) ** 2 + (y - 15) ** 2 + (z - 15) ** 2 - 8**2
+        ).astype(np.float32)
+        return u
+
+    def doTiming(
+        self, vertices: npt.NDArray[np.float32], triangles: npt.NDArray[np.uint32]
+    ) -> None:
         print(
             "Sharp",
             timeit.timeit(
                 lambda: triangles_to_geometry.getGeometry(
                     vertices, triangles, smooth=False
                 ),
-                number=num,
+                number=self.TIMING_ITERATIONS,
             )
-            / num,
+            / self.TIMING_ITERATIONS,
         )
 
         print(
@@ -57,27 +68,10 @@ class App(ShowBase):
                 lambda: triangles_to_geometry.getGeometry(
                     vertices, triangles, smooth=True
                 ),
-                number=num,
+                number=self.TIMING_ITERATIONS,
             )
-            / num,
+            / self.TIMING_ITERATIONS,
         )
-
-        sharp_geom = triangles_to_geometry.getGeometry(
-            vertices, triangles, smooth=False
-        )
-        sharp_node = self.render.attachNewNode(sharp_geom)
-        sharp_node.setZ(-15)
-
-        smooth_geom = triangles_to_geometry.getGeometry(
-            vertices, triangles, smooth=True
-        )
-        smooth_node = self.render.attachNewNode(smooth_geom)
-        smooth_node.setX(30)
-        smooth_node.setZ(-15)
-
-        # Render a cube for comparison
-        cube = self.loader.loadModel("../assets/cube.glb")
-        cube.reparentTo(self.render)
 
 
 app = App()

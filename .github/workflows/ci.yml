@@ -57,10 +57,20 @@ jobs:
       run: |
         make packages-check
 
+    - name: Check Import Order
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make import-check
+
     - name: Check Formatting 
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
         make format-check
+
+    - name: Check Lints
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make lint
 
     - name: Run Unit Tests With Coverage
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}

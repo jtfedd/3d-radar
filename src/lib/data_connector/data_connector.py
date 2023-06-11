@@ -1,11 +1,16 @@
-from lib.model.serialization.serialization import serializeScan, deserializeScan
+import os
+from typing import Optional
 
 import blosc
-import os
+
+from lib.data_provider.abstract_data_provider import AbstractDataProvider
+from lib.model.record import Record
+from lib.model.scan import Scan
+from lib.model.serialization.serialization import deserializeScan, serializeScan
 
 
 class DataConnector:
-    def __init__(self, provider, useCaching=True):
+    def __init__(self, provider: AbstractDataProvider, useCaching: bool = True):
         scriptDir = os.path.abspath(os.path.dirname(__file__))
         self.cacheDir = os.path.join(scriptDir, "cached_data")
 
@@ -15,9 +20,9 @@ class DataConnector:
         self.provider = provider
         self.useCaching = useCaching
 
-    def load(self, record):
-        scan, cached = self.loadCached(record)
-        if cached:
+    def load(self, record: Record) -> Scan:
+        scan = self.loadCached(record)
+        if scan:
             return scan
 
         scan = self.provider.load(record)
@@ -25,32 +30,32 @@ class DataConnector:
 
         return scan
 
-    def getFilepath(self, record):
+    def getFilepath(self, record: Record) -> str:
         fileName = record.cacheKey() + ".dat"
         return os.path.join(self.cacheDir, fileName)
 
-    def loadCached(self, record):
+    def loadCached(self, record: Record) -> Optional[Scan]:
         if not self.useCaching:
-            return None, False
+            return None
 
         filePath = self.getFilepath(record)
 
         if not os.path.exists(filePath):
-            return None, False
+            return None
 
         print("Reading", filePath)
 
-        with open(filePath, "rb") as f:
-            compressed_data = f.read()
+        with open(filePath, "rb") as file:
+            data = file.read()
 
-        decompressed_data = blosc.decompress(compressed_data)
-        scan, _ = deserializeScan(decompressed_data)
+        decompressed = blosc.decompress(data)
+        scan, _ = deserializeScan(decompressed)
 
         print("Read", filePath)
 
-        return scan, True
+        return scan
 
-    def saveCached(self, record, scan):
+    def saveCached(self, record: Record, scan: Scan) -> None:
         if not self.useCaching:
             return
 
@@ -58,10 +63,10 @@ class DataConnector:
 
         print("Writing", filePath)
 
-        decompressed_data = serializeScan(scan)
-        compressed_data = blosc.compress(decompressed_data)
+        data = serializeScan(scan)
+        compressed = blosc.compress(data)
 
-        with open(filePath, "wb") as f:
-            f.write(compressed_data)
+        with open(filePath, "wb") as file:
+            file.write(compressed)
 
         print("Wrote", filePath)
