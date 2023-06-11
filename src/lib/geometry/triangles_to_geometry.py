@@ -32,23 +32,24 @@ def trianglesToGeometry(
     vertexData = GeomVertexData("vdata", GeomVertexFormat.getV3n3(), Geom.UHStatic)
     vertexData.uncleanSetNumRows(len(vertices))
     vertexDataArray = vertexData.modifyArray(0)
-    vertexDataView = memoryview(vertexDataArray).cast("B").cast("f")
+    vdv = memoryview(vertexDataArray).cast("B").cast("f")  # type: ignore
 
     verticesFlat = vertices.flatten().astype(dtype=np.float32)
-    verticesView = memoryview(verticesFlat).cast("B").cast("f")
+    verticesView = memoryview(verticesFlat).cast("B").cast("f")  # type: ignore
 
-    vertexDataView[:] = verticesView
+    vdv[:] = verticesView
 
     trianglesData = GeomTriangles(Geom.UHStatic)
     trianglesData.setIndexType(GeomEnums.NT_uint32)
     trianglesDataArray = trianglesData.modifyVertices()
     trianglesDataArray.uncleanSetNumRows(len(triangles) * 3)
-    trianglesDataView = memoryview(trianglesDataArray).cast("B").cast("I")
+
+    tdv = memoryview(trianglesDataArray).cast("B").cast("I")  # type: ignore
 
     trianglesFlat = triangles.flatten().astype(dtype=np.uint32)
-    trianglesView = memoryview(trianglesFlat).cast("B").cast("I")
+    trianglesView = memoryview(trianglesFlat).cast("B").cast("I")  # type: ignore
 
-    trianglesDataView[:] = trianglesView
+    tdv[:] = trianglesView
 
     geom = Geom(vertexData)
     geom.addPrimitive(trianglesData)
