@@ -9,6 +9,11 @@ from metpy.io import Level2File
 from lib.model.record import Record
 from lib.model.scan import Scan
 
+
+class UnsupportedScanException(Exception):
+    pass
+
+
 RAY_LENGTH = 2000
 
 
@@ -119,7 +124,7 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
     velocityElevations = [sweep.elevation for sweep in velocitySweeps]
 
     if not np.allclose(reflectivityElevations, velocityElevations):
-        raise Exception("Reflectivity and velocity data do not match")
+        raise UnsupportedScanException("Reflectivity and velocity data do not match")
 
     reflectivityLayers = []
     velocityLayers = []
