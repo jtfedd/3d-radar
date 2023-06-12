@@ -30,16 +30,19 @@ class Viewer(ShowBase):
         geom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
         node = self.render.attachNewNode(geom)
         node.setTransparency(TransparencyAttrib.MAlpha)
-        node.setColorScale(1, 1, 1, 0.1)
+        node.setColorScale(1, 1, 1, 1)
+        node.setLightOff()
+        node.setBin("fixed", 0)
+        node.setDepthTest(False)
 
         minValue = np.nanmin(data)
         data = np.nan_to_num(data, nan=float(minValue))
         data = np.negative(data)
 
-        self.addIso(data, scan, 5, 0, 0, 1, 0.2)
-        self.addIso(data, scan, -10, 0, 1, 0, 0.3)
-        self.addIso(data, scan, -35, 1, 1, 0, 0.4)
-        self.addIso(data, scan, -60, 1, 0, 0, 0.5)
+        self.addIso(data, scan, 1, 5, 0, 0, 1, 1)
+        self.addIso(data, scan, 2, -10, 0, 1, 0, 1)
+        self.addIso(data, scan, 3, -35, 1, 1, 0, 1)
+        self.addIso(data, scan, 4, -60, 1, 0, 0, 1)
 
         print("Done!")
 
@@ -47,6 +50,7 @@ class Viewer(ShowBase):
         self,
         data: npt.NDArray[np.float32],
         scan: Scan,
+        renderBin: int,
         level: float,
         red: float,
         green: float,
@@ -62,6 +66,9 @@ class Viewer(ShowBase):
         node = self.render.attachNewNode(geom)
         node.setTransparency(TransparencyAttrib.MAlpha)
         node.setColorScale(red, green, blue, alpha)
+        node.setLightOff()
+        node.setBin("fixed", renderBin)
+        node.setDepthTest(False)
 
 
 app = Viewer()
