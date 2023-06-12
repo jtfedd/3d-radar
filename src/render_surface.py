@@ -32,16 +32,17 @@ class Viewer(ShowBase):
         node.setTransparency(TransparencyAttrib.MAlpha)
         node.setColorScale(1, 1, 1, 0.1)
         node.setLightOff()
-        node.setBin("fixed", 4)
+        node.setBin("fixed", 5)
 
         minValue = np.nanmin(data)
         data = np.nan_to_num(data, nan=float(minValue))
         data = np.negative(data)
 
-        self.addIso(data, scan, 3, 5, 0, 0, 1, 0.2)
-        self.addIso(data, scan, 2, -10, 0, 1, 0, 0.3)
-        self.addIso(data, scan, 1, -35, 1, 1, 0, 0.4)
-        self.addIso(data, scan, 0, -60, 1, 0, 0, 0.5)
+        self.addIso(data, scan, 4, 5, 0, 0, 1, 0.1)
+        self.addIso(data, scan, 3, -10, 0, 1, 0, 0.1)
+        self.addIso(data, scan, 2, -35, 1, 1, 0, 0.1)
+        self.addIso(data, scan, 1, -45, 1, 0.5, 0, 0.1)
+        self.addIso(data, scan, 0, -55, 1, 0, 0, 0.1)
 
         print("Done!")
 
