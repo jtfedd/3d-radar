@@ -92,16 +92,16 @@ def dataFromMetpy(level2File: Level2File, dataType: DataType) -> List[SweepData]
         rays: List[RayData] = []
 
         for ray in sweep:
-            if dataType not in ray[4]:
+            if dataType.value not in ray[4]:
                 continue
 
             header = ray[0]
-            reflectivityHeader = ray[4][dataType][0]
+            reflectivityHeader = ray[4][dataType.value][0]
 
             azimuth: float = math.radians(header.az_angle)
             first: float = reflectivityHeader.first_gate
             spacing: float = reflectivityHeader.gate_width
-            data: npt.NDArray[np.float32] = ray[4][dataType][1].astype(np.float32)
+            data: npt.NDArray[np.float32] = ray[4][dataType.value][1].astype(np.float32)
 
             rays.append(RayData(azimuth, first, spacing, data))
 
