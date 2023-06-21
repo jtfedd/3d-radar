@@ -7,6 +7,10 @@ uniform vec3 camera_position;
 
 out vec4 p3d_FragColor;
 
+const float NEAR = 1;
+const float MAX_STEPS = 1000;
+const float STEP_SIZE = 0.1; 
+
 vec3 gen_ray() {
     float x = (2.0f * gl_FragCoord.x) / resolution.x - 1.0f;
     float y = (2.0f * gl_FragCoord.y) / resolution.y - 1.0f;
@@ -23,39 +27,43 @@ vec3 gen_ray() {
     return ray_world;
 }
 
-float distance_from_sphere(in vec3 point, in vec3 center, float radius) {
-    return length(point - center) - radius;
+float density(in vec3 point, in vec3 center, float radius) {
+    if (length(point - center) < radius) {
+        return 1 - pow((length(point - center) / radius), 3);
+    }
+
+    return 0.0;
 }
 
-vec3 ray_march(in vec3 ro, in vec3 rd) {
-    float total_distance_traveled = 0.0;
-    const int NUMBER_OF_STEPS = 32;
-    const float MINIMUM_HIT_DISTANCE = 0.001;
-    const float MAXIMUM_TRACE_DISTANCE = 1000.0;
+vec4 blendOnto(vec4 cFront, vec4 cBehind) {
+    return cFront + (1.0 - cFront.a)*cBehind;
+}
 
-    for (int i = 0; i < NUMBER_OF_STEPS; ++i) {
-        vec3 current_position = ro + total_distance_traveled * rd;
+vec4 ray_march(in vec3 ro, in vec3 rd) {
+    float transparency = 1.0f;
+    vec4 color = vec4(0.0);
 
-        float distance_to_closest = distance_from_sphere(current_position, vec3(0.0), 1.0);
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float sample_dist = NEAR + (i * STEP_SIZE);
+        vec3 sample_pos = ro + sample_dist * rd;
 
-        if (distance_to_closest < MINIMUM_HIT_DISTANCE) {
-            return vec3(1.0, 0.0, 0.0);
-        }
+        float sample_density = density(sample_pos, vec3(0.0), 2.0);
+        float sample_attenuation = exp(-STEP_SIZE * sample_density);
+        vec3 sample_color = vec3(1.0 - sample_density, 0, sample_density);
+        float sample_alpha = sample_density * STEP_SIZE;
 
-        if (total_distance_traveled > MAXIMUM_TRACE_DISTANCE) {
-            break;
-        }
-        total_distance_traveled += distance_to_closest;
+        vec4 ci = vec4(sample_color, 1.0) * sample_alpha;
+        color = blendOnto(color, ci);
     }
     
-    return vec3(0.0);
+    return color;
 }
 
 void main() {
     vec3 ro = camera_position;
     vec3 rd = gen_ray();
 
-    vec3 shaded_color = ray_march(ro, rd);
+    vec4 shaded_color = ray_march(ro, rd);
 
-    p3d_FragColor = vec4(shaded_color, 0.5);
+    p3d_FragColor = shaded_color;
 }
