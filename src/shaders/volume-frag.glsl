@@ -1,4 +1,4 @@
-#version 330
+#version 460
 
 uniform mat4 p3d_ViewMatrixInverse;
 uniform mat4 p3d_ProjectionMatrixInverse;
@@ -29,7 +29,7 @@ vec3 gen_ray() {
 
 float density(in vec3 point, in vec3 center, float radius) {
     if (length(point - center) < radius) {
-        return 1 - pow((length(point - center) / radius), 3);
+        return 1 - pow((length(point - center) / radius), 3.0f);
     }
 
     return 0.0;
