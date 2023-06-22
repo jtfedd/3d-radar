@@ -44,6 +44,9 @@ class App(DirectObject):
         self.plane.setDepthTest(False)
         self.plane.setDepthWrite(False)
 
+        self.plane.setShaderInput("bounds_start", (0, -2, -2))
+        self.plane.setShaderInput("bounds_end", (2, 2, 2))
+
         # For some reason this seems to be typed incorrectly; override the type
         window: GraphicsWindow = self.base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
