@@ -1,17 +1,24 @@
 #version 460
 
-// Panda3d inputs
+// Inputs from Panda3D
 uniform mat4 p3d_ViewMatrixInverse;
 uniform mat4 p3d_ProjectionMatrixInverse;
 
-// Program inputs
+// Inputs from program
 uniform vec2 resolution;
 uniform vec3 camera_position;
 
 uniform vec3 bounds_start;
 uniform vec3 bounds_end;
 
-// Panda3d outputs
+uniform sampler2D tex;
+
+uniform mat4 trans_clip_to_view_of_myCameraNode;
+uniform mat4 trans_world_to_model_of_myCameraNode;
+
+uniform mat4 proj;
+
+// Outputs to Panda3D
 out vec4 p3d_FragColor;
 
 const float NEAR = 1;
@@ -21,14 +28,27 @@ const float STEP_SIZE = 0.1;
 vec3 gen_ray() {
     float x = (2.0f * gl_FragCoord.x) / resolution.x - 1.0f;
     float y = (2.0f * gl_FragCoord.y) / resolution.y - 1.0f;
-    float z = 1.0f;
     
-    vec3 ray_nds = vec3(x, y, z);
-    vec4 ray_clip = vec4(ray_nds.xy, -1.0, 1.0);
+    vec4 ray_clip = vec4(x, y, -1.0, 1.0);
     vec4 ray_eye = p3d_ProjectionMatrixInverse * ray_clip;
     ray_eye = vec4(ray_eye.xy, -1.0, 0.0);
 
     vec3 ray_world = (p3d_ViewMatrixInverse * ray_eye).xyz;
+    ray_world = normalize(ray_world);
+
+    return ray_world;
+}
+
+vec3 gen_ray_2() {
+    float x = (2.0f * gl_FragCoord.x) / resolution.x - 1.0f;
+    float y = (2.0f * gl_FragCoord.y) / resolution.y - 1.0f;
+    
+    vec4 ray_clip = vec4(x, y, -1.0, 1.0);
+    // vec4 ray_eye = (trans_clip_to_view_of_myCameraNode * ray_clip);
+    vec4 ray_eye = (proj * ray_clip);
+    ray_eye = vec4(ray_eye.xyz, 0.0);
+
+    vec3 ray_world = (inverse(trans_world_to_model_of_myCameraNode) * ray_eye).xyz;
     ray_world = normalize(ray_world);
 
     return ray_world;
@@ -109,11 +129,26 @@ vec4 ray_march(in vec3 ro, in vec3 rd) {
     return color;
 }
 
+vec4 ray_color(in vec3 rd) {
+    return vec4(rd.x, rd.y, rd.z, 0.5);
+}
+
 void main() {
+    vec4 scene_color = texelFetch(tex, ivec2(gl_FragCoord.xy), 0);
+    // vec4 depth_pixel = texelFetch(dtex, ivec2(gl_FragCoord.xy), 0);
+
     vec3 ro = camera_position;
     vec3 rd = gen_ray();
+    vec3 rd2 = gen_ray_2();
 
-    vec4 shaded_color = ray_march(ro, rd);
-
-    p3d_FragColor = shaded_color;
+    vec4 shaded_color = ray_march(ro, rd2);
+    // vec4 rc = ray_color(rd2);
+    // if (gl_FragCoord.x > (resolution.x / 2)) {
+    //     rc = ray_color(rd);
+    // }
+    // p3d_FragColor = rc;
+    // p3d_FragColor = scene_color;
+    // p3d_FragColor = shaded_color;
+    p3d_FragColor = blendOnto(shaded_color, scene_color);
+    // p3d_FragColor = blendOnto(rc, scene_color);
 }

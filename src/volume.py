@@ -1,7 +1,8 @@
+from direct.filter.FilterManager import FilterManager
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
-from panda3d.core import GraphicsWindow, Shader, TransparencyAttrib
+from panda3d.core import GraphicsWindow, Shader, Texture, TransparencyAttrib
 
 from lib.camera.camera_control import CameraControl
 from lib.util.util import defaultLight
@@ -12,10 +13,11 @@ class App(DirectObject):
         self.base = showbase
 
         self.base.setBackgroundColor(0, 0, 0, 1)
-        # self.wireframe On()
+        # self.wireframeOn()
 
         defaultLight(self.base)
-        CameraControl(self.base)
+        self.cameraControl = CameraControl(self.base)
+        self.cameraControl.pitch = 0
 
         cube = self.base.loader.loadModel("../assets/cube.glb")
         if cube:
@@ -29,23 +31,41 @@ class App(DirectObject):
             fragment="shaders/volume-frag.glsl",
         )
 
-        plane = self.base.loader.loadModel("../assets/plane.glb")
+        manager = FilterManager(self.base.win, self.base.cam)  # type: ignore
+        tex = Texture()
+        depth = Texture()
+        plane = manager.renderSceneInto(colortex=tex, depthtex=depth)
         if plane:
             self.plane = plane
 
-        self.plane.reparentTo(self.base.render)
-        self.plane.setP(90)
-        self.plane.setScale(100)
-        self.plane.reparentTo(self.base.camera)
-        self.plane.setY(10)
         self.plane.setShader(shader)
-        self.plane.setTransparency(TransparencyAttrib.MAlpha)
-        self.plane.setBin("fixed", 0)
-        self.plane.setDepthTest(False)
-        self.plane.setDepthWrite(False)
+        self.plane.setShaderInput("tex", tex)
+        self.plane.setShaderInput("dtex", depth)
+
+        # plane = self.base.loader.loadModel("../assets/plane.glb")
+        # if plane:
+        #     self.plane = plane
+
+        # self.plane.reparentTo(self.base.render)
+        # self.plane.setP(90)
+        # self.plane.setScale(100)
+        # self.plane.reparentTo(self.base.camera)
+        # self.plane.setY(10)
+        # self.plane.setShader(shader)
+        # self.plane.setTransparency(TransparencyAttrib.MAlpha)
+        # self.plane.setBin("fixed", 0)
+        # self.plane.setDepthTest(False)
+        # self.plane.setDepthWrite(False)
 
         self.plane.setShaderInput("bounds_start", (0, -2, -2))
         self.plane.setShaderInput("bounds_end", (2, 2, 2))
+
+        self.plane.setShaderInput("myCamera", self.base.camera)
+        self.plane.setShaderInput("myCameraNode", self.base.camera)
+
+        self.plane.setShaderInput(
+            "proj", self.base.cam.node().getLens().getProjectionMatInv()
+        )
 
         # For some reason this seems to be typed incorrectly; override the type
         window: GraphicsWindow = self.base.win  # type: ignore
@@ -69,6 +89,10 @@ class App(DirectObject):
         self.plane.setShaderInput(
             "camera_position",
             self.base.camera.getPos(self.base.render),
+        )
+
+        self.plane.setShaderInput(
+            "proj", self.base.cam.node().getLens().getProjectionMatInv()
         )
 
         return task.cont
