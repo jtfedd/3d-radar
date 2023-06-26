@@ -115,7 +115,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
 
         vec3 sample_pos = ro + t * rd;
 
-        float sample_density = density(sample_pos, vec3(5.0, 0.0, 0.0), 2.0);
+        float sample_density = density(sample_pos, vec3(0.0, 0.0, 0.0), 2.0);
         float sample_attenuation = exp(-step_size * sample_density);
         vec3 sample_color = vec3(1.0 - sample_density, 0, sample_density);
         float sample_alpha = sample_density * step_size;

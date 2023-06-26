@@ -38,7 +38,7 @@ class App(DirectObject):
         self.plane.setShader(shader)
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
-        self.plane.setShaderInput("bounds_start", (0, -2, -2))
+        self.plane.setShaderInput("bounds_start", (-2, -2, -2))
         self.plane.setShaderInput("bounds_end", (2, 2, 2))
         self.plane.setShaderInput("camera", self.base.camera)
         self.plane.setShaderInput("time_ms", 0)
