@@ -1,8 +1,10 @@
+import math
+
 from direct.filter.FilterManager import FilterManager
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
-from panda3d.core import GraphicsWindow, Shader, Texture, TransparencyAttrib
+from panda3d.core import GraphicsWindow, Shader, Texture
 
 from lib.camera.camera_control import CameraControl
 from lib.util.optional import unwrap
@@ -14,13 +16,12 @@ class App(DirectObject):
         self.base = showbase
 
         self.base.setBackgroundColor(0, 0, 0, 1)
-
         defaultLight(self.base)
+
         self.cameraControl = CameraControl(self.base)
         self.cameraControl.zoom = 15
 
         self.cube = unwrap(self.base.loader.loadModel("../assets/cube.glb"))
-
         self.cube.reparentTo(self.base.render)
 
         shader = Shader.load(
@@ -37,11 +38,10 @@ class App(DirectObject):
         self.plane.setShader(shader)
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
-
         self.plane.setShaderInput("bounds_start", (0, -2, -2))
         self.plane.setShaderInput("bounds_end", (2, 2, 2))
-
         self.plane.setShaderInput("camera", self.base.camera)
+        self.plane.setShaderInput("time_ms", 0)
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",
@@ -55,6 +55,8 @@ class App(DirectObject):
 
         self.accept("window-event", self.handleWindowEvent)
         base.taskMgr.add(self.updateCameraParams, "update-camera-params")
+        base.taskMgr.add(self.updateCubePos, "update-cube-pos")
+        base.taskMgr.add(self.updateTime, "update-time")
 
     def handleWindowEvent(self, win: GraphicsWindow) -> None:
         newSize = (win.getXSize(), win.getYSize())
@@ -74,6 +76,16 @@ class App(DirectObject):
             "projection_matrix_inverse",
             self.base.cam.node().getLens().getProjectionMatInv(),
         )
+
+        return task.cont
+
+    def updateCubePos(self, task: Task.Task) -> int:
+        self.cube.setX(math.sin(task.time) * 3)
+
+        return task.cont
+
+    def updateTime(self, task: Task.Task) -> int:
+        self.plane.setShaderInput("time", task.time)
 
         return task.cont
 
