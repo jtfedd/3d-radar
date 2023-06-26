@@ -18,22 +18,24 @@ uniform float time;
 // Outputs to Panda3D
 out vec4 p3d_FragColor;
 
+const float MIN_STEPS = 5;
 const float MAX_STEPS = 1000;
 const float STEP_SIZE = 0.1;
 const float ALPHA_CUTOFF = 0.99;
 
-vec3 gen_ray() {
-    float x = (2.0f * gl_FragCoord.x) / resolution.x - 1.0f;
-    float y = (2.0f * gl_FragCoord.y) / resolution.y - 1.0f;
-    
-    vec4 ray_clip = vec4(x, y, -1.0, 1.0);
+void gen_ray(
+    in float depth_clip, in vec2 uv,
+    out vec3 ray, out float d
+) {    
+    vec4 ray_clip = vec4(uv, depth_clip, 1.0);
     vec4 ray_eye = (projection_matrix_inverse * ray_clip);
+    ray_eye /= ray_eye.w;
+    d = length(ray_eye.xyz);
+
     ray_eye = vec4(ray_eye.xyz, 0.0);
 
     vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
-    ray_world = normalize(ray_world);
-
-    return ray_world;
+    ray = normalize(ray_world);
 }
 
 float density(in vec3 point, in vec3 center, float radius) {
@@ -82,13 +84,16 @@ float hash13(vec3 p3) {
     return fract((p3.x + p3.y) * p3.z);
 }
 
-vec4 ray_march(in vec3 ro, in vec3 rd) {
+vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     vec2 tRange;
     bool no_intersection;
     box_intersection(bounds_start, bounds_end, ro, rd, tRange, no_intersection);
 
     // Make sure the range does not start behind the camera
     tRange.s = max(0.0, tRange.s);
+    
+    // Don't cast the ray further than the first rendered object
+    tRange.t = min(d, tRange.t);
 
     vec4 color = vec4(0.0);
 
@@ -96,7 +101,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd) {
         return color;
     }
 
-    float jitter = min(tRange.t-tRange.s, STEP_SIZE)*hash13(vec3(gl_FragCoord.xy, time));    
+    // Use a smaller step size when the slice of volume is very thin
+    float step_size = min(STEP_SIZE, (tRange.t - tRange.s) / MIN_STEPS);
+
+    float jitter = min(tRange.t-tRange.s, step_size)*hash13(vec3(gl_FragCoord.xy, time));    
     float t = tRange.s + jitter;
 
     for (int i = 0; i < MAX_STEPS; i++) {
@@ -107,15 +115,15 @@ vec4 ray_march(in vec3 ro, in vec3 rd) {
 
         vec3 sample_pos = ro + t * rd;
 
-        float sample_density = density(sample_pos, vec3(0.0), 2.0);
-        float sample_attenuation = exp(-STEP_SIZE * sample_density);
+        float sample_density = density(sample_pos, vec3(5.0, 0.0, 0.0), 2.0);
+        float sample_attenuation = exp(-step_size * sample_density);
         vec3 sample_color = vec3(1.0 - sample_density, 0, sample_density);
-        float sample_alpha = sample_density * STEP_SIZE;
+        float sample_alpha = sample_density * step_size;
 
         vec4 ci = vec4(sample_color, 1.0) * sample_alpha;
         color = blend_onto(color, ci);
 
-        t += STEP_SIZE;
+        t += step_size;
     }
 
     if (color.a > ALPHA_CUTOFF) {
@@ -129,10 +137,16 @@ void main() {
     vec4 scene_color = texelFetch(scene, ivec2(gl_FragCoord.xy), 0);
     vec4 depth_pixel = texelFetch(depth, ivec2(gl_FragCoord.xy), 0);
 
-    vec3 ro = camera_position;
-    vec3 rd = gen_ray();
+    vec2 uv = (gl_FragCoord.xy * 2.0) / resolution.xy - 1.0;
+    float scaled_depth = depth_pixel.x * 2.0 - 1.0;
 
-    vec4 shaded_color = ray_march(ro, rd);
+    vec3 ro = camera_position;
+
+    vec3 rd;
+    float d;
+    gen_ray(scaled_depth, uv, rd, d);
+
+    vec4 shaded_color = ray_march(ro, rd, d);
 
     p3d_FragColor = blend_onto(shaded_color, scene_color);
 }
