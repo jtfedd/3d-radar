@@ -84,6 +84,7 @@ float hash13(vec3 p3) {
     return fract((p3.x + p3.y) * p3.z);
 }
 
+// Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
 vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     vec2 tRange;
     bool no_intersection;
