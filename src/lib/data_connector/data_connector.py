@@ -4,9 +4,9 @@ from typing import Optional
 import blosc
 
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
+from lib.model.convert.serialization import deserializeScan, serializeScan
 from lib.model.record import Record
 from lib.model.scan import Scan
-from lib.model.convert.serialization import deserializeScan, serializeScan
 
 
 class DataConnector:
