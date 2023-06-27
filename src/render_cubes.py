@@ -64,7 +64,7 @@ class Viewer(ShowBase):
         if random.randrange(0, 100) != 1:
             return
 
-        cube = self.loader.loadModel("../assets/cube.glb")
+        cube = self.loader.loadModel("assets/cube.glb")
         if not cube:
             return
 

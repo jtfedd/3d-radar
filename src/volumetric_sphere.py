@@ -21,7 +21,7 @@ class App(DirectObject):
         self.cameraControl = CameraControl(self.base)
         self.cameraControl.zoom = 15
 
-        self.cube = unwrap(self.base.loader.loadModel("../assets/cube.glb"))
+        self.cube = unwrap(self.base.loader.loadModel("assets/cube.glb"))
         self.cube.reparentTo(self.base.render)
 
         shader = Shader.load(

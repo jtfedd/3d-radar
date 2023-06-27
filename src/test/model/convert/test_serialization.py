@@ -6,7 +6,7 @@ from test.testutils.models import (
     newTestScan,
 )
 
-from lib.model.serialization import serialization
+from lib.model.convert import serialization
 
 
 class TestSerialization(unittest.TestCase):
