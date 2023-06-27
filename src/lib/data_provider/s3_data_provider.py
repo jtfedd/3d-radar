@@ -3,7 +3,7 @@ import botocore
 from metpy.io import Level2File
 
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
-from lib.model.from_metpy.scan_from_metpy import scanFromLevel2Data
+from lib.model.convert.scan_from_metpy import scanFromLevel2Data
 from lib.model.record import Record
 from lib.model.scan import Scan
 

@@ -36,7 +36,7 @@ class App(ShowBase):
         smoothNode.setZ(-15)
 
         # Render a cube for comparison
-        cube = self.loader.loadModel("../assets/cube.glb")
+        cube = self.loader.loadModel("assets/cube.glb")
         if cube:
             cube.reparentTo(self.render)
 
