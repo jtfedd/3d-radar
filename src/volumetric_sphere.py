@@ -27,7 +27,7 @@ class App(DirectObject):
         shader = Shader.load(
             Shader.SL_GLSL,
             vertex="shader/vertex.glsl",
-            fragment="shader/fragment.glsl",
+            fragment="shader/sphere.glsl",
         )
 
         manager = FilterManager(self.base.win, self.base.cam)  # type: ignore
