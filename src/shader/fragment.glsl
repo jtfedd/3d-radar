@@ -1,27 +1,27 @@
 #version 460
 
+// Outputs to Panda3D
+out vec4 p3d_FragColor;
+
 // Inputs from program
+uniform sampler2D scene;
+uniform sampler2D depth;
+
 uniform vec2 resolution;
 uniform vec3 camera_position;
+uniform mat4 trans_world_to_model_of_camera;
+uniform mat4 projection_matrix_inverse;
 
 uniform vec3 bounds_start;
 uniform vec3 bounds_end;
 
-uniform sampler2D scene;
-uniform sampler2D depth;
-
-uniform mat4 trans_world_to_model_of_camera;
-uniform mat4 projection_matrix_inverse;
-
 uniform float time;
+// End inputs
 
-// Outputs to Panda3D
-out vec4 p3d_FragColor;
-
-const float MIN_STEPS = 5;
-const float MAX_STEPS = 1000;
-const float STEP_SIZE = 0.1;
-const float ALPHA_CUTOFF = 0.99;
+#define MIN_STEPS 5
+#define MAX_STEPS 1000
+#define STEP_SIZE 0.1
+#define ALPHA_CUTOFF 0.99
 
 void gen_ray(
     in float depth_clip, in vec2 uv,
@@ -36,14 +36,6 @@ void gen_ray(
 
     vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
     ray = normalize(ray_world);
-}
-
-float density(in vec3 point, in vec3 center, float radius) {
-    if (length(point - center) < radius) {
-        return 2 - 2 * pow((length(point - center) / radius), 3.0f);
-    }
-
-    return 0.0;
 }
 
 vec4 blend_onto(vec4 front, vec4 behind) {
@@ -84,6 +76,21 @@ float hash13(vec3 p3) {
     return fract((p3.x + p3.y) * p3.z);
 }
 
+float density(vec3 point) {
+    vec3 center = vec3(0.0);
+    float radius = 2.0;
+
+    if (length(point - center) < radius) {
+        return 2 - 2 * pow((length(point - center) / radius), 3.0f);
+    }
+
+    return 0.0;
+}
+
+vec3 colorize(float sample_density) {
+    return vec3(1.0 - sample_density, 0, sample_density);
+}
+
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
 vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     vec2 tRange;
@@ -116,9 +123,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
 
         vec3 sample_pos = ro + t * rd;
 
-        float sample_density = density(sample_pos, vec3(0.0, 0.0, 0.0), 2.0);
-        float sample_attenuation = exp(-step_size * sample_density);
-        vec3 sample_color = vec3(1.0 - sample_density, 0, sample_density);
+        float sample_density = density(sample_pos);
+        vec3 sample_color = colorize(sample_density);
         float sample_alpha = sample_density * step_size;
 
         vec4 ci = vec4(sample_color, 1.0) * sample_alpha;
