@@ -98,8 +98,8 @@ int calc_el_index(float el) {
 
     for (int i = 0; i < 20; i++) {
         int m = (l + r) / 2;
-        float val = el_values[m];
-        if (el < val) {
+
+        if (el < el_values[m]) {
             r = m;
         } else {
             l = m;
@@ -166,7 +166,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     // Use a smaller step size when the slice of volume is very thin
     float step_size = min(STEP_SIZE, (tRange.t - tRange.s) / MIN_STEPS);
 
-    float jitter = min(tRange.t-tRange.s, step_size)*hash13(vec3(gl_FragCoord.xy, time));    
+    float jitter = min(tRange.t-tRange.s, step_size)*hash13(vec3(gl_FragCoord.xy, time));
     float t = tRange.s + jitter;
 
     for (int i = 0; i < MAX_STEPS; i++) {
