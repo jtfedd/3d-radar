@@ -114,7 +114,6 @@ int calc_el_index(float el) {
 }
 
 float data_value(vec3 point) {
-
     float el = atan(point.z, length(point.xy));
     if (el <= el_min || el >= el_max) {
         return 0.0;
