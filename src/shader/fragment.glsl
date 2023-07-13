@@ -36,7 +36,7 @@ uniform samplerBuffer volume_data;
 
 #define MIN_STEPS 5
 #define MAX_STEPS 1000
-#define STEP_SIZE 0.25
+#define STEP_SIZE 1.5
 #define ALPHA_CUTOFF 0.99
 
 void gen_ray(
@@ -138,7 +138,7 @@ float data_value(vec3 point) {
 }
 
 float density(float value) {
-    return value / 10;
+    return pow(value, 3);
 }
 
 vec3 colorize(float value) {

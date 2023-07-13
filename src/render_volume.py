@@ -19,7 +19,6 @@ class App(DirectObject):
         self.base.setBackgroundColor(0, 0, 0, 1)
 
         self.cameraControl = CameraControl(self.base)
-        self.cameraControl.zoom = 15
         defaultLight(self.base)
 
         scan = getData()
