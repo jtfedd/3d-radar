@@ -20,7 +20,7 @@ uniform vec3 bounds_end;
 uniform float el_min;
 uniform float el_max;
 uniform int el_length;
-uniform float el_values[2];
+uniform float el_values[20];
 
 uniform int az_length;
 uniform float az_step;
@@ -36,7 +36,7 @@ uniform samplerBuffer volume_data;
 
 #define MIN_STEPS 5
 #define MAX_STEPS 1000
-#define STEP_SIZE 0.01
+#define STEP_SIZE 0.25
 #define ALPHA_CUTOFF 0.99
 
 void gen_ray(
@@ -138,11 +138,11 @@ float data_value(vec3 point) {
 }
 
 float density(float value) {
-    return value;
+    return value / 10;
 }
 
-vec3 colorize(float sample_density) {
-    return vec3(1.0, 1.0, 1.0);
+vec3 colorize(float value) {
+    return vec3(2*value, 2.0 - (2*value), 0);
 }
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
@@ -179,7 +179,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
 
         float sample_value = data_value(sample_pos);
         float sample_density = density(sample_value);
-        vec3 sample_color = colorize(sample_density);
+        vec3 sample_color = colorize(sample_value);
         float sample_alpha = sample_density * step_size;
 
         vec4 ci = vec4(sample_color, 1.0) * sample_alpha;
