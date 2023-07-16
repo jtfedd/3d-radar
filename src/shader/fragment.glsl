@@ -119,7 +119,7 @@ float data_value(vec3 point) {
         return 0.0;
     }
 
-    float az = mod(atan(point.y, point.x), PI*2);
+    float az = mod(atan(point.x, point.y), PI*2);
     int az_index = int(floor(az / az_step));
     if (az_index < 0 || az_index >= az_length) {
         return 0.0;
