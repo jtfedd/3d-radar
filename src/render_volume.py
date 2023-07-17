@@ -82,8 +82,8 @@ class App(DirectObject):
         self.plane.setShaderInput("el_length", len(scan.elevations))
 
         elevations = PTA_float.emptyArray(20)
-        for i, el in enumerate(scan.elevations):
-            elevations.setElement(i, math.radians(el))
+        for i, elevation in enumerate(scan.elevations):
+            elevations.setElement(i, math.radians(elevation))
         self.plane.setShaderInput("el_values", elevations)
 
         self.plane.setShaderInput("az_length", 720)
@@ -126,7 +126,9 @@ class App(DirectObject):
 
 
 base = ShowBase()
-print("Max buffer size: %d" % (base.win.get_gsg().get_max_buffer_texture_size()))
+
+maxBufferSize = base.win.get_gsg().get_max_buffer_texture_size()  # type: ignore
+print("Max buffer size: " + str(maxBufferSize))
 
 app = App(base)
 base.run()
