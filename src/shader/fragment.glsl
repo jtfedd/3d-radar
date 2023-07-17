@@ -1,27 +1,43 @@
 #version 460
 
-// Inputs from program
-uniform vec2 resolution;
-uniform vec3 camera_position;
+// Outputs to Panda3D
+out vec4 p3d_FragColor;
 
-uniform vec3 bounds_start;
-uniform vec3 bounds_end;
+// Inputs from program
+uniform float time;
 
 uniform sampler2D scene;
 uniform sampler2D depth;
 
+uniform vec2 resolution;
+uniform vec3 camera_position;
 uniform mat4 trans_world_to_model_of_camera;
 uniform mat4 projection_matrix_inverse;
 
-uniform float time;
+uniform vec3 bounds_start;
+uniform vec3 bounds_end;
 
-// Outputs to Panda3D
-out vec4 p3d_FragColor;
+uniform float el_min;
+uniform float el_max;
+uniform int el_length;
+uniform float el_values[20];
 
-const float MIN_STEPS = 5;
-const float MAX_STEPS = 1000;
-const float STEP_SIZE = 0.1;
-const float ALPHA_CUTOFF = 0.99;
+uniform int az_length;
+uniform float az_step;
+
+uniform float r_min;
+uniform int r_length;
+uniform float r_step;
+
+uniform samplerBuffer volume_data;
+// End inputs
+
+#define PI 3.1415926538
+
+#define MIN_STEPS 5
+#define MAX_STEPS 1000
+#define STEP_SIZE 1.5
+#define ALPHA_CUTOFF 0.99
 
 void gen_ray(
     in float depth_clip, in vec2 uv,
@@ -36,14 +52,6 @@ void gen_ray(
 
     vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
     ray = normalize(ray_world);
-}
-
-float density(in vec3 point, in vec3 center, float radius) {
-    if (length(point - center) < radius) {
-        return 2 - 2 * pow((length(point - center) / radius), 3.0f);
-    }
-
-    return 0.0;
 }
 
 vec4 blend_onto(vec4 front, vec4 behind) {
@@ -72,16 +80,69 @@ void box_intersection(
 }
 
 // https://www.shadertoy.com/view/4djSRW
-float hash12(vec2 p) {
-	vec3 p3  = fract(vec3(p.xyx) * .1031);
-    p3 += dot(p3, p3.yzx + 33.33);
-    return fract((p3.x + p3.y) * p3.z);
-}
+// float hash12(vec2 p) {
+// 	vec3 p3  = fract(vec3(p.xyx) * .1031);
+//     p3 += dot(p3, p3.yzx + 33.33);
+//     return fract((p3.x + p3.y) * p3.z);
+// }
 
 float hash13(vec3 p3) {
 	p3  = fract(p3 * .1031);
     p3 += dot(p3, p3.zyx + 31.32);
     return fract((p3.x + p3.y) * p3.z);
+}
+
+int calc_el_index(float el) {
+    int l = 0;
+    int r = el_length;
+
+    for (int i = 0; i < 20; i++) {
+        int m = (l + r) / 2;
+
+        if (el < el_values[m]) {
+            r = m;
+        } else {
+            l = m;
+        }
+
+        if (r - l <= 1) {
+            return l;
+        }
+    }
+
+    return 0;
+}
+
+float data_value(vec3 point) {
+    float el = atan(point.z, length(point.xy));
+    if (el <= el_min || el >= el_max) {
+        return 0.0;
+    }
+
+    float az = mod(atan(point.x, point.y), PI*2);
+    int az_index = int(floor(az / az_step));
+    if (az_index < 0 || az_index >= az_length) {
+        return 0.0;
+    }
+
+    float r = length(point);
+    int r_index = int(floor((r - r_min) / r_step));
+    if (r_index < 0 || r_index >= r_length) {
+        return 0.0;
+    }
+
+    int el_index = calc_el_index(el);
+
+    int buff_index = az_length * r_length * el_index + r_length * az_index + r_index;
+    return texelFetch(volume_data, buff_index).x;
+}
+
+float density(float value) {
+    return pow(value, 3);
+}
+
+vec3 colorize(float value) {
+    return vec3(2*value, 2.0 - (2*value), 0);
 }
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
@@ -105,7 +166,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     // Use a smaller step size when the slice of volume is very thin
     float step_size = min(STEP_SIZE, (tRange.t - tRange.s) / MIN_STEPS);
 
-    float jitter = min(tRange.t-tRange.s, step_size)*hash13(vec3(gl_FragCoord.xy, time));    
+    float jitter = min(tRange.t-tRange.s, step_size)*hash13(vec3(gl_FragCoord.xy, time));
     float t = tRange.s + jitter;
 
     for (int i = 0; i < MAX_STEPS; i++) {
@@ -116,9 +177,9 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
 
         vec3 sample_pos = ro + t * rd;
 
-        float sample_density = density(sample_pos, vec3(0.0, 0.0, 0.0), 2.0);
-        float sample_attenuation = exp(-step_size * sample_density);
-        vec3 sample_color = vec3(1.0 - sample_density, 0, sample_density);
+        float sample_value = data_value(sample_pos);
+        float sample_density = density(sample_value);
+        vec3 sample_color = colorize(sample_value);
         float sample_alpha = sample_density * step_size;
 
         vec4 ci = vec4(sample_color, 1.0) * sample_alpha;

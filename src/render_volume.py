@@ -1,28 +1,31 @@
 import math
 
+import numpy as np
 from direct.filter.FilterManager import FilterManager
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
-from panda3d.core import GraphicsWindow, Shader, Texture
+from panda3d.core import GeomEnums, GraphicsWindow, PTA_float, Shader, Texture
 
 from lib.camera.camera_control import CameraControl
 from lib.util.optional import unwrap
-from lib.util.util import defaultLight
+from lib.util.util import defaultLight, getData
 
 
 class App(DirectObject):
     def __init__(self, showbase: ShowBase) -> None:
         self.base = showbase
-
+        self.base.setFrameRateMeter(True)
         self.base.setBackgroundColor(0, 0, 0, 1)
-        defaultLight(self.base)
 
         self.cameraControl = CameraControl(self.base)
-        self.cameraControl.zoom = 15
+        defaultLight(self.base)
+
+        scan = getData()
 
         self.cube = unwrap(self.base.loader.loadModel("assets/cube.glb"))
         self.cube.reparentTo(self.base.render)
+        self.cube.setScale(0)
 
         shader = Shader.load(
             Shader.SL_GLSL,
@@ -38,8 +41,8 @@ class App(DirectObject):
         self.plane.setShader(shader)
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
-        self.plane.setShaderInput("bounds_start", (-2, -2, -2))
-        self.plane.setShaderInput("bounds_end", (2, 2, 2))
+        self.plane.setShaderInput("bounds_start", (-1000, -1000, 0))
+        self.plane.setShaderInput("bounds_end", (1000, 1000, 20))
         self.plane.setShaderInput("camera", self.base.camera)
         self.plane.setShaderInput("time_ms", 0)
 
@@ -57,6 +60,38 @@ class App(DirectObject):
         base.taskMgr.add(self.updateCameraParams, "update-camera-params")
         base.taskMgr.add(self.updateCubePos, "update-cube-pos")
         base.taskMgr.add(self.updateTime, "update-time")
+
+        data = scan.reflectivity
+        data = data - np.nanmin(data)
+        data = data / np.nanmax(data)
+        data = np.nan_to_num(data, nan=0)
+        dataBytes = data.flatten().tobytes()
+
+        buffer = Texture("volume_data")
+        buffer.setup_buffer_texture(
+            len(dataBytes), Texture.T_float, Texture.F_r32, GeomEnums.UH_dynamic
+        )
+        self.plane.setShaderInput("volume_data", buffer)
+
+        dataView = memoryview(buffer.modifyRamImage())  # type: ignore
+        dataView[0 : len(dataBytes)] = dataBytes
+
+        self.plane.setShaderInput("el_min", float(scan.elevations[0]))
+        self.plane.setShaderInput("el_max", float(scan.elevations[-1]))
+
+        self.plane.setShaderInput("el_length", len(scan.elevations))
+
+        elevations = PTA_float.emptyArray(20)
+        for i, elevation in enumerate(scan.elevations):
+            elevations.setElement(i, math.radians(elevation))
+        self.plane.setShaderInput("el_values", elevations)
+
+        self.plane.setShaderInput("az_length", 720)
+        self.plane.setShaderInput("az_step", math.pi / 360)
+
+        self.plane.setShaderInput("r_length", 2001)
+        self.plane.setShaderInput("r_min", float(scan.ranges[0]))
+        self.plane.setShaderInput("r_step", 0.25)
 
     def handleWindowEvent(self, win: GraphicsWindow) -> None:
         newSize = (win.getXSize(), win.getYSize())
@@ -91,5 +126,9 @@ class App(DirectObject):
 
 
 base = ShowBase()
+
+maxBufferSize = base.win.get_gsg().get_max_buffer_texture_size()  # type: ignore
+print("Max buffer size: " + str(maxBufferSize))
+
 app = App(base)
 base.run()

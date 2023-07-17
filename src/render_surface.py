@@ -18,8 +18,6 @@ class Viewer(ShowBase):
         self.cameraControl = CameraControl(self)
         self.accept("w", self.toggle_wireframe)
 
-        self.radarBase = self.render.attachNewNode("radar")
-
         scan = getData()
 
         data = scan.reflectivity
