@@ -1,10 +1,10 @@
 astroid==2.15.6
 black==23.7.0
 blosc==1.11.1
-boto3==1.28.9
-boto3-stubs==1.28.9
-botocore==1.31.9
-botocore-stubs==1.31.9
+boto3==1.28.15
+boto3-stubs==1.28.15.post1
+botocore==1.31.15
+botocore-stubs==1.31.15
 certifi==2023.7.22
 charset-normalizer==3.2.0
 click==8.1.6
@@ -12,7 +12,7 @@ colorama==0.4.6
 contourpy==1.1.0
 coverage==7.2.7
 cycler==0.11.0
-dill==0.3.6
+dill==0.3.7
 flake8==6.0.0
 fonttools==4.41.1
 idna==3.4
@@ -30,7 +30,7 @@ numpy==1.25.1
 packaging==23.1
 Panda3D==1.10.13
 pandas==2.0.3
-pathspec==0.11.1
+pathspec==0.11.2
 perlin-numpy @ git+https://github.com/pvigier/perlin-numpy@5e26837db14042e51166eb6cad4c0df2c1907016
 Pillow==10.0.0
 Pint==0.22
@@ -38,7 +38,7 @@ platformdirs==3.9.1
 pooch==1.7.0
 pycodestyle==2.10.0
 pyflakes==3.0.1
-pylint==2.17.4
+pylint==2.17.5
 PyMCubes==0.1.4
 pyparsing==3.1.0
 pyproj==3.6.0
@@ -49,9 +49,9 @@ s3transfer==0.6.1
 scipy==1.11.1
 six==1.16.0
 tomli==2.0.1
-tomlkit==0.11.8
+tomlkit==0.12.1
 traitlets==5.9.0
-types-awscrt==0.16.26
+types-awscrt==0.17.0
 types-panda3d==0.3.3
 types-requests==2.31.0.2
 types-s3transfer==0.6.1
