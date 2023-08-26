@@ -1,10 +1,10 @@
 astroid==2.15.6
 black==23.7.0
 blosc==1.11.1
-boto3==1.28.30
-boto3-stubs==1.28.30
-botocore==1.31.30
-botocore-stubs==1.31.30
+boto3==1.28.35
+boto3-stubs==1.28.35
+botocore==1.31.35
+botocore-stubs==1.31.35
 certifi==2023.7.22
 charset-normalizer==3.2.0
 click==8.1.7
@@ -14,11 +14,11 @@ coverage==7.3.0
 cycler==0.11.0
 dill==0.3.7
 flake8==6.1.0
-fonttools==4.42.0
+fonttools==4.42.1
 idna==3.4
 isort==5.12.0
 jmespath==1.0.1
-kiwisolver==1.4.4
+kiwisolver==1.4.5
 lazy-object-proxy==1.9.0
 lxml==4.9.3
 matplotlib==3.7.1
@@ -61,4 +61,4 @@ tzdata==2023.3
 unittest-xml-reporting==3.2.0
 urllib3==1.26.16
 wrapt==1.15.0
-xarray==2023.7.0
+xarray==2023.8.0
