@@ -1,10 +1,10 @@
 astroid==2.15.6
 black==23.9.1
 blosc==1.11.1
-boto3==1.28.49
-boto3-stubs==1.28.49
-botocore==1.31.49
-botocore-stubs==1.31.49
+boto3==1.28.53
+boto3-stubs==1.28.53
+botocore==1.31.53
+botocore-stubs==1.31.53
 certifi==2023.7.22
 charset-normalizer==3.2.0
 click==8.1.7
@@ -26,10 +26,10 @@ mccabe==0.7.0
 MetPy==1.5.1
 mypy==1.5.1
 mypy-extensions==1.0.0
-numpy==1.25.2
+numpy==1.26.0
 packaging==23.1
 Panda3D==1.10.13
-pandas==2.1.0
+pandas==2.1.1
 pathspec==0.11.2
 perlin-numpy @ git+https://github.com/pvigier/perlin-numpy@5e26837db14042e51166eb6cad4c0df2c1907016
 Pillow==10.0.1
@@ -41,7 +41,7 @@ pyflakes==3.1.0
 pylint==2.17.5
 PyMCubes==0.1.4
 pyparsing==3.1.1
-pyproj==3.6.0
+pyproj==3.6.1
 python-dateutil==2.8.2
 pytz==2023.3.post1
 requests==2.31.0
@@ -53,10 +53,10 @@ tomlkit==0.12.1
 traitlets==5.10.0
 types-awscrt==0.19.1
 types-panda3d==0.3.3
-types-requests==2.31.0.2
+types-requests==2.31.0.4
 types-s3transfer==0.6.2
 types-urllib3==1.26.25.14
-typing_extensions==4.7.1
+typing_extensions==4.8.0
 tzdata==2023.3
 unittest-xml-reporting==3.2.0
 urllib3==1.26.16
