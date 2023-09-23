@@ -15,6 +15,18 @@ OPTIONS
     -c, --check: Run in check mode"""
 
 
+def pathHasPythonChild(path: pathlib.Path) -> bool:
+    for child in path.iterdir():
+        if child.is_dir():
+            if pathHasPythonChild(child):
+                return True
+        if child.is_file():
+            if child.suffix == ".py":
+                return True
+
+    return False
+
+
 def checkPath(path: pathlib.Path) -> List[pathlib.Path]:
     """Searches the path for missing __init__.py files
 
@@ -25,6 +37,9 @@ def checkPath(path: pathlib.Path) -> List[pathlib.Path]:
         return []
 
     if path.name in ignore:
+        return []
+
+    if not pathHasPythonChild(path):
         return []
 
     missingInitFiles = []
