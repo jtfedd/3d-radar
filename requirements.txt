@@ -1,10 +1,10 @@
 astroid==3.0.0
 black==23.9.1
 blosc==1.11.1
-boto3==1.28.62
-boto3-stubs==1.28.62
-botocore==1.31.62
-botocore-stubs==1.31.62
+boto3==1.28.63
+boto3-stubs==1.28.63
+botocore==1.31.63
+botocore-stubs==1.31.63
 certifi==2023.7.22
 charset-normalizer==3.3.0
 click==8.1.7
@@ -24,7 +24,7 @@ lxml==4.9.3
 matplotlib==3.8.0
 mccabe==0.7.0
 MetPy==1.5.1
-mypy==1.5.1
+mypy==1.6.0
 mypy-extensions==1.0.0
 numpy==1.26.0
 packaging==23.2
@@ -36,7 +36,7 @@ Pillow==10.0.1
 Pint==0.22
 platformdirs==3.11.0
 pooch==1.7.0
-pycodestyle==2.11.0
+pycodestyle==2.11.1
 pyflakes==3.1.0
 pylint==3.0.1
 PyMCubes==0.1.4
@@ -53,7 +53,7 @@ tomlkit==0.12.1
 traitlets==5.11.2
 types-awscrt==0.19.2
 types-panda3d==0.3.3
-types-requests==2.31.0.8
+types-requests==2.31.0.9
 types-s3transfer==0.7.0
 types-urllib3==1.26.25.14
 typing_extensions==4.8.0
