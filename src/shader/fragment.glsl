@@ -30,6 +30,17 @@ uniform int r_length;
 uniform float r_step;
 
 uniform samplerBuffer volume_data;
+
+// Density parameters
+uniform float d_min;
+uniform float d_scale;
+uniform float d_exp;
+
+uniform float d_offset;
+uniform float d_factor;
+
+uniform sampler2D color_scale;
+
 // End inputs
 
 #define PI 3.1415926538
@@ -116,19 +127,19 @@ int calc_el_index(float el) {
 float data_value(vec3 point) {
     float el = atan(point.z, length(point.xy));
     if (el <= el_min || el >= el_max) {
-        return 0.0;
+        return -1.0;
     }
 
     float az = mod(atan(point.x, point.y), PI*2);
     int az_index = int(floor(az / az_step));
     if (az_index < 0 || az_index >= az_length) {
-        return 0.0;
+        return -1.0;
     }
 
     float r = length(point);
     int r_index = int(floor((r - r_min) / r_step));
     if (r_index < 0 || r_index >= r_length) {
-        return 0.0;
+        return -1.0;
     }
 
     int el_index = calc_el_index(el);
@@ -138,11 +149,14 @@ float data_value(vec3 point) {
 }
 
 float density(float value) {
-    return pow(value, 3);
+    if (value < 0) return 0;
+
+    value = abs((value - d_offset) * d_factor);
+    return d_min + d_scale * pow(value, d_exp);
 }
 
 vec3 colorize(float value) {
-    return vec3(2*value, 2.0 - (2*value), 0);
+    return texture(color_scale, vec2(0, value)).rgb;
 }
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1

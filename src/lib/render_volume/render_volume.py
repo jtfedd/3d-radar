@@ -21,6 +21,9 @@ class VolumeRenderer(DirectObject):
             fragment="shader/fragment.glsl",
         )
 
+        self.densityMin = 0.0
+        self.densityMax = 1.0
+
         manager = FilterManager(self.base.win, self.base.cam)  # type: ignore
         scene = Texture()
         depth = Texture()
@@ -49,11 +52,48 @@ class VolumeRenderer(DirectObject):
         self.base.taskMgr.add(self.updateTime, "update-time")
 
     def updateVolumeData(self, scan: Scan) -> None:
+        # velocity scale: -100 to 100
+        # reflectivity scale: -35 to 80
+
+        # density curve
+        # k -0.5..1
+        # density = abs(d)^(10^k)
+        k = 0.5
+
+        scaleMin = -35
+        scaleMax = 80
+
+        # Scale the data to 0..1, based on the scale range, and clip any outliers
         data = scan.reflectivity
-        data = data - np.nanmin(data)
-        data = data / np.nanmax(data)
-        data = np.nan_to_num(data, nan=0)
+        data = data - scaleMin
+        data = data / (scaleMax - scaleMin)
+        data = np.clip(data, 0, 1)
+
+        # Turn any nan into -1
+        data = np.nan_to_num(data, nan=-1)
+
+        # Get the bytes
         dataBytes = data.flatten().tobytes()
+
+        # Params for rendering the volume
+        densityMin = 0
+        densityMax = 1
+        densityScale = densityMax - densityMin
+        densityExp = math.pow(10, k)
+
+        self.plane.setShaderInput("d_min", densityMin)
+        self.plane.setShaderInput("d_scale", densityScale)
+        self.plane.setShaderInput("d_exp", densityExp)
+
+        # Params to change to get velocity to be both negative and positive
+        # reflectivity = 0, 1
+        # velocity = -0.5, 2
+        self.plane.setShaderInput("d_offset", 0)
+        self.plane.setShaderInput("d_factor", 1)
+
+        # Load the color scale image and send it to the shader
+        colorScale = self.base.loader.loadTexture("assets/reflectivity_scale.png")
+        self.plane.setShaderInput("color_scale", colorScale)
 
         buffer = Texture("volume_data")
         buffer.setup_buffer_texture(
@@ -80,6 +120,19 @@ class VolumeRenderer(DirectObject):
         self.plane.setShaderInput("r_length", 2001)
         self.plane.setShaderInput("r_min", float(scan.ranges[0]))
         self.plane.setShaderInput("r_step", 0.25)
+
+    def updateDensityExponent(self, k: float) -> None:
+        densityExp = math.pow(10, k)
+        self.plane.setShaderInput("d_exp", densityExp)
+
+    def updateMin(self, value: float) -> None:
+        self.densityMin = value
+        self.plane.setShaderInput("d_min", self.densityMin)
+        self.plane.setShaderInput("d_scale", self.densityMax - self.densityMin)
+
+    def updateMax(self, value: float) -> None:
+        self.densityMax = value
+        self.plane.setShaderInput("d_scale", self.densityMax - self.densityMin)
 
     def handleWindowEvent(self, win: GraphicsWindow) -> None:
         newSize = (win.getXSize(), win.getYSize())
