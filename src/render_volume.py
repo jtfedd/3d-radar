@@ -1,3 +1,4 @@
+from direct.gui.DirectGui import DirectSlider
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 
@@ -19,6 +20,42 @@ class App(DirectObject):
 
         scan = getData()
         self.volumeRenderer.updateVolumeData(scan)
+
+        self.minSlider = DirectSlider(
+            pos=(0, 0, -0.7),
+            scale=0.6,
+            range=(0, 1),
+            value=0,
+            pageSize=0.1,
+            command=self.updateMin,
+        )
+
+        self.maxSlider = DirectSlider(
+            pos=(0, 0, -0.8),
+            scale=0.6,
+            range=(0, 10),
+            value=1,
+            pageSize=0.1,
+            command=self.updateMax,
+        )
+
+        self.slider = DirectSlider(
+            pos=(0, 0, -0.9),
+            scale=0.6,
+            range=(-0.5, 1.0),
+            value=0.5,
+            pageSize=0.05,
+            command=self.updateDensityExponent,
+        )
+
+    def updateDensityExponent(self) -> None:
+        self.volumeRenderer.updateDensityExponent(float(self.slider["value"]))
+
+    def updateMin(self) -> None:
+        self.volumeRenderer.updateMin(float(self.minSlider["value"]))
+
+    def updateMax(self) -> None:
+        self.volumeRenderer.updateMax(float(self.maxSlider["value"]))
 
 
 base = ShowBase()
