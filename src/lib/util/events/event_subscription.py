@@ -1,17 +1,18 @@
 from typing import Callable, Generic, TypeVar
 
 from lib.util.errors import StateError
-from lib.util.events.event_dispatcher import EventDispatcher
 
 T = TypeVar("T")
 
 
 class EventSubscription(Generic[T]):
     def __init__(
-        self, dispatcher: EventDispatcher, callback: Callable[[T], None]
+        self,
+        callback: Callable[[T], None],
+        cancelCallback: Callable[[], None],
     ) -> None:
-        self.dispatcher = dispatcher
         self.callback = callback
+        self.cancelCallback = cancelCallback
         self.cancelled = False
 
     def cancel(self) -> None:
@@ -19,7 +20,7 @@ class EventSubscription(Generic[T]):
             raise StateError("EventSubscription is already cancelled")
 
         self.cancelled = True
-        self.dispatcher.remove(self)
+        self.cancelCallback()
 
     def send(self, payload: T) -> None:
         if self.cancelled:

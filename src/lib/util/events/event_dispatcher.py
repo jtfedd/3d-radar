@@ -1,7 +1,8 @@
-from typing import Callable, Generic, List, TypeVar
+from typing import Callable, Dict, Generic, TypeVar
 
 from lib.util.errors import StateError
 from lib.util.events.event_subscription import EventSubscription
+from lib.util.uuid import uuid
 
 T = TypeVar("T")
 
@@ -9,10 +10,10 @@ T = TypeVar("T")
 class EventDispatcher(Generic[T]):
     def __init__(self) -> None:
         self.closed = False
-        self.subscriptions: List[EventSubscription[T]] = []
+        self.subscriptions: Dict[str, EventSubscription[T]] = {}
 
-    def remove(self, subscription: EventSubscription[T]) -> None:
-        self.subscriptions.remove(subscription)
+    def remove(self, subscriptionID: str) -> None:
+        del self.subscriptions[subscriptionID]
 
     def close(self) -> None:
         if self.closed:
@@ -20,20 +21,23 @@ class EventDispatcher(Generic[T]):
 
         self.closed = True
 
-        while len(self.subscriptions) > 0:
-            self.subscriptions[0].cancel()
+        keys = self.subscriptions.keys()
+        for key in keys:
+            self.remove(key)
 
     def listen(self, callback: Callable[[T], None]) -> EventSubscription[T]:
         if self.closed:
             raise StateError("EventDispatcher cannot accept listeners when closed")
 
-        subscription = EventSubscription(self, callback)
-        self.subscriptions.append(subscription)
+        subscriptionID = uuid()
+        subscription = EventSubscription(callback, lambda: self.remove(subscriptionID))
+        self.subscriptions[subscriptionID] = subscription
+
         return subscription
 
     def send(self, payload: T) -> None:
         if self.closed:
             raise StateError("EventDispatcher cannot send events when closed")
 
-        for subscription in self.subscriptions:
+        for subscription in self.subscriptions.values():
             subscription.send(payload)
