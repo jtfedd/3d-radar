@@ -8,11 +8,7 @@ from metpy.io import Level2File
 
 from lib.model.record import Record
 from lib.model.scan import Scan
-
-
-class UnsupportedScanException(Exception):
-    pass
-
+from lib.util.errors import UnsupportedScanException
 
 RAY_LENGTH = 2000
 
