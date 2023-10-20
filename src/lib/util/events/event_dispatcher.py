@@ -22,8 +22,7 @@ class EventDispatcher(Generic[T]):
 
         self.closed = True
 
-        keys = list(self.subscriptions.keys())
-        for key in keys:
+        for key in list(self.subscriptions.keys()):
             self.remove(key)
 
     def listen(self, callback: Callable[[T], None]) -> EventSubscription[T]:
