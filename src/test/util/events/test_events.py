@@ -1,5 +1,6 @@
 import unittest
 
+from lib.util.errors import StateError
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
@@ -70,3 +71,40 @@ class TestEvents(unittest.TestCase):
 
         self.assertEqual(x, 12)
         self.assertEqual(y, 9)
+
+    def testEventInteractingAfterCloseRaisesErrors(self) -> None:
+        event = EventDispatcher[int]()
+
+        event.close()
+
+        def callback(_: int) -> None:
+            pass
+
+        # Calling close again should raise an exception
+        self.assertRaises(StateError, event.close)
+        self.assertRaises(StateError, event.listen, callback)
+        self.assertRaises(StateError, event.send, 1)
+
+    def testEventSubscriptionsCancelledAfterEventClosed(self) -> None:
+        event = EventDispatcher[int]()
+
+        def callback(_: int) -> None:
+            pass
+
+        subscription = event.listen(callback)
+
+        event.close()
+        subscription.cancel()
+
+    def testEventSubscriptionInteractingAfterCloseRaisesError(self) -> None:
+        event = EventDispatcher[int]()
+
+        def callback(_: int) -> None:
+            pass
+
+        subscription = event.listen(callback)
+
+        subscription.cancel()
+
+        self.assertRaises(StateError, subscription.cancel)
+        self.assertRaises(StateError, subscription.send, 1)

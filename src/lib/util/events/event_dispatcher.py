@@ -13,7 +13,8 @@ class EventDispatcher(Generic[T]):
         self.subscriptions: Dict[str, EventSubscription[T]] = {}
 
     def remove(self, subscriptionID: str) -> None:
-        del self.subscriptions[subscriptionID]
+        if subscriptionID in self.subscriptions:
+            del self.subscriptions[subscriptionID]
 
     def close(self) -> None:
         if self.closed:
@@ -21,7 +22,7 @@ class EventDispatcher(Generic[T]):
 
         self.closed = True
 
-        keys = self.subscriptions.keys()
+        keys = list(self.subscriptions.keys())
         for key in keys:
             self.remove(key)
 
