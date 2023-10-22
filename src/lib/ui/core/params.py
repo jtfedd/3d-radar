@@ -4,6 +4,7 @@ from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import GraphicsWindow
 
+from lib.ui.core.anchors import UIAnchors
 from lib.ui.core.constants import UIConstants
 from lib.util.observable.observable import Observable
 
@@ -13,6 +14,8 @@ class UIParams(DirectObject):
         window: GraphicsWindow = base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
         self.accept("window-event", self.handleWindowEvent)
+
+        self.anchors = UIAnchors(base.pixel2d, self.windowSize)
 
         self.scale = 1.0
 
@@ -49,6 +52,8 @@ class UIParams(DirectObject):
 
         self.windowSize = newSize
 
+        self.anchors.update(newSize)
+
         self.update()
 
     def createObservable(self) -> Observable[float]:
@@ -61,3 +66,5 @@ class UIParams(DirectObject):
             observable.close()
 
         self.ignoreAll()
+
+        self.anchors.destroy()
