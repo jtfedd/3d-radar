@@ -1,5 +1,6 @@
 from typing import TypeVar
 
+from lib.util.errors import StateError
 from lib.util.events.event_dispatcher import EventDispatcher
 
 T = TypeVar("T")
@@ -12,6 +13,12 @@ class Observable(EventDispatcher[T]):
         self.value = value
 
     def setValue(self, newValue: T) -> None:
+        if self.closed:
+            raise StateError("Observable is closed")
+
+        if newValue == self.value:
+            return
+
         self.value = newValue
         self.send(newValue)
 

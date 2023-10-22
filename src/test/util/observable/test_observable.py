@@ -28,6 +28,10 @@ class TestObservable(unittest.TestCase):
         self.assertEqual(x, 9)
         self.assertEqual(ob.getValue(), 7)
 
+        ob.setValue(7)
+        self.assertEqual(x, 9)
+        self.assertEqual(ob.getValue(), 7)
+
         sub.cancel()
 
         ob.setValue(3)
