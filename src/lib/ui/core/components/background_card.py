@@ -26,5 +26,9 @@ class BackgroundCard:
             sort=layer.value,
         )
 
+    def update(self, x: float, y: float, width: float, height: float) -> None:
+        self.card.setPos(x + width / 2, 0, y - height / 2)
+        self.card.setScale(width / 2, 1, height / 2)
+
     def destroy(self) -> None:
         self.card.destroy()
