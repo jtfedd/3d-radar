@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Tuple
 
 from panda3d.core import NodePath, PandaNode
@@ -6,7 +8,7 @@ from panda3d.core import NodePath, PandaNode
 class UIAnchors:
     def __init__(
         self,
-        root: "NodePath[PandaNode]",
+        root: NodePath[PandaNode],
         windowSize: Tuple[int, int],
     ):
         self.topLeft = root.attachNewNode("top-left")

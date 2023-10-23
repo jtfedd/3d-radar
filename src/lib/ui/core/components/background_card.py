@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import NodePath, PandaNode, Vec4
 
@@ -7,7 +9,7 @@ from lib.ui.core.layers import UILayer
 class BackgroundCard:
     def __init__(
         self,
-        root: "NodePath[PandaNode]",
+        root: NodePath[PandaNode],
         x: float,
         y: float,
         width: float,
