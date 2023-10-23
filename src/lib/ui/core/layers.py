@@ -1,4 +1,7 @@
-class UILayers:
-    Background = 0
-    BackgroundDecoration = 1
-    Content = 2
+from enum import Enum
+
+
+class UILayer(Enum):
+    BACKGROUND = 0
+    BACKGROUND_DECORATION = 1
+    CONTENT = 2

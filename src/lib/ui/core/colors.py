@@ -6,13 +6,11 @@ from lib.util.errors import StateError
 
 
 class UIColors:
-    white = Vec4(1, 1, 1, 1)
-
-    colorStringRegex = re.compile("^#[A-Fa-f0-9]{6}$")
-
     @staticmethod
     def fromHex(hexColor: str) -> Vec4:
-        if UIColors.colorStringRegex.match(hexColor) is None:
+        colorStringRegex = re.compile("^#[A-F0-9]{6}$")
+
+        if colorStringRegex.match(hexColor) is None:
             raise StateError("Invalid color " + hexColor)
 
         r = int(hexColor[1:3], 16) / 255.0
@@ -20,3 +18,7 @@ class UIColors:
         b = int(hexColor[5:7], 16) / 255.0
 
         return Vec4(r, g, b, 1)
+
+    white = fromHex("#FFFFFF")
+    black = fromHex("#000000")
+    gray = fromHex("454545")

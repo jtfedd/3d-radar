@@ -10,13 +10,13 @@ class TestColors(unittest.TestCase):
     def testParseHexColor(self) -> None:
         self.assertEqual(UIColors.fromHex("#000000"), Vec4(0, 0, 0, 1))
         self.assertEqual(UIColors.fromHex("#FFFFFF"), Vec4(1, 1, 1, 1))
-        self.assertEqual(UIColors.fromHex("#fFfffF"), Vec4(1, 1, 1, 1))
 
     def testParseHexColorInvalid(self) -> None:
         self.assertRaises(StateError, UIColors.fromHex, "")
         self.assertRaises(StateError, UIColors.fromHex, "#")
-        self.assertRaises(StateError, UIColors.fromHex, "#fff")
-        self.assertRaises(StateError, UIColors.fromHex, "#fffff")
-        self.assertRaises(StateError, UIColors.fromHex, "#fffffff")
-        self.assertRaises(StateError, UIColors.fromHex, "ffffff")
-        self.assertRaises(StateError, UIColors.fromHex, "#abcdeg")
+        self.assertRaises(StateError, UIColors.fromHex, "#FFF")
+        self.assertRaises(StateError, UIColors.fromHex, "#FFFFF")
+        self.assertRaises(StateError, UIColors.fromHex, "#FFFFFFF")
+        self.assertRaises(StateError, UIColors.fromHex, "FFFFFF")
+        self.assertRaises(StateError, UIColors.fromHex, "#ABCDEG")
+        self.assertRaises(StateError, UIColors.fromHex, "#fFfffF")
