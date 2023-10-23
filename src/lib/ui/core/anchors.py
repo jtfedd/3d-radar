@@ -1,23 +1,23 @@
 from typing import Tuple
 
-from direct.showbase.ShowBase import ShowBase
+from panda3d.core import NodePath, PandaNode
 
 
 class UIAnchors:
     def __init__(
         self,
-        base: ShowBase,
+        root: "NodePath[PandaNode]",
         windowSize: Tuple[int, int],
     ):
-        self.topLeft = base.pixel2d.attachNewNode("top-left")
-        self.topCenter = base.pixel2d.attachNewNode("top-center")
-        self.topRight = base.pixel2d.attachNewNode("top-right")
-        self.centerLeft = base.pixel2d.attachNewNode("center-left")
-        self.center = base.pixel2d.attachNewNode("center")
-        self.centerRight = base.pixel2d.attachNewNode("center-right")
-        self.bottomLeft = base.pixel2d.attachNewNode("bottom-left")
-        self.bottomCenter = base.pixel2d.attachNewNode("bottom-center")
-        self.bottomRight = base.pixel2d.attachNewNode("bottom-right")
+        self.topLeft = root.attachNewNode("top-left")
+        self.topCenter = root.attachNewNode("top-center")
+        self.topRight = root.attachNewNode("top-right")
+        self.centerLeft = root.attachNewNode("center-left")
+        self.center = root.attachNewNode("center")
+        self.centerRight = root.attachNewNode("center-right")
+        self.bottomLeft = root.attachNewNode("bottom-left")
+        self.bottomCenter = root.attachNewNode("bottom-center")
+        self.bottomRight = root.attachNewNode("bottom-right")
 
         self.update(windowSize)
 

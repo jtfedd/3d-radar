@@ -15,7 +15,7 @@ class UIConfig(DirectObject):
         self.windowSize = (window.getXSize(), window.getYSize())
         self.accept("window-event", self.handleWindowEvent)
 
-        self.anchors = UIAnchors(base, self.windowSize)
+        self.anchors = UIAnchors(base.pixel2d, self.windowSize)
 
         self.scale = scale
 
