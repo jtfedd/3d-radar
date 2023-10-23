@@ -1,5 +1,5 @@
 from direct.gui.OnscreenImage import OnscreenImage
-from panda3d.core import NodePath, PandaNode, Vec4
+from panda3d.core import NodePath, Vec4
 
 from lib.ui.core.layers import UILayer
 
@@ -7,7 +7,7 @@ from lib.ui.core.layers import UILayer
 class BackgroundCard:
     def __init__(
         self,
-        root: NodePath[PandaNode],
+        root: NodePath,
         x: float,
         y: float,
         width: float,
@@ -16,8 +16,9 @@ class BackgroundCard:
         layer: UILayer = UILayer.BACKGROUND,
     ) -> None:
         self.card = OnscreenImage(
-            pos=(x + width / 2, 0, -(y + height / 2)),
-            scale=(width, 1, height),
+            image="assets/white.png",
+            pos=(x + width / 2, 0, y - height / 2),
+            scale=(width / 2, 1, height / 2),
             parent=root,
             color=color,
             sort=layer.value,

@@ -9,15 +9,15 @@ from lib.ui.core.constants import UIConstants
 from lib.util.observable.observable import Observable
 
 
-class UIParams(DirectObject):
-    def __init__(self, base: ShowBase) -> None:
+class UIConfig(DirectObject):
+    def __init__(self, base: ShowBase, scale: float = 1.0) -> None:
         window: GraphicsWindow = base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
         self.accept("window-event", self.handleWindowEvent)
 
-        self.anchors = UIAnchors(base.pixel2d, self.windowSize)
+        self.anchors = UIAnchors(base, self.windowSize)
 
-        self.scale = 1.0
+        self.scale = scale
 
         self.observables: List[Observable[float]] = []
 

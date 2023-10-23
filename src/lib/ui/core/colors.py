@@ -19,6 +19,6 @@ class UIColors:
 
         return Vec4(r, g, b, 1)
 
-    white = fromHex("#FFFFFF")
-    black = fromHex("#000000")
-    gray = fromHex("454545")
+    WHTIE = fromHex("#FFFFFF")
+    BLACK = fromHex("#000000")
+    GRAY = fromHex("#454545")

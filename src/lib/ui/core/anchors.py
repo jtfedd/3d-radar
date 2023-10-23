@@ -1,19 +1,23 @@
 from typing import Tuple
 
-from panda3d.core import NodePath, PandaNode
+from direct.showbase.ShowBase import ShowBase
 
 
 class UIAnchors:
-    def __init__(self, root: NodePath[PandaNode], windowSize: Tuple[int, int]):
-        self.topLeft = root.attachNewNode("top-left")
-        self.topCenter = root.attachNewNode("top-center")
-        self.topRight = root.attachNewNode("top-right")
-        self.centerLeft = root.attachNewNode("center-left")
-        self.center = root.attachNewNode("center")
-        self.centerRight = root.attachNewNode("center-right")
-        self.bottomLeft = root.attachNewNode("bottom-left")
-        self.bottomCenter = root.attachNewNode("bottom-center")
-        self.bottomRight = root.attachNewNode("bottom-right")
+    def __init__(
+        self,
+        base: ShowBase,
+        windowSize: Tuple[int, int],
+    ):
+        self.topLeft = base.pixel2d.attachNewNode("top-left")
+        self.topCenter = base.pixel2d.attachNewNode("top-center")
+        self.topRight = base.pixel2d.attachNewNode("top-right")
+        self.centerLeft = base.pixel2d.attachNewNode("center-left")
+        self.center = base.pixel2d.attachNewNode("center")
+        self.centerRight = base.pixel2d.attachNewNode("center-right")
+        self.bottomLeft = base.pixel2d.attachNewNode("bottom-left")
+        self.bottomCenter = base.pixel2d.attachNewNode("bottom-center")
+        self.bottomRight = base.pixel2d.attachNewNode("bottom-right")
 
         self.update(windowSize)
 
@@ -24,12 +28,12 @@ class UIAnchors:
         self.topLeft.setPos(0, 0, 0)
         self.topCenter.setPos(width / 2, 0, 0)
         self.topRight.setPos(width, 0, 0)
-        self.centerLeft.setPos(0, 0, height / 2)
-        self.center.setPos(width / 2, 0, height / 2)
-        self.centerRight.setPos(width, 0, height / 2)
-        self.bottomLeft.setPos(0, 0, height)
-        self.bottomCenter.setPos(width / 2, 0, height)
-        self.bottomRight.setPos(width, 0, height)
+        self.centerLeft.setPos(0, 0, -height / 2)
+        self.center.setPos(width / 2, 0, -height / 2)
+        self.centerRight.setPos(width, 0, -height / 2)
+        self.bottomLeft.setPos(0, 0, -height)
+        self.bottomCenter.setPos(width / 2, 0, -height)
+        self.bottomRight.setPos(width, 0, -height)
 
     def destroy(self) -> None:
         self.topLeft.removeNode()
