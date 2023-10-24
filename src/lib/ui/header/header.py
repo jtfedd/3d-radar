@@ -3,6 +3,7 @@ from direct.showbase.DirectObject import DirectObject
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.config import UIConfig
+from lib.ui.header.clock import Clock
 from lib.util.events.event_collection import EventCollection
 
 
@@ -21,6 +22,8 @@ class Header(DirectObject):
             UIColors.BLACK,
         )
 
+        self.clock = Clock(config)
+
         self.events.add(self.config.headerWidth, self.update)
         self.events.add(self.config.headerHeight, self.update)
 
@@ -36,3 +39,4 @@ class Header(DirectObject):
         self.events.destroy()
 
         self.background.destroy()
+        self.clock.destroy()

@@ -21,6 +21,8 @@ class UIConfig(DirectObject):
 
         self.observables: List[Observable[float]] = []
 
+        self.fontSize = self.createObservable()
+
         self.headerWidth = self.createObservable()
         self.headerHeight = self.createObservable()
 
@@ -32,6 +34,8 @@ class UIConfig(DirectObject):
         self.update()
 
     def update(self) -> None:
+        self.fontSize.setValue(UIConstants.fontSize * self.scale)
+
         self.headerWidth.setValue(self.windowSize[0])
         self.headerHeight.setValue(UIConstants.headerFooterHeight * self.scale)
 
