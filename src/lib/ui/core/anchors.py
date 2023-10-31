@@ -27,14 +27,17 @@ class UIAnchors:
         width = windowSize[0]
         height = windowSize[1]
 
+        widthCenter = int(width / 2)
+        heightCenter = int(height / 2)
+
         self.topLeft.setPos(0, 0, 0)
-        self.topCenter.setPos(width / 2, 0, 0)
+        self.topCenter.setPos(widthCenter, 0, 0)
         self.topRight.setPos(width, 0, 0)
-        self.centerLeft.setPos(0, 0, -height / 2)
-        self.center.setPos(width / 2, 0, -height / 2)
-        self.centerRight.setPos(width, 0, -height / 2)
+        self.centerLeft.setPos(0, 0, -heightCenter)
+        self.center.setPos(widthCenter, 0, -heightCenter)
+        self.centerRight.setPos(width, 0, -heightCenter)
         self.bottomLeft.setPos(0, 0, -height)
-        self.bottomCenter.setPos(width / 2, 0, -height)
+        self.bottomCenter.setPos(widthCenter, 0, -height)
         self.bottomRight.setPos(width, 0, -height)
 
     def destroy(self) -> None:

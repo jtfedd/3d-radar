@@ -23,6 +23,6 @@ def fromHex(hexColor: str) -> Vec4:
 
 
 class UIColors:
-    WHTIE = fromHex("#FFFFFF")
+    WHITE = fromHex("#FFFFFF")
     BLACK = fromHex("#000000")
     GRAY = fromHex("#454545")

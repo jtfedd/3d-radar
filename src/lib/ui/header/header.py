@@ -19,7 +19,7 @@ class Header(DirectObject):
             0,
             config.headerWidth.value,
             config.headerHeight.value,
-            UIColors.BLACK,
+            UIColors.WHITE,
         )
 
         self.clock = Clock(config)

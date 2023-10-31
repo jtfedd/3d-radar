@@ -11,11 +11,11 @@ class Clock(DirectObject):
 
         self.text = Text(
             config.anchors.topCenter,
-            "Hello, World!",
+            "The quick brown fox jumps\nover the lazy dog",
             0,
-            -config.headerHeight.value / 2,
-            config.fontSize.value,
-            UIColors.WHTIE,
+            -config.headerHeight.value,
+            UIColors.BLACK,
+            font=config.font,
         )
 
     def destroy(self) -> None:
