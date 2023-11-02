@@ -3,6 +3,7 @@ from direct.showbase.DirectObject import DirectObject
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.text import Text
 from lib.ui.core.config import UIConfig
+from lib.ui.core.constants import UIConstants
 
 
 class Clock(DirectObject):
@@ -13,9 +14,10 @@ class Clock(DirectObject):
             config.anchors.topCenter,
             "The quick brown fox jumps\nover the lazy dog",
             0,
-            -config.headerHeight.value,
+            -UIConstants.headerFooterHeight,
+            UIConstants.fontSizeRegular,
             UIColors.BLACK,
-            font=config.font,
+            config.font,
         )
 
     def destroy(self) -> None:

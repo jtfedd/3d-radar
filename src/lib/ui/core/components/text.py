@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import DynamicTextFont, NodePath, PandaNode, TextNode, Vec4
 
+from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.layers import UILayer
 
 
@@ -12,34 +14,33 @@ class Text:
         text: str,
         x: float,
         y: float,
+        size: float,
         color: Vec4,
         font: DynamicTextFont,
+        hAlign: HAlign = HAlign.LEFT,
         layer: UILayer = UILayer.CONTENT,
     ):
         self.root = root
 
-        self.text = TextNode("text")
-        self.text.setText(text)
-        self.text.setTextColor(color)
-        self.text.setFont(font)
+        align = TextNode.ALeft
+        if hAlign == HAlign.CENTER:
+            align = TextNode.ACenter
+        elif hAlign == HAlign.RIGHT:
+            align = TextNode.ARight
 
-        print("width", self.text.getWidth())
-        print("height", self.text.getHeight())
-
-        node = self.text.generate()
-        self.nodePath = root.attachNewNode(node, sort=layer.value)
-
-        xPos = int(x - (self.text.getWidth() / 2))
-        yPos = int(y - 18)
-
-        self.nodePath.setPos(xPos + 0.5, 0, yPos + 0.5)
-
-    def update(self, x: float, y: float, size: float) -> None:
-        self.nodePath.setPos(x, 0, y)
-        self.nodePath.setScale(size)
+        self.text = OnscreenText(
+            parent=root,
+            text=text,
+            pos=(x, y),
+            scale=size,
+            fg=color,
+            font=font,
+            sort=layer.value,
+            align=align,  # type:ignore
+        )
 
     def updateText(self, text: str) -> None:
         self.text.setText(text)
 
     def destroy(self) -> None:
-        self.nodePath.removeNode()
+        self.text.destroy()

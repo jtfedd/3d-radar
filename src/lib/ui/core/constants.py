@@ -1,3 +1,5 @@
 class UIConstants:
-    headerFooterHeight = 24
-    panelWidth = 150
+    headerFooterHeight = 0.1
+    panelWidth = 0.4
+
+    fontSizeRegular = 0.05
