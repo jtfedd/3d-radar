@@ -4,6 +4,7 @@ from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import NodePath, PandaNode, Vec4
 
 from lib.ui.core.alignment import HAlign, VAlign
+from lib.ui.core.colors import UIColors
 from lib.ui.core.layers import UILayer
 
 
@@ -11,11 +12,11 @@ class BackgroundCard:
     def __init__(
         self,
         root: NodePath[PandaNode],
-        x: float,
-        y: float,
         width: float,
         height: float,
-        color: Vec4,
+        x: float = 0,
+        y: float = 0,
+        color: Vec4 = UIColors.BLACK,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.BACKGROUND,

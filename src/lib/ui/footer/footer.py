@@ -13,11 +13,9 @@ class Footer(DirectObject):
 
         self.background = BackgroundCard(
             config.anchors.bottomCenter,
-            0,
-            0,
-            1000,
-            UIConstants.headerFooterHeight,
-            UIColors.BLACK,
+            width=UIConstants.infinite,
+            height=UIConstants.headerFooterHeight,
+            color=UIColors.BLACK,
             vAlign=VAlign.BOTTOM,
         )
 
