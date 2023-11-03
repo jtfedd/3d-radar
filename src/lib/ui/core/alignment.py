@@ -11,3 +11,4 @@ class VAlign(Enum):
     TOP = 1
     CENTER = 2
     BOTTOM = 3
+    BASELINE = 4

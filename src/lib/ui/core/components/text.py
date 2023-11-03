@@ -18,6 +18,7 @@ class Text:
         color: Vec4,
         font: DynamicTextFont,
         hAlign: HAlign = HAlign.LEFT,
+        vAlign: VAlign = VAlign.BASELINE,
         layer: UILayer = UILayer.CONTENT,
     ):
         self.root = root
@@ -28,10 +29,18 @@ class Text:
         elif hAlign == HAlign.RIGHT:
             align = TextNode.ARight
 
+        yPos = y
+        if vAlign == VAlign.TOP:
+            yPos -= size
+        elif vAlign == VAlign.CENTER:
+            yPos -= size / 3.5
+        elif vAlign == VAlign.BOTTOM:
+            yPos += size * (font.line_height - 1)
+
         self.text = OnscreenText(
             parent=root,
             text=text,
-            pos=(x, y),
+            pos=(x, yPos),
             scale=size,
             fg=color,
             font=font,

@@ -29,7 +29,7 @@ class BackgroundCard:
         yPos = 0.0
         if vAlign == VAlign.TOP:
             yPos = -height / 2
-        elif vAlign == VAlign.BOTTOM:
+        elif vAlign in (VAlign.BOTTOM, VAlign.BASELINE):
             yPos = height / 2
 
         self.card = OnscreenImage(

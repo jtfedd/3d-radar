@@ -12,7 +12,7 @@ class Clock(DirectObject):
 
         self.text = Text(
             config.anchors.topCenter,
-            "The quick brown fox jumps\nover the lazy dog",
+            "The quick brown fox jumps over the lazy dog",
             0,
             -UIConstants.headerFooterHeight,
             UIConstants.fontSizeRegular,
