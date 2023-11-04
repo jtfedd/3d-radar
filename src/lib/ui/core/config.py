@@ -1,6 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 
-from lib.ui.core.components.anchors import UIAnchors
+from lib.ui.core.anchors import UIAnchors
 from lib.ui.core.font import UIFonts
 
 

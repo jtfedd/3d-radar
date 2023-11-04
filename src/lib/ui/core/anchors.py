@@ -8,6 +8,7 @@ class UIAnchors(DirectObject):
     def __init__(self, base: ShowBase, scale: float):
         self.base = base
         self.scale = scale
+        self.aspectRatio = -1.0
 
         root = base.aspect2dp
 
@@ -39,29 +40,40 @@ class UIAnchors(DirectObject):
 
     def update(self) -> None:
         aspectRatio = self.base.getAspectRatio()
+        if aspectRatio == self.aspectRatio:
+            return
+
+        self.aspectRatio = aspectRatio
+
+        width = aspectRatio
+        height = 1.0
+
+        if aspectRatio < 1.0:
+            width = 1.0
+            height = 1 / aspectRatio
 
         self.center.setPos(0, 0, 0)
 
-        self.top.setPos(0, 0, 1)
-        self.bottom.setPos(0, 0, -1)
-        self.left.setPos(-aspectRatio, 0, 0)
-        self.right.setPos(0, 0, aspectRatio)
+        self.top.setPos(0, 0, height)
+        self.bottom.setPos(0, 0, -height)
+        self.left.setPos(-width, 0, 0)
+        self.right.setPos(0, 0, width)
 
-        self.topLeft.setPos(-aspectRatio, 0, 0)
+        self.topLeft.setPos(-width, 0, 0)
         self.topCenter.setPos(0, 0, 0)
-        self.topRight.setPos(aspectRatio, 0, 0)
+        self.topRight.setPos(width, 0, 0)
 
-        self.bottomLeft.setPos(-aspectRatio, 0, 0)
+        self.bottomLeft.setPos(-width, 0, 0)
         self.bottomCenter.setPos(0, 0, 0)
-        self.bottomRight.setPos(aspectRatio, 0, 0)
+        self.bottomRight.setPos(width, 0, 0)
 
-        self.leftTop.setPos(0, 0, 1)
+        self.leftTop.setPos(0, 0, height)
         self.leftCenter.setPos(0, 0, 0)
-        self.leftBottom.setPos(0, 0, -1)
+        self.leftBottom.setPos(0, 0, -height)
 
-        self.rightTop.setPos(0, 0, 1)
+        self.rightTop.setPos(0, 0, height)
         self.rightCenter.setPos(0, 0, 0)
-        self.rightBottom.setPos(0, 0, -1)
+        self.rightBottom.setPos(0, 0, -height)
 
         self.updateScale(self.scale)
 
