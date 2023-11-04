@@ -15,7 +15,7 @@ class Footer(DirectObject):
             config.anchors.bottomCenter,
             width=UIConstants.infinite,
             height=UIConstants.headerFooterHeight,
-            color=UIColors.BLACK,
+            color=UIColors.GRAY,
             vAlign=VAlign.BOTTOM,
         )
 
