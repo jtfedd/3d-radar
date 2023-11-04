@@ -19,18 +19,21 @@ class Clock(DirectObject):
             self.getClockStr(),
             y=-UIConstants.headerFooterHeight / 2,
             hAlign=HAlign.CENTER,
-            vAlign=VAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
         )
 
-        self.updateTask = self.addTask(self.update, "update-clock")
+        self.updateTask = self.addTask(self.update, "update-clock", delay=1)
 
     def update(self, task: Task) -> int:
         self.text.updateText(self.getClockStr())
 
-        return task.cont
+        return task.again
 
     def getClockStr(self) -> str:
-        return datetime.datetime.now().strftime("%a %d %b %Y, %I:%M:%S %p")
+        dateStr = "%A, %d %B %Y"
+        timeStr = "%I:%M:%S %p"
+
+        return datetime.datetime.now().strftime(dateStr + "\n" + timeStr)
 
     def destroy(self) -> None:
         self.updateTask.cancel()
