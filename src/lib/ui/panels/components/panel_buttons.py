@@ -21,7 +21,13 @@ class PanelButtons:
             vAlign=VAlign.BOTTOM,
         )
 
+        self.settingsSub = self.settingsButton.onClick.listen(
+            lambda _: self.onClick.send(PanelType.SETTINGS)
+        )
+
     def destroy(self) -> None:
         self.onClick.close()
 
         self.settingsButton.destroy()
+
+        self.settingsSub.cancel()

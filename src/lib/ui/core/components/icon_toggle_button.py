@@ -6,6 +6,7 @@ from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctXForAlignment, correctYForAlignment
+from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class IconToggleButton:
@@ -37,11 +38,13 @@ class IconToggleButton:
         )
 
         self.button.setBin("fixed", layer.value)
-
         self.button.setTransparency(TransparencyAttrib.MAlpha)
 
+        self.onClick = EventDispatcher[bool]()
+
     def handleClick(self) -> None:
-        print("click")
+        self.onClick.send(True)
 
     def destroy(self) -> None:
         self.button.destroy()
+        self.onClick.close()
