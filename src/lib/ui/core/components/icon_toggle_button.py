@@ -30,7 +30,12 @@ class IconToggleButton(DirectObject):
         hoverColor: Vec4 = UIColors.WHITE,
         clickColor: Vec4 = UIColors.BLACK,
         disabledColor: Vec4 = UIColors.GRAY,
+        toggleColor: Vec4 = UIColors.LIGHTGRAY,
+        toggleState: bool = False,
     ) -> None:
+        self.toggleState = toggleState
+        self.toggleColor = toggleColor
+
         xPos = correctXForAlignment(x, width, hAlign)
         yPos = correctYForAlignment(y, height, vAlign)
 
@@ -75,12 +80,22 @@ class IconToggleButton(DirectObject):
     def update(self, task: Task) -> int:
         buttonState = self.button.guiItem.getState()  # type: ignore
 
-        self.background.updateColor(self.colorMap[buttonState])
+        # Toggled state should override ready and hover
+        if self.toggleState and buttonState in (
+            DGG.BUTTON_READY_STATE,
+            DGG.BUTTON_ROLLOVER_STATE,
+        ):
+            self.background.updateColor(self.toggleColor)
+        else:
+            self.background.updateColor(self.colorMap[buttonState])
 
         return task.cont
 
     def handleClick(self) -> None:
         self.onClick.send(True)
+
+    def setToggleState(self, toggleState: bool) -> None:
+        self.toggleState = toggleState
 
     def destroy(self) -> None:
         self.removeAllTasks()

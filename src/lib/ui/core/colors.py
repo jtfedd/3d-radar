@@ -27,3 +27,4 @@ class UIColors:
     WHITE = fromHex("#FFFFFF")
     BLACK = fromHex("#000000")
     GRAY = fromHex("#454545")
+    LIGHTGRAY = fromHex("#555555")
