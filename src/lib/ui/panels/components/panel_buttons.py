@@ -21,13 +21,29 @@ class PanelButtons:
             vAlign=VAlign.BOTTOM,
         )
 
+        self.radarButton = IconToggleButton(
+            config.anchors.bottomLeft,
+            "assets/radar.png",
+            width=UIConstants.headerFooterHeight,
+            height=UIConstants.headerFooterHeight,
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.BOTTOM,
+            x=UIConstants.headerFooterHeight,
+        )
+
         self.settingsSub = self.settingsButton.onClick.listen(
             lambda _: self.onClick.send(PanelType.SETTINGS)
+        )
+
+        self.radarSub = self.radarButton.onClick.listen(
+            lambda _: self.onClick.send(PanelType.DATA)
         )
 
     def destroy(self) -> None:
         self.onClick.close()
 
         self.settingsButton.destroy()
+        self.radarButton.destroy()
 
         self.settingsSub.cancel()
+        self.radarSub.cancel()

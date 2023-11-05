@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from direct.gui.OnscreenImage import OnscreenImage
-from panda3d.core import NodePath, PandaNode, Vec4
+from panda3d.core import NodePath, PandaNode, TransparencyAttrib, Vec4
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -32,8 +32,12 @@ class BackgroundCard:
             parent=root,
             color=color,
         )
+        self.card.setTransparency(TransparencyAttrib.MAlpha)
 
         self.card.setBin("fixed", layer.value)
+
+    def updateColor(self, color: Vec4) -> None:
+        self.card.setColor(color)
 
     def destroy(self) -> None:
         self.card.destroy()
