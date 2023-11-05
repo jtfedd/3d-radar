@@ -5,6 +5,7 @@ from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.layers import UILayer
+from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 
 
 class IconToggleButton:
@@ -20,24 +21,15 @@ class IconToggleButton:
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.CONTENT,
     ) -> None:
-        xPos = 0.0
-        if hAlign == HAlign.LEFT:
-            xPos = width / 2
-        elif hAlign == HAlign.RIGHT:
-            xPos = -width / 2
-
-        yPos = 0.0
-        if vAlign == VAlign.TOP:
-            yPos = -height / 2
-        elif vAlign in (VAlign.BOTTOM, VAlign.BASELINE):
-            yPos = height / 2
+        x = correctXForAlignment(x, width, hAlign)
+        y = correctYForAlignment(y, height, vAlign)
 
         self.button = DirectButton(
             parent=root,
-            pos=(x + xPos, layer.value, y + yPos),
-            scale=(width / 2, 1, height / 2),
-            command=self.handleClick,
             image=icon,
+            command=self.handleClick,
+            pos=(x, 0, y),
+            scale=(width / 2, 1, height / 2),
             borderWidth=(0, 0),
             frameColor=(0, 0, 0, 0),
             rolloverSound=None,
