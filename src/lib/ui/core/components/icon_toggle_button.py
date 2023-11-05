@@ -1,25 +1,24 @@
 from __future__ import annotations
 
-from direct.gui.OnscreenImage import OnscreenImage
-from panda3d.core import NodePath, PandaNode, Vec4
+from direct.gui.DirectButton import DirectButton
+from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
 from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.colors import UIColors
 from lib.ui.core.layers import UILayer
 
 
-class BackgroundCard:
+class IconToggleButton:
     def __init__(
         self,
         root: NodePath[PandaNode],
+        icon: str,
         width: float,
         height: float,
         x: float = 0,
         y: float = 0,
-        color: Vec4 = UIColors.BLACK,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
-        layer: UILayer = UILayer.BACKGROUND,
+        layer: UILayer = UILayer.CONTENT,
     ) -> None:
         xPos = 0.0
         if hAlign == HAlign.LEFT:
@@ -33,15 +32,24 @@ class BackgroundCard:
         elif vAlign in (VAlign.BOTTOM, VAlign.BASELINE):
             yPos = height / 2
 
-        self.card = OnscreenImage(
-            image="assets/white.png",
-            pos=(x + xPos, 0, y + yPos),
-            scale=(width / 2, 1, height / 2),
+        self.button = DirectButton(
             parent=root,
-            color=color,
+            pos=(x + xPos, layer.value, y + yPos),
+            scale=(width / 2, 1, height / 2),
+            command=self.handleClick,
+            image=icon,
+            borderWidth=(0, 0),
+            frameColor=(0, 0, 0, 0),
+            rolloverSound=None,
+            clickSound=None,
         )
 
-        self.card.setBin("fixed", layer.value)
+        self.button.setBin("fixed", layer.value)
+
+        self.button.setTransparency(TransparencyAttrib.MAlpha)
+
+    def handleClick(self) -> None:
+        print("click")
 
     def destroy(self) -> None:
-        self.card.destroy()
+        self.button.destroy()
