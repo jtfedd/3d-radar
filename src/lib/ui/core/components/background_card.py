@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from direct.gui.OnscreenImage import OnscreenImage
-from panda3d.core import NodePath, PandaNode, TransparencyAttrib, Vec4
+from panda3d.core import NodePath, PandaNode, Vec4
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
+from lib.ui.core.components.image import Image
 from lib.ui.core.layers import UILayer
-from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 
 
 class BackgroundCard:
@@ -22,22 +21,21 @@ class BackgroundCard:
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.BACKGROUND,
     ) -> None:
-        x = correctXForAlignment(x, width, hAlign)
-        y = correctYForAlignment(y, height, vAlign)
-
-        self.card = OnscreenImage(
-            image="assets/white.png",
-            pos=(x, 0, y),
-            scale=(width / 2, 1, height / 2),
-            parent=root,
+        self.image = Image(
+            root,
+            "assets/white.png",
+            width=width,
+            height=height,
+            x=x,
+            y=y,
             color=color,
+            hAlign=hAlign,
+            vAlign=vAlign,
+            layer=layer,
         )
-        self.card.setTransparency(TransparencyAttrib.MAlpha)
-
-        self.card.setBin("fixed", layer.value)
 
     def updateColor(self, color: Vec4) -> None:
-        self.card.setColor(color)
+        self.image.updateColor(color)
 
     def destroy(self) -> None:
-        self.card.destroy()
+        self.image.destroy()

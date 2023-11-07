@@ -16,8 +16,10 @@ class PanelButtons:
         self.settingsButton = IconToggleButton(
             config.anchors.bottomLeft,
             "assets/gear.png",
-            width=UIConstants.headerFooterHeight,
+            width=UIConstants.panelWidth / 2,
             height=UIConstants.headerFooterHeight,
+            iconWidth=UIConstants.headerFooterHeight,
+            iconHeight=UIConstants.headerFooterHeight,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
         )
@@ -25,11 +27,13 @@ class PanelButtons:
         self.radarButton = IconToggleButton(
             config.anchors.bottomLeft,
             "assets/radar.png",
-            width=UIConstants.headerFooterHeight,
+            width=UIConstants.panelWidth / 2,
             height=UIConstants.headerFooterHeight,
+            iconWidth=UIConstants.headerFooterHeight,
+            iconHeight=UIConstants.headerFooterHeight,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
-            x=UIConstants.headerFooterHeight,
+            x=UIConstants.panelWidth / 2,
         )
 
         self.settingsSub = self.settingsButton.onClick.listen(
