@@ -2,13 +2,21 @@ from __future__ import annotations
 
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
+from direct.task.Task import Task
+
+from lib.ui.core.constants import UIConstants
 
 
 class UIAnchors(DirectObject):
+    ANIMATION_TIME = 0.1
+
     def __init__(self, base: ShowBase, scale: float):
         self.base = base
         self.scale = scale
-        self.aspectRatio = -1.0
+
+        self.animating = False
+        self.hidden = False
+        self.hideFactor = 0.0
 
         root = base.aspect2dp
 
@@ -26,13 +34,51 @@ class UIAnchors(DirectObject):
 
         self.update()
         self.accept("window-event", lambda _: self.update())
+        self.accept("h", self.toggleHide)
+
+    def toggleHide(self) -> None:
+        if self.animating:
+            return
+
+        self.animating = True
+
+        if self.hidden:
+            self.addTask(self.show, "show-anchors")
+        else:
+            self.addTask(self.hide, "hide-anchors")
+
+    def hide(self, task: Task) -> int:
+        progress = task.time / self.ANIMATION_TIME
+
+        if progress >= 1.0:
+            self.hideFactor = 1.0
+            self.animating = False
+            self.hidden = True
+            self.update()
+            return task.exit
+
+        self.hideFactor = progress
+        self.update()
+
+        return task.cont
+
+    def show(self, task: Task) -> int:
+        progress = task.time / self.ANIMATION_TIME
+
+        if progress >= 1.0:
+            self.hideFactor = 0.0
+            self.animating = False
+            self.hidden = False
+            self.update()
+            return task.exit
+
+        self.hideFactor = 1 - progress
+        self.update()
+
+        return task.cont
 
     def update(self) -> None:
         aspectRatio = self.base.getAspectRatio()
-        if aspectRatio == self.aspectRatio:
-            return
-
-        self.aspectRatio = aspectRatio
 
         width = aspectRatio
         height = 1.0
@@ -41,17 +87,22 @@ class UIAnchors(DirectObject):
             width = 1.0
             height = 1 / aspectRatio
 
+        top = height + (self.hideFactor * UIConstants.headerFooterHeight)
+        bottom = -height - (self.hideFactor * UIConstants.headerFooterHeight)
+        right = width
+        left = -width - (self.hideFactor * UIConstants.panelWidth)
+
         self.center.setPos(0, 0, 0)
 
-        self.top.setPos(0, 0, height)
-        self.bottom.setPos(0, 0, -height)
-        self.left.setPos(-width, 0, 0)
-        self.right.setPos(0, 0, width)
+        self.top.setPos(0, 0, top)
+        self.bottom.setPos(0, 0, bottom)
+        self.left.setPos(left, 0, 0)
+        self.right.setPos(0, 0, right)
 
-        self.topLeft.setPos(-width, 0, height)
-        self.topRight.setPos(width, 0, height)
-        self.bottomLeft.setPos(-width, 0, -height)
-        self.bottomRight.setPos(width, 0, -height)
+        self.topLeft.setPos(left, 0, top)
+        self.topRight.setPos(right, 0, top)
+        self.bottomLeft.setPos(left, 0, bottom)
+        self.bottomRight.setPos(right, 0, bottom)
 
         self.updateScale(self.scale)
 
@@ -71,6 +122,8 @@ class UIAnchors(DirectObject):
         self.bottomRight.setScale(self.scale)
 
     def destroy(self) -> None:
+        self.removeAllTasks()
+
         self.center.removeNode()
 
         self.top.removeNode()
