@@ -90,7 +90,7 @@ class IconToggleButton(DirectObject):
         self.button.setTransparency(TransparencyAttrib.MAlpha)
         self.button.setAlphaScale(0)
 
-        self.onClick = EventDispatcher[bool]()
+        self.onClick = EventDispatcher[None]()
 
         self.addTask(self.update, "button-update")
 
@@ -111,7 +111,7 @@ class IconToggleButton(DirectObject):
         return task.cont
 
     def handleClick(self) -> None:
-        self.onClick.send(True)
+        self.onClick.send(None)
 
     def setToggleState(self, toggleState: bool) -> None:
         self.toggleState = toggleState

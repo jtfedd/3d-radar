@@ -1,61 +1,66 @@
+from typing import Callable, List, Tuple
+
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.icon_toggle_button import IconToggleButton
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.icons import Icons
 from lib.ui.panels.panel_events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
 from lib.util.events.event_dispatcher import EventDispatcher
+from lib.util.events.event_subscription import EventSubscription
 
 
 class PanelButtons:
+    buttonConfig: List[Tuple[PanelType, str]] = [
+        (PanelType.SETTINGS, Icons.GEAR),
+        (PanelType.DATA, Icons.RADAR),
+    ]
+
     def __init__(self, config: UIConfig, panelEvents: PanelEvents) -> None:
         self.config = config
 
         self.onClick = EventDispatcher[PanelType]()
 
-        self.settingsButton = IconToggleButton(
-            config.anchors.bottomLeft,
-            "assets/gear.png",
-            width=UIConstants.panelWidth / 2,
-            height=UIConstants.headerFooterHeight,
-            iconWidth=UIConstants.headerFooterHeight,
-            iconHeight=UIConstants.headerFooterHeight,
-            hAlign=HAlign.LEFT,
-            vAlign=VAlign.BOTTOM,
-        )
+        self.buttons: List[IconToggleButton] = []
+        self.subs: List[EventSubscription[None]] = []
 
-        self.radarButton = IconToggleButton(
-            config.anchors.bottomLeft,
-            "assets/radar.png",
-            width=UIConstants.panelWidth / 2,
-            height=UIConstants.headerFooterHeight,
-            iconWidth=UIConstants.headerFooterHeight,
-            iconHeight=UIConstants.headerFooterHeight,
-            hAlign=HAlign.LEFT,
-            vAlign=VAlign.BOTTOM,
-            x=UIConstants.panelWidth / 2,
-        )
+        for i, settings in enumerate(self.buttonConfig):
+            panelType = settings[0]
+            icon = settings[1]
 
-        self.settingsSub = self.settingsButton.onClick.listen(
-            lambda _: self.onClick.send(PanelType.SETTINGS)
-        )
+            button = IconToggleButton(
+                config.anchors.bottomLeft,
+                icon,
+                x=i * (UIConstants.panelWidth / len(self.buttonConfig)),
+                width=UIConstants.panelWidth / len(self.buttonConfig),
+                height=UIConstants.headerFooterHeight,
+                iconWidth=UIConstants.headerFooterHeight,
+                iconHeight=UIConstants.headerFooterHeight,
+                hAlign=HAlign.LEFT,
+                vAlign=VAlign.BOTTOM,
+            )
 
-        self.radarSub = self.radarButton.onClick.listen(
-            lambda _: self.onClick.send(PanelType.DATA)
-        )
+            sub = button.onClick.listen(self.handleClick(panelType))
+
+            self.buttons.append(button)
+            self.subs.append(sub)
 
         self.panelTypeSub = panelEvents.panelChanged.listen(self.updateToggleButtons)
 
+    def handleClick(self, panelType: PanelType) -> Callable[[None], None]:
+        return lambda _: self.onClick.send(panelType)
+
     def updateToggleButtons(self, panelType: PanelType) -> None:
-        self.radarButton.setToggleState(panelType == PanelType.DATA)
-        self.settingsButton.setToggleState(panelType == PanelType.SETTINGS)
+        for i, button in enumerate(self.buttons):
+            button.setToggleState(panelType == self.buttonConfig[i][0])
 
     def destroy(self) -> None:
         self.onClick.close()
         self.panelTypeSub.cancel()
 
-        self.settingsButton.destroy()
-        self.radarButton.destroy()
+        for button in self.buttons:
+            button.destroy()
 
-        self.settingsSub.cancel()
-        self.radarSub.cancel()
+        for sub in self.subs:
+            sub.cancel()
