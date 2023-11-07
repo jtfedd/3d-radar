@@ -10,7 +10,7 @@ class PanelBackground:
         self.config = config
 
         self.background = BackgroundCard(
-            config.anchors.leftCenter,
+            config.anchors.left,
             width=UIConstants.panelWidth,
             height=UIConstants.infinite,
             color=UIColors.GRAY,

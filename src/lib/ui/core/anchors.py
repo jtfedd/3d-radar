@@ -19,21 +19,10 @@ class UIAnchors(DirectObject):
         self.left = root.attachNewNode("left")
         self.right = root.attachNewNode("right")
 
-        self.topLeft = self.top.attachNewNode("top-left")
-        self.topCenter = self.top.attachNewNode("top-center")
-        self.topRight = self.top.attachNewNode("top-right")
-
-        self.bottomLeft = self.bottom.attachNewNode("bottom-left")
-        self.bottomCenter = self.bottom.attachNewNode("bottom-center")
-        self.bottomRight = self.bottom.attachNewNode("bottom-right")
-
-        self.leftTop = self.left.attachNewNode("left-top")
-        self.leftCenter = self.left.attachNewNode("left-center")
-        self.leftBottom = self.left.attachNewNode("left-bottom")
-
-        self.rightTop = self.right.attachNewNode("right-top")
-        self.rightCenter = self.right.attachNewNode("right-center")
-        self.rightBottom = self.right.attachNewNode("right-bottom")
+        self.topLeft = root.attachNewNode("top-left")
+        self.topRight = root.attachNewNode("top-right")
+        self.bottomLeft = root.attachNewNode("bottom-left")
+        self.bottomRight = root.attachNewNode("bottom-right")
 
         self.update()
         self.accept("window-event", lambda _: self.update())
@@ -59,21 +48,10 @@ class UIAnchors(DirectObject):
         self.left.setPos(-width, 0, 0)
         self.right.setPos(0, 0, width)
 
-        self.topLeft.setPos(-width, 0, 0)
-        self.topCenter.setPos(0, 0, 0)
-        self.topRight.setPos(width, 0, 0)
-
-        self.bottomLeft.setPos(-width, 0, 0)
-        self.bottomCenter.setPos(0, 0, 0)
-        self.bottomRight.setPos(width, 0, 0)
-
-        self.leftTop.setPos(0, 0, height)
-        self.leftCenter.setPos(0, 0, 0)
-        self.leftBottom.setPos(0, 0, -height)
-
-        self.rightTop.setPos(0, 0, height)
-        self.rightCenter.setPos(0, 0, 0)
-        self.rightBottom.setPos(0, 0, -height)
+        self.topLeft.setPos(-width, 0, height)
+        self.topRight.setPos(width, 0, height)
+        self.bottomLeft.setPos(-width, 0, -height)
+        self.bottomRight.setPos(width, 0, -height)
 
         self.updateScale(self.scale)
 
@@ -82,21 +60,15 @@ class UIAnchors(DirectObject):
 
         self.center.setScale(self.scale)
 
+        self.top.setScale(self.scale)
+        self.bottom.setScale(self.scale)
+        self.left.setScale(self.scale)
+        self.right.setScale(self.scale)
+
         self.topLeft.setScale(self.scale)
-        self.topCenter.setScale(self.scale)
         self.topRight.setScale(self.scale)
-
         self.bottomLeft.setScale(self.scale)
-        self.bottomCenter.setScale(self.scale)
         self.bottomRight.setScale(self.scale)
-
-        self.leftTop.setScale(self.scale)
-        self.leftCenter.setScale(self.scale)
-        self.leftBottom.setScale(self.scale)
-
-        self.rightTop.setScale(self.scale)
-        self.rightCenter.setScale(self.scale)
-        self.rightBottom.setScale(self.scale)
 
     def destroy(self) -> None:
         self.center.removeNode()
@@ -107,19 +79,9 @@ class UIAnchors(DirectObject):
         self.right.removeNode()
 
         self.topLeft.removeNode()
-        self.topCenter.removeNode()
         self.topRight.removeNode()
 
         self.bottomLeft.removeNode()
-        self.bottomCenter.removeNode()
         self.bottomRight.removeNode()
-
-        self.leftTop.removeNode()
-        self.leftCenter.removeNode()
-        self.leftBottom.removeNode()
-
-        self.rightTop.removeNode()
-        self.rightCenter.removeNode()
-        self.rightBottom.removeNode()
 
         self.ignoreAll()
