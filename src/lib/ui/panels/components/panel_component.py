@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
-class StackableComponent(ABC):
+class PanelComponent(ABC):
     def __init__(self) -> None:
         self.onChange = EventDispatcher[None]()
 

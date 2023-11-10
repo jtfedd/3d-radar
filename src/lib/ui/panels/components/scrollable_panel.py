@@ -2,15 +2,18 @@ import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectScrolledFrame import DirectScrolledFrame
 from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.DirectObject import DirectObject
+from panda3d.core import NodePath, PandaNode
 
 from lib.ui.core.colors import UIColors
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.panel_component_manager import PanelComponentManager
 
 
 class ScrollablePanel(DirectObject):
-    def __init__(self, config: UIConfig) -> None:
+    def __init__(self, config: UIConfig, components: PanelComponentManager) -> None:
         self.config = config
+        self.components = components
 
         self.frame = DirectScrolledFrame(
             parent=config.anchors.topLeft,
@@ -50,6 +53,8 @@ class ScrollablePanel(DirectObject):
             lambda _: self.updateFrame()
         )
 
+        self.contentSub = self.components.onUpdate.listen(self.updateFrameForCanvasSize)
+
     def updateInBounds(self, inBounds: bool) -> None:
         self.inBounds = inBounds
 
@@ -60,8 +65,10 @@ class ScrollablePanel(DirectObject):
         self.frame.verticalScroll.scrollStep(direction)
 
     def updateFrame(self) -> None:
+        self.updateFrameForCanvasSize(self.getContentHeight())
+
+    def updateFrameForCanvasSize(self, canvasHeight: float) -> None:
         frameHeight = self.getPanelHeight()
-        canvasHeight = self.getContentHeight()
         canvasHeight = max(canvasHeight, frameHeight)
 
         self.frame["frameSize"] = (0, UIConstants.panelWidth, -frameHeight, 0)
@@ -101,10 +108,13 @@ class ScrollablePanel(DirectObject):
         return absolutePanelHeight / self.config.anchors.scale
 
     def getContentHeight(self) -> float:
-        # TODO needs to retrieve the content height from the stack manager
-        return 5.0
+        return self.components.getHeight()
+
+    def getCanvas(self) -> NodePath[PandaNode]:
+        return self.frame.getCanvas()
 
     def destroy(self) -> None:
         self.ignoreAll()
         self.windowSub.cancel()
+        self.contentSub.cancel()
         self.frame.destroy()
