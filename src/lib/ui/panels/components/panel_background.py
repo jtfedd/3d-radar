@@ -3,6 +3,7 @@ from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.scrollable_panel import ScrollablePanel
 
 
 class PanelBackground:
@@ -18,5 +19,8 @@ class PanelBackground:
             hAlign=HAlign.LEFT,
         )
 
+        self.scroller = ScrollablePanel(config)
+
     def destroy(self) -> None:
+        self.scroller.destroy()
         self.background.destroy()

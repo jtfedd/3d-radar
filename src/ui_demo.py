@@ -1,3 +1,5 @@
+import random
+
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 
@@ -11,6 +13,11 @@ class App(DirectObject):
 
         self.uiConfig = UIConfig(base)
         self.ui = UI(self.uiConfig)
+
+        self.accept("s", self.scale)
+
+    def scale(self) -> None:
+        self.uiConfig.setScale(random.randrange(5, 20) / 10.0)
 
 
 base = ShowBase()

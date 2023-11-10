@@ -5,6 +5,7 @@ from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
 from lib.ui.core.constants import UIConstants
+from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class UIAnchors(DirectObject):
@@ -17,6 +18,9 @@ class UIAnchors(DirectObject):
         self.animating = False
         self.hidden = False
         self.hideFactor = 0.0
+
+        self.width = 1.0
+        self.height = 1.0
 
         root = base.aspect2dp
 
@@ -31,6 +35,8 @@ class UIAnchors(DirectObject):
         self.topRight = root.attachNewNode("top-right")
         self.bottomLeft = root.attachNewNode("bottom-left")
         self.bottomRight = root.attachNewNode("bottom-right")
+
+        self.onUpdate = EventDispatcher[None]()
 
         self.update()
         self.accept("window-event", lambda _: self.update())
@@ -92,6 +98,10 @@ class UIAnchors(DirectObject):
         right = width
         left = -width - (self.hideFactor * UIConstants.panelWidth)
 
+        self.height = top - bottom
+        self.width = right - left
+
+        # Update positions
         self.center.setPos(0, 0, 0)
 
         self.top.setPos(0, 0, top)
@@ -104,11 +114,7 @@ class UIAnchors(DirectObject):
         self.bottomLeft.setPos(left, 0, bottom)
         self.bottomRight.setPos(right, 0, bottom)
 
-        self.updateScale(self.scale)
-
-    def updateScale(self, newScale: float) -> None:
-        self.scale = newScale
-
+        # Update scale
         self.center.setScale(self.scale)
 
         self.top.setScale(self.scale)
@@ -121,7 +127,15 @@ class UIAnchors(DirectObject):
         self.bottomLeft.setScale(self.scale)
         self.bottomRight.setScale(self.scale)
 
+        self.onUpdate.send(None)
+
+    def updateScale(self, newScale: float) -> None:
+        self.scale = newScale
+        self.update()
+
     def destroy(self) -> None:
+        self.onUpdate.close()
+
         self.removeAllTasks()
 
         self.center.removeNode()
