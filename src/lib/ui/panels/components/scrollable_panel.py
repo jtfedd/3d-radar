@@ -14,10 +14,10 @@ class ScrollablePanel(DirectObject):
 
         self.frame = DirectScrolledFrame(
             parent=config.anchors.topLeft,
-            pos=(0, 0, -UIConstants.headerFooterHeight),
+            pos=(0, 0, -UIConstants.headerFooterHeight - UIConstants.panelHeaderHeight),
             manageScrollBars=False,
             autoHideScrollBars=False,
-            frameColor=(1, 0, 0, 1),  # TODO make transparent
+            frameColor=(0, 0, 0, 0),
             scrollBarWidth=UIConstants.scrollbarWidth,
             verticalScroll_borderWidth=(0, 0),
             verticalScroll_frameColor=UIColors.LIGHTGRAY,
@@ -86,12 +86,17 @@ class ScrollablePanel(DirectObject):
         self.frame.verticalScroll["scrollSize"] = scrollSize
 
     def getPanelHeight(self) -> float:
-        # TODO this needs to account for the UI scale
-        # AND the fact that the panel itself will be scaled
         windowHeight = self.config.anchors.height
         headerFooterHeight = UIConstants.headerFooterHeight * self.config.anchors.scale
+        panelHeaderHeight = UIConstants.panelHeaderHeight * self.config.anchors.scale
+        panelFooterHeight = UIConstants.panelBorderWidth * self.config.anchors.scale
 
-        absolutePanelHeight = windowHeight - (headerFooterHeight * 2)
+        absolutePanelHeight = (
+            windowHeight
+            - (headerFooterHeight * 2)
+            - panelHeaderHeight
+            - panelFooterHeight
+        )
 
         return absolutePanelHeight / self.config.anchors.scale
 
