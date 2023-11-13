@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectScrolledFrame import DirectScrolledFrame
 from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.DirectObject import DirectObject
-from panda3d.core import NodePath, PandaNode
+from direct.task.Task import Task
+from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
 from lib.ui.core.colors import UIColors
 from lib.ui.core.config import UIConfig
@@ -11,6 +14,9 @@ from lib.ui.panels.components.panel_component_manager import PanelComponentManag
 
 
 class ScrollablePanel(DirectObject):
+    SCROLLBAR_FADE_IN = 0.1
+    SCROLLBAR_FADE_OUT = 0.4
+
     def __init__(self, config: UIConfig, components: PanelComponentManager) -> None:
         self.config = config
         self.components = components
@@ -20,16 +26,17 @@ class ScrollablePanel(DirectObject):
             pos=(0, 0, -UIConstants.headerFooterHeight - UIConstants.panelHeaderHeight),
             manageScrollBars=False,
             autoHideScrollBars=False,
-            frameColor=(0, 0, 0, 0),
+            frameColor=UIColors.TRANSPARENT,
             scrollBarWidth=UIConstants.scrollbarWidth,
             verticalScroll_borderWidth=(0, 0),
-            verticalScroll_frameColor=UIColors.LIGHTGRAY,
+            verticalScroll_frameColor=UIColors.BLACK,
             verticalScroll_thumb_frameColor=UIColors.WHITE,
         )
 
         self.frame.horizontalScroll.hide()
         self.frame.verticalScroll.incButton.hide()
         self.frame.verticalScroll.decButton.hide()
+        self.frame.verticalScroll.setTransparency(TransparencyAttrib.MAlpha)
 
         self.updateFrame()
 
@@ -55,8 +62,27 @@ class ScrollablePanel(DirectObject):
 
         self.contentSub = self.components.onUpdate.listen(self.updateFrameForCanvasSize)
 
+        self.scrollbarAlpha = 0.0
+        self.lastScrollbarUpdate = 0.0
+        self.addTask(self.updateScrollbar)
+
     def updateInBounds(self, inBounds: bool) -> None:
         self.inBounds = inBounds
+
+    def updateScrollbar(self, task: Task) -> int:
+        dt = task.time - self.lastScrollbarUpdate
+        self.lastScrollbarUpdate = task.time
+
+        if self.inBounds:
+            self.scrollbarAlpha += dt / self.SCROLLBAR_FADE_IN
+            self.scrollbarAlpha = min(1.0, self.scrollbarAlpha)
+        else:
+            self.scrollbarAlpha -= dt / self.SCROLLBAR_FADE_OUT
+            self.scrollbarAlpha = max(0.0, self.scrollbarAlpha)
+
+        self.frame.verticalScroll.setAlphaScale(self.scrollbarAlpha)
+
+        return task.cont
 
     def handleScroll(self, direction: int) -> None:
         if not self.inBounds or self.frame.verticalScroll.isHidden():
