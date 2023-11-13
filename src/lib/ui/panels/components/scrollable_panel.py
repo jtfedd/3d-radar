@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectScrolledFrame import DirectScrolledFrame
-from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib
@@ -38,15 +37,17 @@ class ScrollablePanel(DirectObject):
         self.frame.verticalScroll.decButton.hide()
         self.frame.verticalScroll.setTransparency(TransparencyAttrib.MAlpha)
 
+        self.scrollbarAlpha = 0.0
+        self.lastScrollbarUpdate = 0.0
+        self.addTask(self.updateScrollbar)
+
         self.updateFrame()
 
-        for i in range(50):
-            OnscreenText(
-                parent=self.frame.getCanvas(),
-                text=str(i),
-                pos=(0.25, -i / 10.0),
-                scale=0.07,
-            )
+        self.windowSub = self.config.anchors.onUpdate.listen(
+            lambda _: self.updateFrame()
+        )
+
+        self.contentSub = self.components.onUpdate.listen(self.updateFrameForCanvasSize)
 
         self.inBounds = False
         self.frame["state"] = DGG.NORMAL
@@ -56,15 +57,11 @@ class ScrollablePanel(DirectObject):
         self.accept("wheel_up-up", self.handleScroll, [-1])
         self.accept("wheel_down-up", self.handleScroll, [1])
 
-        self.windowSub = self.config.anchors.onUpdate.listen(
-            lambda _: self.updateFrame()
-        )
+    def hide(self) -> None:
+        self.frame.hide()
 
-        self.contentSub = self.components.onUpdate.listen(self.updateFrameForCanvasSize)
-
-        self.scrollbarAlpha = 0.0
-        self.lastScrollbarUpdate = 0.0
-        self.addTask(self.updateScrollbar)
+    def show(self) -> None:
+        self.frame.show()
 
     def updateInBounds(self, inBounds: bool) -> None:
         self.inBounds = inBounds
@@ -141,6 +138,7 @@ class ScrollablePanel(DirectObject):
 
     def destroy(self) -> None:
         self.ignoreAll()
+        self.removeAllTasks()
         self.windowSub.cancel()
         self.contentSub.cancel()
         self.frame.destroy()

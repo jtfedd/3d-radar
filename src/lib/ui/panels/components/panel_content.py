@@ -39,9 +39,23 @@ class PanelContent(ABC):
         self.scroller = ScrollablePanel(config, self.componentManager)
         self.root = self.scroller.getCanvas()
 
+        self.hide()
+
     @abstractmethod
     def headerText(self) -> str:
         pass
+
+    def hide(self) -> None:
+        self.background.hide()
+        self.header.hide()
+        self.footer.hide()
+        self.scroller.hide()
+
+    def show(self) -> None:
+        self.background.show()
+        self.header.show()
+        self.footer.show()
+        self.scroller.show()
 
     def destroy(self) -> None:
         self.background.destroy()

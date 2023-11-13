@@ -40,5 +40,11 @@ class Image:
     def updateColor(self, color: Vec4) -> None:
         self.card.setColor(color)
 
+    def hide(self) -> None:
+        self.card.hide()
+
+    def show(self) -> None:
+        self.card.show()
+
     def destroy(self) -> None:
         self.card.destroy()

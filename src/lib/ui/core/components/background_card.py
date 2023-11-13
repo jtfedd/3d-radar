@@ -37,5 +37,11 @@ class BackgroundCard:
     def updateColor(self, color: Vec4) -> None:
         self.image.updateColor(color)
 
+    def hide(self) -> None:
+        self.image.hide()
+
+    def show(self) -> None:
+        self.image.show()
+
     def destroy(self) -> None:
         self.image.destroy()

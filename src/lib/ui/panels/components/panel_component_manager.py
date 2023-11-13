@@ -13,6 +13,8 @@ class PanelComponentManager:
         self.onUpdate = EventDispatcher[float]()
 
     def add(self, component: PanelComponent) -> None:
+        component.setOffset(self.getHeight())
+        self.components.append(component)
         self.subscriptions.append(component.onChange.listen(lambda _: self.update()))
 
     def update(self) -> None:

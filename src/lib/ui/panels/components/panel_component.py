@@ -17,7 +17,7 @@ class PanelComponent(ABC):
         pass
 
     def setOffset(self, offset: float) -> None:
-        self.root.setY(-offset)
+        self.root.setZ(-offset)
 
     def destroy(self) -> None:
         self.onChange.close()

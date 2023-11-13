@@ -9,8 +9,10 @@ from lib.ui.core.layers import UILayer
 
 class PanelHeader:
     def __init__(self, config: UIConfig, text: str) -> None:
+        self.root = config.anchors.topLeft.attachNewNode("panel-header")
+
         self.text = Text(
-            root=config.anchors.topLeft,
+            root=self.root,
             font=config.fonts.bold,
             text=text,
             x=UIConstants.panelWidth / 2,
@@ -21,7 +23,7 @@ class PanelHeader:
         )
 
         self.topBorder = BackgroundCard(
-            root=config.anchors.topLeft,
+            root=self.root,
             width=UIConstants.panelWidth,
             height=UIConstants.panelBorderWidth,
             x=0,
@@ -32,6 +34,13 @@ class PanelHeader:
             layer=UILayer.BACKGROUND_DECORATION,
         )
 
+    def hide(self) -> None:
+        self.root.hide()
+
+    def show(self) -> None:
+        self.root.show()
+
     def destroy(self) -> None:
         self.text.destroy()
         self.topBorder.destroy()
+        self.root.removeNode()
