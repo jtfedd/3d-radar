@@ -2,13 +2,25 @@ from __future__ import annotations
 
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
+from direct.task.Task import Task
+
+from lib.ui.core.constants import UIConstants
+from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class UIAnchors(DirectObject):
+    ANIMATION_TIME = 0.1
+
     def __init__(self, base: ShowBase, scale: float):
         self.base = base
         self.scale = scale
-        self.aspectRatio = -1.0
+
+        self.animating = False
+        self.hidden = False
+        self.hideFactor = 0.0
+
+        self.width = 1.0
+        self.height = 1.0
 
         root = base.aspect2dp
 
@@ -19,31 +31,60 @@ class UIAnchors(DirectObject):
         self.left = root.attachNewNode("left")
         self.right = root.attachNewNode("right")
 
-        self.topLeft = self.top.attachNewNode("top-left")
-        self.topCenter = self.top.attachNewNode("top-center")
-        self.topRight = self.top.attachNewNode("top-right")
+        self.topLeft = root.attachNewNode("top-left")
+        self.topRight = root.attachNewNode("top-right")
+        self.bottomLeft = root.attachNewNode("bottom-left")
+        self.bottomRight = root.attachNewNode("bottom-right")
 
-        self.bottomLeft = self.bottom.attachNewNode("bottom-left")
-        self.bottomCenter = self.bottom.attachNewNode("bottom-center")
-        self.bottomRight = self.bottom.attachNewNode("bottom-right")
-
-        self.leftTop = self.left.attachNewNode("left-top")
-        self.leftCenter = self.left.attachNewNode("left-center")
-        self.leftBottom = self.left.attachNewNode("left-bottom")
-
-        self.rightTop = self.right.attachNewNode("right-top")
-        self.rightCenter = self.right.attachNewNode("right-center")
-        self.rightBottom = self.right.attachNewNode("right-bottom")
+        self.onUpdate = EventDispatcher[None]()
 
         self.update()
         self.accept("window-event", lambda _: self.update())
+        self.accept("h", self.toggleHide)
+
+    def toggleHide(self) -> None:
+        if self.animating:
+            return
+
+        self.animating = True
+
+        if self.hidden:
+            self.addTask(self.show, "show-anchors")
+        else:
+            self.addTask(self.hide, "hide-anchors")
+
+    def hide(self, task: Task) -> int:
+        progress = task.time / self.ANIMATION_TIME
+
+        if progress >= 1.0:
+            self.hideFactor = 1.0
+            self.animating = False
+            self.hidden = True
+            self.update()
+            return task.exit
+
+        self.hideFactor = progress
+        self.update()
+
+        return task.cont
+
+    def show(self, task: Task) -> int:
+        progress = task.time / self.ANIMATION_TIME
+
+        if progress >= 1.0:
+            self.hideFactor = 0.0
+            self.animating = False
+            self.hidden = False
+            self.update()
+            return task.exit
+
+        self.hideFactor = 1 - progress
+        self.update()
+
+        return task.cont
 
     def update(self) -> None:
         aspectRatio = self.base.getAspectRatio()
-        if aspectRatio == self.aspectRatio:
-            return
-
-        self.aspectRatio = aspectRatio
 
         width = aspectRatio
         height = 1.0
@@ -52,53 +93,51 @@ class UIAnchors(DirectObject):
             width = 1.0
             height = 1 / aspectRatio
 
+        top = height + (self.hideFactor * UIConstants.headerFooterHeight)
+        bottom = -height - (self.hideFactor * UIConstants.headerFooterHeight)
+        right = width
+        left = -width - (self.hideFactor * UIConstants.panelWidth)
+
+        self.height = top - bottom
+        self.width = right - left
+
+        # Update positions
         self.center.setPos(0, 0, 0)
 
-        self.top.setPos(0, 0, height)
-        self.bottom.setPos(0, 0, -height)
-        self.left.setPos(-width, 0, 0)
-        self.right.setPos(0, 0, width)
+        self.top.setPos(0, 0, top)
+        self.bottom.setPos(0, 0, bottom)
+        self.left.setPos(left, 0, 0)
+        self.right.setPos(0, 0, right)
 
-        self.topLeft.setPos(-width, 0, 0)
-        self.topCenter.setPos(0, 0, 0)
-        self.topRight.setPos(width, 0, 0)
+        self.topLeft.setPos(left, 0, top)
+        self.topRight.setPos(right, 0, top)
+        self.bottomLeft.setPos(left, 0, bottom)
+        self.bottomRight.setPos(right, 0, bottom)
 
-        self.bottomLeft.setPos(-width, 0, 0)
-        self.bottomCenter.setPos(0, 0, 0)
-        self.bottomRight.setPos(width, 0, 0)
+        # Update scale
+        self.center.setScale(self.scale)
 
-        self.leftTop.setPos(0, 0, height)
-        self.leftCenter.setPos(0, 0, 0)
-        self.leftBottom.setPos(0, 0, -height)
+        self.top.setScale(self.scale)
+        self.bottom.setScale(self.scale)
+        self.left.setScale(self.scale)
+        self.right.setScale(self.scale)
 
-        self.rightTop.setPos(0, 0, height)
-        self.rightCenter.setPos(0, 0, 0)
-        self.rightBottom.setPos(0, 0, -height)
+        self.topLeft.setScale(self.scale)
+        self.topRight.setScale(self.scale)
+        self.bottomLeft.setScale(self.scale)
+        self.bottomRight.setScale(self.scale)
 
-        self.updateScale(self.scale)
+        self.onUpdate.send(None)
 
     def updateScale(self, newScale: float) -> None:
         self.scale = newScale
-
-        self.center.setScale(self.scale)
-
-        self.topLeft.setScale(self.scale)
-        self.topCenter.setScale(self.scale)
-        self.topRight.setScale(self.scale)
-
-        self.bottomLeft.setScale(self.scale)
-        self.bottomCenter.setScale(self.scale)
-        self.bottomRight.setScale(self.scale)
-
-        self.leftTop.setScale(self.scale)
-        self.leftCenter.setScale(self.scale)
-        self.leftBottom.setScale(self.scale)
-
-        self.rightTop.setScale(self.scale)
-        self.rightCenter.setScale(self.scale)
-        self.rightBottom.setScale(self.scale)
+        self.update()
 
     def destroy(self) -> None:
+        self.onUpdate.close()
+
+        self.removeAllTasks()
+
         self.center.removeNode()
 
         self.top.removeNode()
@@ -107,19 +146,9 @@ class UIAnchors(DirectObject):
         self.right.removeNode()
 
         self.topLeft.removeNode()
-        self.topCenter.removeNode()
         self.topRight.removeNode()
 
         self.bottomLeft.removeNode()
-        self.bottomCenter.removeNode()
         self.bottomRight.removeNode()
-
-        self.leftTop.removeNode()
-        self.leftCenter.removeNode()
-        self.leftBottom.removeNode()
-
-        self.rightTop.removeNode()
-        self.rightCenter.removeNode()
-        self.rightBottom.removeNode()
 
         self.ignoreAll()

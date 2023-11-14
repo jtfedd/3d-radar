@@ -46,9 +46,10 @@ class Text:
             scale=size,
             fg=color,
             font=font,
-            sort=layer.value,
             align=align,  # type:ignore
         )
+
+        self.text.setBin("fixed", layer.value)
 
     def updateText(self, text: str) -> None:
         self.text.setText(text)

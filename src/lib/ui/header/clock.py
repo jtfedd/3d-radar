@@ -14,7 +14,7 @@ class Clock(DirectObject):
         self.config = config
 
         self.text = Text(
-            config.anchors.topCenter,
+            config.anchors.top,
             config.fonts.bold,
             self.getClockStr(),
             y=-UIConstants.headerFooterHeight / 2,

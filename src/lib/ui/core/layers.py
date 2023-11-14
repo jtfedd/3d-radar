@@ -5,3 +5,4 @@ class UILayer(Enum):
     BACKGROUND = 0
     BACKGROUND_DECORATION = 1
     CONTENT = 2
+    INTERACTION = 3
