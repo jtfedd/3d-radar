@@ -12,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
-    strategy:
-      matrix:
-        python-version: ["3.10"]
-
     steps:
     - name: Check out the branch
       uses: actions/checkout@v3
@@ -23,10 +19,10 @@ jobs:
     - name: Setup LCOV
       uses: hrishikesh-kadam/setup-lcov@v1
 
-    - name: Set Up Python ${{ matrix.python-version }}
+    - name: Set Up Python 3.11
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.11"
 
     - name: Display Python Version
       run: python -c "import sys; print(sys.version)"
