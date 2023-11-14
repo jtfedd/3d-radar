@@ -6,7 +6,7 @@ This is a project to build a 3d rendering program which can visualize full 3d ne
 
 ### Python
 
-This project is written in [Python](https://www.python.org/). It is currently developed with Python 3.10; your milage may vary with other versions.
+This project is written in [Python](https://www.python.org/). It is currently developed with Python 3.11; your milage may vary with other versions.
 
 ### Set up a virtual environment
 
