@@ -7,7 +7,7 @@ class SettingsPanel(PanelContent):
     def __init__(self, config: UIConfig) -> None:
         super().__init__(config)
 
-        for i in range(10):
+        for _ in range(10):
             text = TextComponent(self.root, config)
             self.componentManager.add(text)
 
