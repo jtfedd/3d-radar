@@ -1,11 +1,11 @@
-isort>=5.12.0
 black>=23.11.0
-mypy>=1.7.0
+boto3-stubs>=1.29.0
+coverage>=7.3.2
 flake8>=6.1.0
+isort>=5.12.0
+mypy>=1.7.0
 pylint>=3.0.2
 types-panda3d>=0.3.3
 types-requests>=2.31.0.10
 types-urllib3>=1.26.25.14
-boto3-stubs>=1.29.0
-coverage>=7.3.2
 unittest-xml-reporting>=3.2.0

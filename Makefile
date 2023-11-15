@@ -21,7 +21,8 @@ install-dev: ## Install build and dev dependencies
 upgrade: ## Upgrade all dependencies
 	python -m pip install --upgrade -r requirements.txt -r requirements-dev.txt
 	python -m pip freeze > requirements-lock.txt
-	@rm requirements-upgrade.txt
+	python tool/scripts/syncdeps.py requirements.txt requirements-lock.txt
+	python tool/scripts/syncdeps.py requirements-dev.txt requirements-lock.txt
 
 .PHONY: upgrade-pip
 upgrade-pip: ## Upgrade pip

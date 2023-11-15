@@ -1,6 +1,6 @@
-panda3d>=1.10.13
-numpy>=1.26.2
 blosc>=1.11.1
 boto3>=1.29.0
 metpy>=1.5.1
+numpy>=1.26.2
+panda3d>=1.10.13
 pymcubes>=0.1.4
