@@ -8,14 +8,20 @@ help: ## Display this help page
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: install
-install: ## Install dependencies
+install: ## Install only the dependencies needed to build and run the app
 	python -m pip install -r requirements.txt
+	python -m pip freeze > requirements-lock.txt
+
+.PHONY: install-dev
+install-dev: ## Install build and dev dependencies
+	python -m pip install -r requirements.txt -r requirements-dev.txt
+	python -m pip freeze > requirements-lock.txt
 
 .PHONY: upgrade
 upgrade: ## Upgrade all dependencies
-	sed -i 's/==/>=/g' requirements.txt
-	python -m pip install --upgrade -r requirements.txt
-	python -m pip freeze > requirements.txt
+	python -m pip install --upgrade -r requirements.txt -r requirements-dev.txt
+	python -m pip freeze > requirements-lock.txt
+	@rm requirements-upgrade.txt
 
 .PHONY: upgrade-pip
 upgrade-pip: ## Upgrade pip

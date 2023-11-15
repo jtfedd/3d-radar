@@ -1,44 +1,50 @@
 name: Upgrade Dependencies
 
 on:
-    schedule:
-        - cron: '0 13 * * 6'
-    workflow_dispatch: # Allow the workflow to be started manually
+  schedule:
+    - cron: '0 13 * * 6'
+  workflow_dispatch: # Allow the workflow to be started manually
 
 jobs:
-    upgrade-deps:
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
+  upgrade-deps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-        steps:
-            - name: Check out the branch
-              uses: actions/checkout@v3
+    steps:
+      - name: Check out the branch
+        uses: actions/checkout@v3
 
-            - name: Set Up Python 3.11
-              uses: actions/setup-python@v3
-              with:
-                python-version: "3.11"
+      - name: Set Up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
 
-            - name: Upgrade Pip
-              run: |
-                make upgrade-pip
-                
-            - name: Upgrade Dependencies
-              run: |
-                make upgrade
+      - name: Upgrade Pip
+        run: |
+          make upgrade-pip
+          
+      - name: Upgrade Dependencies
+        run: |
+          make upgrade
 
-            - name: Print Changes
-              run: |
-                git diff -U0
+      - name: Cache Resolved Dependencies
+        uses: actions/upload-artifact@v3
+        with:
+          name: requirements-lock
+          path: requirements-lock.txt
 
-            - name: Create Pull Request
-              uses: peter-evans/create-pull-request@v3
-              with:
-                token: ${{ secrets.UPDATE_DEPS_TOKEN }}
-                base: main
-                branch: upgrade-dependencies
-                branch-suffix: timestamp
-                commit-message: upgrade-dependencies
-                title: Automated Dependency Upgrade
-                body: |
-                  Automated dependency upgrade, created by https://github.com/jtfedd/3d-radar/actions/workflows/upgrade_deps.yml
+      - name: Print Changes
+        run: |
+          git diff -U0
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.UPDATE_DEPS_TOKEN }}
+          base: main
+          branch: upgrade-dependencies
+          branch-suffix: timestamp
+          commit-message: upgrade-dependencies
+          title: Automated Dependency Upgrade
+          body: |
+            Automated dependency upgrade, created by https://github.com/jtfedd/3d-radar/actions/workflows/upgrade_deps.yml
