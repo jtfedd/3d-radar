@@ -21,3 +21,6 @@
 
 # Test Reports
 reports/*
+
+# Requirements lock file
+requirements-lock.txt

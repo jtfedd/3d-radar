@@ -31,7 +31,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -41,7 +41,13 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        make install
+        make install-dev
+
+    - name: Cache Resolved Dependencies
+      uses: actions/upload-artifact@v3
+      with:
+        name: requirements-lock
+        path: requirements-lock.txt
 
     - name: Complete Setup
       id: setup
