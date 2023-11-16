@@ -12,7 +12,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.panel_component_manager import PanelComponentManager
 
 
-class ScrollablePanel(DirectObject):
+class PanelScroller(DirectObject):
     SCROLLBAR_FADE_IN = 0.1
     SCROLLBAR_FADE_OUT = 0.4
 

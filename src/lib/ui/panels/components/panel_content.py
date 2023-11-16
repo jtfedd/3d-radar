@@ -8,7 +8,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.ui.panels.components.panel_component_manager import PanelComponentManager
 from lib.ui.panels.components.panel_header import PanelHeader
-from lib.ui.panels.components.scrollable_panel import ScrollablePanel
+from lib.ui.panels.components.panel_scroller import PanelScroller
 
 
 class PanelContent(ABC):
@@ -36,7 +36,7 @@ class PanelContent(ABC):
         )
 
         self.componentManager = PanelComponentManager()
-        self.scroller = ScrollablePanel(config, self.componentManager)
+        self.scroller = PanelScroller(config, self.componentManager)
         self.root = self.scroller.getCanvas()
 
         self.hide()
