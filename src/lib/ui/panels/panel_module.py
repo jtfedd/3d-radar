@@ -1,5 +1,5 @@
 from lib.ui.core.config import UIConfig
-from lib.ui.panels.components.panel_buttons import PanelButtons
+from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.panel_events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
 from lib.ui.panels.settings.settings_panel import SettingsPanel

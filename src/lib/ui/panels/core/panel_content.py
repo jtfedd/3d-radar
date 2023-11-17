@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List, TypeVar
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -6,17 +7,22 @@ from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
-from lib.ui.panels.components.panel_component_manager import PanelComponentManager
-from lib.ui.panels.components.panel_header import PanelHeader
-from lib.ui.panels.components.panel_scroller import PanelScroller
+from lib.ui.panels.core.panel_component import PanelComponent
+from lib.ui.panels.core.panel_component_manager import PanelComponentManager
+from lib.ui.panels.core.panel_header import PanelHeader
+from lib.ui.panels.core.panel_scroller import PanelScroller
+
+T = TypeVar("T", bound=PanelComponent)
 
 
 class PanelContent(ABC):
     def __init__(self, config: UIConfig) -> None:
+        self.components: List[PanelComponent] = []
+
         self.background = BackgroundCard(
             config.anchors.left,
             width=UIConstants.panelWidth,
-            height=UIConstants.infinite,
+            height=UIConstants.infinity,
             color=UIColors.GRAY,
             vAlign=VAlign.CENTER,
             hAlign=HAlign.LEFT,
@@ -57,7 +63,15 @@ class PanelContent(ABC):
         self.footer.show()
         self.scroller.show()
 
+    def addComponent(self, component: T) -> T:
+        self.componentManager.add(component)
+        self.components.append(component)
+        return component
+
     def destroy(self) -> None:
+        for component in self.components:
+            component.destroy()
+
         self.background.destroy()
         self.header.destroy()
         self.footer.destroy()

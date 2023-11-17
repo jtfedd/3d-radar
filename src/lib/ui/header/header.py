@@ -14,7 +14,7 @@ class Header(DirectObject):
 
         self.background = BackgroundCard(
             config.anchors.top,
-            width=UIConstants.infinite,
+            width=UIConstants.infinity,
             height=UIConstants.headerFooterHeight,
             color=UIColors.GRAY,
             vAlign=VAlign.TOP,

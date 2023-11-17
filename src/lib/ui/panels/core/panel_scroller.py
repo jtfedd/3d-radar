@@ -9,7 +9,7 @@ from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 from lib.ui.core.colors import UIColors
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
-from lib.ui.panels.components.panel_component_manager import PanelComponentManager
+from lib.ui.panels.core.panel_component_manager import PanelComponentManager
 
 
 class PanelScroller(DirectObject):
