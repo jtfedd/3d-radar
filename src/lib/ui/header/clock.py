@@ -31,7 +31,7 @@ class Clock(DirectObject):
 
     def getClockStr(self) -> str:
         dateStr = "%A, %d %B %Y"
-        timeStr = "%I:%M:%S %p"
+        timeStr = "%I:%M %p"
 
         return datetime.datetime.now().strftime(dateStr + "\n" + timeStr)
 
