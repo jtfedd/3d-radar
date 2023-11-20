@@ -7,9 +7,6 @@
 # Blender backup files
 *.blend[0-9]*
 
-# Cached data folder
-**/cached_data/*
-
 # Virtual environment
 .venv/*
 

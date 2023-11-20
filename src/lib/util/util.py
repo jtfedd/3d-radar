@@ -3,6 +3,7 @@ import datetime
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import AmbientLight, DirectionalLight
 
+from lib.app.file_manager import FileManager
 from lib.data_connector.data_connector import DataConnector
 from lib.data_provider.s3_data_provider import S3DataProvider
 from lib.model.record import Record
@@ -24,7 +25,8 @@ def getData() -> Scan:
     record = Record(site, time)
 
     provider = S3DataProvider()
-    connector = DataConnector(provider)
+    fileManager = FileManager()
+    connector = DataConnector(provider, str(fileManager.cachePath))
 
     return connector.load(record)
 

@@ -10,14 +10,14 @@ from lib.model.scan import Scan
 
 
 class DataConnector:
-    def __init__(self, provider: AbstractDataProvider, useCaching: bool = True):
-        scriptDir = os.path.abspath(os.path.dirname(__file__))
-        self.cacheDir = os.path.join(scriptDir, "cached_data")
-
-        if not os.path.exists(self.cacheDir):
-            os.makedirs(self.cacheDir)
-
+    def __init__(
+        self,
+        provider: AbstractDataProvider,
+        cacheDir: str,
+        useCaching: bool = True,
+    ):
         self.provider = provider
+        self.cacheDir = cacheDir
         self.useCaching = useCaching
 
     def load(self, record: Record) -> Scan:
