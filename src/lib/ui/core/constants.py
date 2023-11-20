@@ -12,6 +12,8 @@ class UIConstants:
     panelInputHeight = 0.06
     labelWidth = panelContentWidth / 4
 
+    inputPadding = 0.3
+
     scrollbarWidth = 0.01
     scrollbarPadding = panelPadding / 2
 

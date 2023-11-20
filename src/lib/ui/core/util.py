@@ -1,3 +1,5 @@
+from panda3d.core import DynamicTextFont
+
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.util.errors import InvalidArgumentException
 
@@ -28,5 +30,26 @@ def correctYForAlignment(y: float, height: float, align: VAlign) -> float:
 
     if align in (VAlign.BOTTOM, VAlign.BASELINE):
         return y + offset
+
+    raise InvalidArgumentException("align has invalid value " + align.value)
+
+
+def correctYForTextAlignment(
+    y: float,
+    font: DynamicTextFont,
+    textSize: float,
+    align: VAlign,
+) -> float:
+    if align == VAlign.BASELINE:
+        return y
+
+    if align == VAlign.TOP:
+        return y - textSize
+
+    if align == VAlign.CENTER:
+        return y - textSize / 3.5
+
+    if align == VAlign.BOTTOM:
+        return y + textSize * (font.line_height - 1)
 
     raise InvalidArgumentException("align has invalid value " + align.value)

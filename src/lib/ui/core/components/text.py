@@ -7,6 +7,7 @@ from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
+from lib.ui.core.util import correctYForTextAlignment
 
 
 class Text:
@@ -31,13 +32,7 @@ class Text:
         elif hAlign == HAlign.RIGHT:
             align = TextNode.ARight
 
-        yPos = y
-        if vAlign == VAlign.TOP:
-            yPos -= size
-        elif vAlign == VAlign.CENTER:
-            yPos -= size / 3.5
-        elif vAlign == VAlign.BOTTOM:
-            yPos += size * (font.line_height - 1)
+        yPos = correctYForTextAlignment(y, font, size, vAlign)
 
         self.text = OnscreenText(
             parent=root,

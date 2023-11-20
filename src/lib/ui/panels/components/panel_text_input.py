@@ -4,6 +4,7 @@ from panda3d.core import NodePath, PandaNode
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
+from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.core.panel_component import PanelComponent
@@ -23,6 +24,18 @@ class PanelTextInput(PanelComponent):
             vAlign=VAlign.CENTER,
         )
 
+        self.input = TextInput(
+            config=config,
+            root=self.root,
+            font=config.fonts.regular,
+            x=UIConstants.panelContentWidth + UIConstants.panelPadding,
+            y=-UIConstants.panelInputHeight / 2,
+            hAlign=HAlign.RIGHT,
+            vAlign=VAlign.CENTER,
+            width=UIConstants.panelContentWidth / 2,
+            size=UIConstants.fontSizeRegular,
+        )
+
     def getHeight(self) -> float:
         return UIConstants.panelInputHeight
 
@@ -30,3 +43,4 @@ class PanelTextInput(PanelComponent):
         super().destroy()
 
         self.label.destroy()
+        self.input.destroy()

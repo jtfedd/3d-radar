@@ -5,14 +5,16 @@ from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.keybindings.keybinding_manager import KeybindingManager
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class UIAnchors(DirectObject):
     ANIMATION_TIME = 0.1
 
-    def __init__(self, base: ShowBase, scale: float):
+    def __init__(self, base: ShowBase, keybindings: KeybindingManager, scale: float):
         self.base = base
+        self.keybindings = keybindings
         self.scale = scale
 
         self.animating = False
@@ -40,7 +42,7 @@ class UIAnchors(DirectObject):
 
         self.update()
         self.accept("window-event", lambda _: self.update())
-        self.accept("h", self.toggleHide)
+        self.hideSub = self.keybindings.hideEvent.listen(lambda _: self.toggleHide())
 
     def toggleHide(self) -> None:
         if self.animating:
@@ -152,3 +154,4 @@ class UIAnchors(DirectObject):
         self.bottomRight.removeNode()
 
         self.ignoreAll()
+        self.hideSub.cancel()
