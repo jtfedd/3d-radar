@@ -15,3 +15,14 @@ class FileManager:
 
     def getCacheFile(self, filename: str) -> Path:
         return self.cachePath.joinpath(filename)
+
+    def removeCacheFile(self, filename: str) -> None:
+        file = self.getCacheFile(filename)
+        if not file.exists():
+            return
+
+        file.unlink()
+
+    def clearCache(self) -> None:
+        for file in self.cachePath.iterdir():
+            file.unlink()
