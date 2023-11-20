@@ -13,14 +13,5 @@ class FileManager:
     def getConfigFile(self) -> Path:
         return self.configPath.joinpath("config.json")
 
-    def loadConfig(self) -> str:
-        configPath = self.getConfigFile()
-        if not configPath.exists():
-            return "{}"
-
-        with self.configPath.joinpath("config.json").open("r", encoding="utf-8") as f:
-            return f.read()
-
-    def saveConfig(self, configStr: str) -> None:
-        with self.configPath.joinpath("config.json").open("w", encoding="utf-8") as f:
-            f.write(configStr)
+    def getCacheFile(self, filename: str) -> Path:
+        return self.cachePath.joinpath(filename)

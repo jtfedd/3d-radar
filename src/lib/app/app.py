@@ -15,12 +15,22 @@ class App:
         self.fileManager = FileManager()
 
         self.config = AppConfig()
-        self.config.fromJson(self.fileManager.loadConfig())
+        self.loadConfig()
 
         self.uiConfig = UIConfig(self.base)
         self.ui = UI(self.uiConfig)
 
         atexit.register(self.saveConfig)
 
+    def loadConfig(self) -> None:
+        configPath = self.fileManager.getConfigFile()
+        if not configPath.exists():
+            return
+
+        with configPath.open("r", encoding="utf-8") as f:
+            jsonStr = f.read()
+            self.config.fromJson(jsonStr)
+
     def saveConfig(self) -> None:
-        self.fileManager.saveConfig(self.config.toJson())
+        with self.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
+            f.write(self.config.toJson())

@@ -26,7 +26,7 @@ def getData() -> Scan:
 
     provider = S3DataProvider()
     fileManager = FileManager()
-    connector = DataConnector(provider, str(fileManager.cachePath))
+    connector = DataConnector(provider, fileManager)
 
     return connector.load(record)
 
