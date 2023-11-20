@@ -7,6 +7,10 @@
 help: ## Display this help page
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: run
+run: ## Runs the app
+	python src/main.py
+
 .PHONY: install
 install: ## Install only the dependencies needed to build and run the app
 	python -m pip install -r requirements.txt
@@ -84,8 +88,3 @@ coverage-html: ## Generate html coverage report from a previous test coverage ru
 .PHONY: coverage-lcov
 coverage-lcov: ## Generage lcov report from a previous test coverage run
 	cd reports && python -m coverage lcov
-
-.PHONY: clean
-clean: ## Remove all cached data files, config files, etc.
-	@rm -rfv src/lib/data_connector/cached_data/*
-	@rm -rfv reports

@@ -1,8 +1,9 @@
-import os
+from pathlib import Path
 from typing import Optional
 
 import blosc
 
+from lib.app.file_manager import FileManager
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
 from lib.model.convert.serialization import deserializeScan, serializeScan
 from lib.model.record import Record
@@ -10,14 +11,14 @@ from lib.model.scan import Scan
 
 
 class DataConnector:
-    def __init__(self, provider: AbstractDataProvider, useCaching: bool = True):
-        scriptDir = os.path.abspath(os.path.dirname(__file__))
-        self.cacheDir = os.path.join(scriptDir, "cached_data")
-
-        if not os.path.exists(self.cacheDir):
-            os.makedirs(self.cacheDir)
-
+    def __init__(
+        self,
+        provider: AbstractDataProvider,
+        fileManager: FileManager,
+        useCaching: bool = True,
+    ):
         self.provider = provider
+        self.fileManager = fileManager
         self.useCaching = useCaching
 
     def load(self, record: Record) -> Scan:
@@ -30,9 +31,9 @@ class DataConnector:
 
         return scan
 
-    def getFilepath(self, record: Record) -> str:
+    def getFilepath(self, record: Record) -> Path:
         fileName = record.cacheKey() + ".dat"
-        return os.path.join(self.cacheDir, fileName)
+        return self.fileManager.getCacheFile(fileName)
 
     def loadCached(self, record: Record) -> Optional[Scan]:
         if not self.useCaching:
@@ -40,12 +41,12 @@ class DataConnector:
 
         filePath = self.getFilepath(record)
 
-        if not os.path.exists(filePath):
+        if not filePath.exists():
             return None
 
         print("Reading", filePath)
 
-        with open(filePath, "rb") as file:
+        with filePath.open("rb") as file:
             data = file.read()
 
         decompressed = blosc.decompress(data)
@@ -66,7 +67,7 @@ class DataConnector:
         data = serializeScan(scan)
         compressed = blosc.compress(data)
 
-        with open(filePath, "wb") as file:
+        with filePath.open("wb") as file:
             file.write(compressed)
 
         print("Wrote", filePath)

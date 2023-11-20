@@ -3,4 +3,5 @@ boto3>=1.29.3
 metpy>=1.5.1
 numpy>=1.26.2
 panda3d>=1.10.13
+platformdirs>=4.0.0
 pymcubes>=0.1.4
