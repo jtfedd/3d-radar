@@ -10,6 +10,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.focus.focusable import Focusable
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctYForTextAlignment
+from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class TextInput(Focusable):
@@ -58,11 +59,16 @@ class TextInput(Focusable):
 
         self.entry.setBin("fixed", layer.value)
 
+        self.onChange = EventDispatcher[str]()
+
     def onCommit(self, value: str) -> None:
-        print("commit " + value)
-        self.entry.enterText("haha")
+        self.onChange.send(value)
+
+    def setText(self, value: str) -> None:
+        self.entry.enterText(value)
 
     def destroy(self) -> None:
         super().destroy()
 
         self.entry.destroy()
+        self.onChange.close()

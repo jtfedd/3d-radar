@@ -95,10 +95,12 @@ class UIAnchors(DirectObject):
             width = 1.0
             height = 1 / aspectRatio
 
-        top = height + (self.hideFactor * UIConstants.headerFooterHeight)
-        bottom = -height - (self.hideFactor * UIConstants.headerFooterHeight)
+        top = height + (self.hideFactor * UIConstants.headerFooterHeight * self.scale)
+        bottom = -height - (
+            self.hideFactor * UIConstants.headerFooterHeight * self.scale
+        )
         right = width
-        left = -width - (self.hideFactor * UIConstants.panelWidth)
+        left = -width - (self.hideFactor * UIConstants.panelWidth * self.scale)
 
         self.height = top - bottom
         self.width = right - left

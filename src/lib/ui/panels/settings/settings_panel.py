@@ -1,7 +1,8 @@
 from lib.ui.core.config import UIConfig
 from lib.ui.panels.components.panel_spacer import PanelSpacer
-from lib.ui.panels.components.panel_text_input import PanelTextInput
 from lib.ui.panels.core.panel_content import PanelContent
+
+from .ui_scale import UIScaleInput
 
 
 class SettingsPanel(PanelContent):
@@ -11,7 +12,7 @@ class SettingsPanel(PanelContent):
         self.addComponent(PanelSpacer(self.root))
 
         self.scaleInput = self.addComponent(
-            PanelTextInput(
+            UIScaleInput(
                 self.root,
                 config,
                 label="UI Scale",
