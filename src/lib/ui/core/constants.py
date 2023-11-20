@@ -10,7 +10,6 @@ class UIConstants:
     panelHeaderHeight = 0.08
     panelContentWidth = panelWidth - (panelPadding * 2)
     panelInputHeight = 0.06
-    labelWidth = panelContentWidth / 4
 
     inputPadding = 0.3
 
