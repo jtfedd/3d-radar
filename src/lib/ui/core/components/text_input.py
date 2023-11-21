@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from direct.gui.DirectEntry import DirectEntry
-from panda3d.core import DynamicTextFont, NodePath, PandaNode, TextNode
+from panda3d.core import DynamicTextFont, NodePath, PandaNode
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -9,7 +9,7 @@ from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.focus.focusable import Focusable
 from lib.ui.core.layers import UILayer
-from lib.ui.core.util import correctYForTextAlignment
+from lib.ui.core.util import correctYForTextAlignment, horizontalAlignToTextNodeAlign
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
@@ -30,12 +30,6 @@ class TextInput(Focusable):
     ):
         super().__init__(config.focusManager)
 
-        align = TextNode.ALeft
-        if hAlign == HAlign.CENTER:
-            align = TextNode.ACenter
-        elif hAlign == HAlign.RIGHT:
-            align = TextNode.ARight
-
         yPos = correctYForTextAlignment(y, font, size, vAlign)
 
         self.entry = DirectEntry(
@@ -49,7 +43,7 @@ class TextInput(Focusable):
             borderWidth=(UIConstants.inputPadding, UIConstants.inputPadding),
             frameColor=UIColors.DARKGRAY,
             text_fg=UIColors.WHITE,
-            text_align=align,
+            text_align=horizontalAlignToTextNodeAlign(hAlign),
             command=self.onCommit,
             focusInCommand=self.onFocus,
             focusInExtraArgs=[True],
