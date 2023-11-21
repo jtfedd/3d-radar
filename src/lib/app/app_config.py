@@ -19,3 +19,6 @@ class AppConfig:
 
         if "uiscale" in raw:
             self.uiScale = raw["uiscale"]
+
+    def setUiScale(self, newScale: float) -> None:
+        self.uiScale = newScale

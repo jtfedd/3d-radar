@@ -1,6 +1,6 @@
 from typing import List
 
-from lib.ui.panels.components.panel_component import PanelComponent
+from lib.ui.panels.core.panel_component import PanelComponent
 from lib.util.events.event_dispatcher import EventDispatcher
 from lib.util.events.event_subscription import EventSubscription
 

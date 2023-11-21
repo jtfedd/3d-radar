@@ -4,21 +4,21 @@ from direct.showbase.ShowBase import ShowBase
 
 from lib.app.app_config import AppConfig
 from lib.app.file_manager import FileManager
-from lib.ui.core.config import UIConfig
 from lib.ui.ui import UI
 
 
 class App:
     def __init__(self, base: ShowBase) -> None:
         self.base = base
+        self.base.setBackgroundColor(0, 0, 0, 1)
 
         self.fileManager = FileManager()
 
         self.config = AppConfig()
         self.loadConfig()
 
-        self.uiConfig = UIConfig(self.base)
-        self.ui = UI(self.uiConfig)
+        self.ui = UI(self.base, self.config)
+        self.ui.panels.events.scaleChanged.listen(self.config.setUiScale)
 
         atexit.register(self.saveConfig)
 

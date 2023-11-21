@@ -9,10 +9,11 @@ from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 from lib.ui.core.colors import UIColors
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
-from lib.ui.panels.components.panel_component_manager import PanelComponentManager
+from lib.ui.core.layers import UILayer
+from lib.ui.panels.core.panel_component_manager import PanelComponentManager
 
 
-class ScrollablePanel(DirectObject):
+class PanelScroller(DirectObject):
     SCROLLBAR_FADE_IN = 0.1
     SCROLLBAR_FADE_OUT = 0.4
 
@@ -31,6 +32,8 @@ class ScrollablePanel(DirectObject):
             verticalScroll_frameColor=UIColors.BLACK,
             verticalScroll_thumb_frameColor=UIColors.WHITE,
         )
+
+        self.frame.setBin("fixed", UILayer.INTERACTION.value)
 
         self.frame.horizontalScroll.hide()
         self.frame.verticalScroll.incButton.hide()

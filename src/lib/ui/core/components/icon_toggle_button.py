@@ -38,7 +38,7 @@ class IconToggleButton(DirectObject):
 
         self.backgroundColorMap = {
             DGG.BUTTON_READY_STATE: UIColors.TRANSPARENT,
-            DGG.BUTTON_ROLLOVER_STATE: UIColors.WHITE,
+            DGG.BUTTON_ROLLOVER_STATE: UIColors.LIGHTGRAY,
             DGG.BUTTON_DEPRESSED_STATE: UIColors.BLACK,
             DGG.BUTTON_INACTIVE_STATE: UIColors.GRAY,
         }
@@ -81,7 +81,7 @@ class IconToggleButton(DirectObject):
             pos=(xPos, 0, yPos),
             scale=(width / 2, 1, height / 2),
             borderWidth=(0, 0),
-            frameColor=(0, 0, 0, 0),
+            frameColor=UIColors.TRANSPARENT,
             rolloverSound=None,
             clickSound=None,
         )
