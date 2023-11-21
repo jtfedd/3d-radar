@@ -1,7 +1,11 @@
 from lib.ui.core.config import UIConfig
 from lib.ui.panels.core.panel_buttons import PanelButtons
+from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.panel_events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
+from lib.ui.panels.radar_visualization.radar_visualization_panel import (
+    RadarVisualizationPanel,
+)
 from lib.ui.panels.settings.settings_panel import SettingsPanel
 from lib.util.errors import InvalidArgumentException
 
@@ -14,8 +18,9 @@ class PanelModule:
         self.panelType = PanelType.NONE
 
         self.settingsPanel = SettingsPanel(self.config, self.events)
+        self.radarVizPanel = RadarVisualizationPanel(self.config)
 
-        self.currentPanel = self.settingsPanel
+        self.currentPanel: PanelContent = self.settingsPanel
 
         self.buttons = PanelButtons(config, self.events)
         self.buttonsSub = self.buttons.onClick.listen(self.panelTypeClicked)
@@ -40,6 +45,8 @@ class PanelModule:
 
         if panel is PanelType.SETTINGS:
             self.currentPanel = self.settingsPanel
+        elif panel is PanelType.RADAR_VISUALIZATION:
+            self.currentPanel = self.radarVizPanel
         else:
             raise InvalidArgumentException("Unsupported panel type: " + str(panel))
 

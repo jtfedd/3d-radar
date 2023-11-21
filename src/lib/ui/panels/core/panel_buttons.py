@@ -14,7 +14,8 @@ from lib.util.events.event_subscription import EventSubscription
 class PanelButtons:
     buttonConfig: List[Tuple[PanelType, str]] = [
         (PanelType.SETTINGS, Icons.GEAR),
-        (PanelType.DATA, Icons.RADAR),
+        (PanelType.RADAR_DATA, Icons.RADAR),
+        (PanelType.RADAR_VISUALIZATION, Icons.RADAR_DISPLAY),
     ]
 
     def __init__(self, config: UIConfig, panelEvents: PanelEvents) -> None:
