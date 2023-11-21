@@ -4,7 +4,10 @@ from direct.showbase.ShowBase import ShowBase
 
 from lib.app.app_config import AppConfig
 from lib.app.file_manager import FileManager
+from lib.camera.camera_control import CameraControl
+from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
+from lib.util.util import defaultLight, getData
 
 
 class App:
@@ -19,6 +22,14 @@ class App:
 
         self.ui = UI(self.base, self.config)
         self.ui.panels.events.scaleChanged.listen(self.config.setUiScale)
+
+        self.cameraControl = CameraControl(self.base)
+        defaultLight(self.base)
+
+        self.volumeRenderer = VolumeRenderer(self.base)
+
+        scan = getData()
+        self.volumeRenderer.updateVolumeData(scan)
 
         atexit.register(self.saveConfig)
 
