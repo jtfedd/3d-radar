@@ -13,7 +13,7 @@ class PanelModule:
 
         self.panelType = PanelType.NONE
 
-        self.settingsPanel = SettingsPanel(self.config)
+        self.settingsPanel = SettingsPanel(self.config, self.events)
 
         self.currentPanel = self.settingsPanel
 

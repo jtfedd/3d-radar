@@ -17,7 +17,8 @@ class App:
         self.config = AppConfig()
         self.loadConfig()
 
-        self.ui = UI(self.base)
+        self.ui = UI(self.base, self.config)
+        self.ui.panels.events.scaleChanged.listen(self.config.setUiScale)
 
         atexit.register(self.saveConfig)
 

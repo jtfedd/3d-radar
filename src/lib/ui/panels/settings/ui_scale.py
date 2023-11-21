@@ -8,6 +8,7 @@ from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.core.panel_component import PanelComponent
+from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class UIScaleInput(PanelComponent):
@@ -53,6 +54,7 @@ class UIScaleInput(PanelComponent):
         )
 
         self.inputChangeSub = self.input.onChange.listen(self.handleScaleChange)
+        self.onScaleChange = EventDispatcher[float]()
 
     def scaleStr(self) -> str:
         return str(int(self.config.anchors.scale * 100))
@@ -71,7 +73,7 @@ class UIScaleInput(PanelComponent):
             newScale = min(self.MAX_SCALE, max(self.MIN_SCALE, newScale))
             self.input.setText(str(newScale))
 
-        self.config.setScale(newScale / 100.0)
+        self.onScaleChange.send(newScale / 100.0)
 
     def getHeight(self) -> float:
         return UIConstants.panelInputHeight
@@ -80,6 +82,7 @@ class UIScaleInput(PanelComponent):
         super().destroy()
 
         self.inputChangeSub.cancel()
+        self.onScaleChange.close()
 
         self.label.destroy()
         self.input.destroy()
