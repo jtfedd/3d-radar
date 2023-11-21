@@ -1,7 +1,7 @@
 import unittest
 
 from lib.util.errors import StateError
-from lib.util.observable.observable import Observable
+from lib.util.events.observable import Observable
 
 
 class TestObservable(unittest.TestCase):

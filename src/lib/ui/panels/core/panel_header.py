@@ -2,18 +2,18 @@ from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.components.text import Text
-from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.context import UIContext
 from lib.ui.core.layers import UILayer
 
 
 class PanelHeader:
-    def __init__(self, config: UIConfig, text: str) -> None:
-        self.root = config.anchors.topLeft.attachNewNode("panel-header")
+    def __init__(self, ctx: UIContext, text: str) -> None:
+        self.root = ctx.anchors.topLeft.attachNewNode("panel-header")
 
         self.text = Text(
             root=self.root,
-            font=config.fonts.bold,
+            font=ctx.fonts.bold,
             text=text,
             x=UIConstants.panelWidth / 2,
             y=-UIConstants.headerFooterHeight - (UIConstants.panelHeaderHeight / 2),

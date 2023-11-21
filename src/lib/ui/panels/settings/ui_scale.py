@@ -5,8 +5,8 @@ from panda3d.core import NodePath, PandaNode
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
 from lib.ui.core.components.text_input import TextInput
-from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.context import UIContext
 from lib.ui.panels.core.panel_component import PanelComponent
 from lib.util.events.event_dispatcher import EventDispatcher
 
@@ -15,14 +15,14 @@ class UIScaleInput(PanelComponent):
     MIN_SCALE = 25
     MAX_SCALE = 300
 
-    def __init__(self, root: NodePath[PandaNode], config: UIConfig, label: str):
+    def __init__(self, root: NodePath[PandaNode], ctx: UIContext, label: str):
         super().__init__(root)
 
-        self.config = config
+        self.ctx = ctx
 
         self.label = Text(
             root=self.root,
-            font=config.fonts.bold,
+            font=ctx.fonts.bold,
             text=label,
             x=UIConstants.panelPadding,
             y=-UIConstants.panelInputHeight / 2,
@@ -31,9 +31,9 @@ class UIScaleInput(PanelComponent):
         )
 
         self.input = TextInput(
-            config=config,
+            ctx=ctx,
             root=self.root,
-            font=config.fonts.regular,
+            font=ctx.fonts.regular,
             x=UIConstants.panelContentWidth + UIConstants.panelPadding - 0.04,
             y=-UIConstants.panelInputHeight / 2,
             hAlign=HAlign.RIGHT,
@@ -45,7 +45,7 @@ class UIScaleInput(PanelComponent):
 
         self.percent = Text(
             root=self.root,
-            font=config.fonts.regular,
+            font=ctx.fonts.regular,
             text="%",
             x=UIConstants.panelContentWidth + UIConstants.panelPadding,
             y=-UIConstants.panelInputHeight / 2,
@@ -57,7 +57,7 @@ class UIScaleInput(PanelComponent):
         self.onScaleChange = EventDispatcher[float]()
 
     def scaleStr(self) -> str:
-        return str(int(self.config.anchors.scale * 100))
+        return str(int(self.ctx.anchors.scale * 100))
 
     def resetValue(self) -> None:
         self.input.setText(self.scaleStr())

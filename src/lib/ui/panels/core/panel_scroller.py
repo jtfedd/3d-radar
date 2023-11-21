@@ -7,8 +7,8 @@ from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
 from lib.ui.core.colors import UIColors
-from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.context import UIContext
 from lib.ui.core.layers import UILayer
 from lib.ui.panels.core.panel_component_manager import PanelComponentManager
 
@@ -17,12 +17,12 @@ class PanelScroller(DirectObject):
     SCROLLBAR_FADE_IN = 0.1
     SCROLLBAR_FADE_OUT = 0.4
 
-    def __init__(self, config: UIConfig, components: PanelComponentManager) -> None:
-        self.config = config
+    def __init__(self, ctx: UIContext, components: PanelComponentManager) -> None:
+        self.ctx = ctx
         self.components = components
 
         self.frame = DirectScrolledFrame(
-            parent=config.anchors.topLeft,
+            parent=ctx.anchors.topLeft,
             pos=(0, 0, -UIConstants.headerFooterHeight - UIConstants.panelHeaderHeight),
             manageScrollBars=False,
             autoHideScrollBars=False,
@@ -46,10 +46,7 @@ class PanelScroller(DirectObject):
 
         self.updateFrame()
 
-        self.windowSub = self.config.anchors.onUpdate.listen(
-            lambda _: self.updateFrame()
-        )
-
+        self.windowSub = ctx.anchors.onUpdate.listen(lambda _: self.updateFrame())
         self.contentSub = self.components.onUpdate.listen(self.updateFrameForCanvasSize)
 
         self.inBounds = False
@@ -119,10 +116,10 @@ class PanelScroller(DirectObject):
         self.frame.verticalScroll["scrollSize"] = scrollSize
 
     def getPanelHeight(self) -> float:
-        windowHeight = self.config.anchors.height
-        headerFooterHeight = UIConstants.headerFooterHeight * self.config.anchors.scale
-        panelHeaderHeight = UIConstants.panelHeaderHeight * self.config.anchors.scale
-        panelFooterHeight = UIConstants.panelBorderWidth * self.config.anchors.scale
+        windowHeight = self.ctx.anchors.height
+        headerFooterHeight = UIConstants.headerFooterHeight * self.ctx.anchors.scale
+        panelHeaderHeight = UIConstants.panelHeaderHeight * self.ctx.anchors.scale
+        panelFooterHeight = UIConstants.panelBorderWidth * self.ctx.anchors.scale
 
         absolutePanelHeight = (
             windowHeight
@@ -131,7 +128,7 @@ class PanelScroller(DirectObject):
             - panelFooterHeight
         )
 
-        return absolutePanelHeight / self.config.anchors.scale
+        return absolutePanelHeight / self.ctx.anchors.scale
 
     def getContentHeight(self) -> float:
         return self.components.getHeight()

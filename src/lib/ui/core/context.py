@@ -6,7 +6,7 @@ from lib.ui.core.font import UIFonts
 from lib.ui.core.keybindings.keybinding_manager import KeybindingManager
 
 
-class UIConfig:
+class UIContext:
     def __init__(self, base: ShowBase, scale: float = 1.0) -> None:
         self.focusManager = FocusManager()
         self.keybindings = KeybindingManager(self.focusManager)

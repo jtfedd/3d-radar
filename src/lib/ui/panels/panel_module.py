@@ -1,4 +1,4 @@
-from lib.ui.core.config import UIConfig
+from lib.ui.core.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.panel_events import PanelEvents
@@ -11,18 +11,17 @@ from lib.util.errors import InvalidArgumentException
 
 
 class PanelModule:
-    def __init__(self, config: UIConfig) -> None:
-        self.config = config
+    def __init__(self, ctx: UIContext) -> None:
         self.events = PanelEvents()
 
         self.panelType = PanelType.NONE
 
-        self.settingsPanel = SettingsPanel(self.config, self.events)
-        self.radarVizPanel = RadarVisualizationPanel(self.config)
+        self.settingsPanel = SettingsPanel(ctx, self.events)
+        self.radarVizPanel = RadarVisualizationPanel(ctx)
 
         self.currentPanel: PanelContent = self.settingsPanel
 
-        self.buttons = PanelButtons(config, self.events)
+        self.buttons = PanelButtons(ctx, self.events)
         self.buttonsSub = self.buttons.onClick.listen(self.panelTypeClicked)
 
     def panelTypeClicked(self, newPanelType: PanelType) -> None:
