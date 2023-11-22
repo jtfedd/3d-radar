@@ -2,12 +2,13 @@ import atexit
 
 from direct.showbase.ShowBase import ShowBase
 
-from lib.app.app_config import AppConfig
-from lib.app.file_manager import FileManager
 from lib.camera.camera_control import CameraControl
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight, getData
+
+from .file_manager import FileManager
+from .state import AppState
 
 
 class App:
@@ -17,11 +18,10 @@ class App:
 
         self.fileManager = FileManager()
 
-        self.config = AppConfig()
+        self.state = AppState()
         self.loadConfig()
 
-        self.ui = UI(self.base, self.config)
-        self.ui.panels.events.scaleChanged.listen(self.config.setUiScale)
+        self.ui = UI(self.base, self.state)
 
         self.cameraControl = CameraControl(self.base)
         defaultLight(self.base)
@@ -40,8 +40,8 @@ class App:
 
         with configPath.open("r", encoding="utf-8") as f:
             jsonStr = f.read()
-            self.config.fromJson(jsonStr)
+            self.state.fromJson(jsonStr)
 
     def saveConfig(self) -> None:
         with self.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
-            f.write(self.config.toJson())
+            f.write(self.state.toJson())

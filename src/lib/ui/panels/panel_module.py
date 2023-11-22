@@ -1,7 +1,8 @@
+from lib.app.state import AppState
 from lib.ui.core.context import UIContext
+from lib.ui.events import UIEvents
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
-from lib.ui.panels.panel_events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
 from lib.ui.panels.radar_visualization.radar_visualization_panel import (
     RadarVisualizationPanel,
@@ -11,17 +12,18 @@ from lib.util.errors import InvalidArgumentException
 
 
 class PanelModule:
-    def __init__(self, ctx: UIContext) -> None:
-        self.events = PanelEvents()
+    def __init__(self, ctx: UIContext, state: AppState, events: UIEvents) -> None:
+        self.events = events
+        self.state = state
 
         self.panelType = PanelType.NONE
 
-        self.settingsPanel = SettingsPanel(ctx, self.events)
-        self.radarVizPanel = RadarVisualizationPanel(ctx)
+        self.settingsPanel = SettingsPanel(ctx, state, events)
+        self.radarVizPanel = RadarVisualizationPanel(ctx, state, events)
 
         self.currentPanel: PanelContent = self.settingsPanel
 
-        self.buttons = PanelButtons(ctx, self.events)
+        self.buttons = PanelButtons(ctx, self.events.panels)
         self.buttonsSub = self.buttons.onClick.listen(self.panelTypeClicked)
 
     def panelTypeClicked(self, newPanelType: PanelType) -> None:
@@ -37,7 +39,7 @@ class PanelModule:
         self.panelType = PanelType.NONE
         self.currentPanel.hide()
 
-        self.events.panelChanged.send(self.panelType)
+        self.events.panels.panelChanged.send(self.panelType)
 
     def openPanel(self, panel: PanelType) -> None:
         self.currentPanel.hide()
@@ -52,7 +54,7 @@ class PanelModule:
         self.currentPanel.show()
 
         self.panelType = panel
-        self.events.panelChanged.send(self.panelType)
+        self.events.panels.panelChanged.send(self.panelType)
 
     def destroy(self) -> None:
         self.events.destroy()

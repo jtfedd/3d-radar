@@ -1,14 +1,16 @@
 import json
 
+from lib.util.events.observable import Observable
 
-class AppConfig:
+
+class AppState:
     def __init__(self) -> None:
-        self.uiScale = 1.0
+        self.uiScale = Observable[float](1.0)
 
     def toJson(self) -> str:
         return json.dumps(
             {
-                "uiscale": self.uiScale,
+                "uiscale": self.uiScale.value,
             },
             sort_keys=True,
             indent=4,
@@ -18,7 +20,7 @@ class AppConfig:
         raw = json.loads(jsonStr)
 
         if "uiscale" in raw:
-            self.uiScale = raw["uiscale"]
+            self.uiScale.setValue(raw["uiscale"])
 
-    def setUiScale(self, newScale: float) -> None:
-        self.uiScale = newScale
+    def destroy(self) -> None:
+        self.uiScale.close()

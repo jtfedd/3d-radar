@@ -2,23 +2,30 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.state import AppState
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.context import UIContext
 from lib.ui.panels.core.panel_component import PanelComponent
-from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class UIScaleInput(PanelComponent):
     MIN_SCALE = 25
     MAX_SCALE = 300
 
-    def __init__(self, root: NodePath[PandaNode], ctx: UIContext, label: str):
+    def __init__(
+        self,
+        root: NodePath[PandaNode],
+        ctx: UIContext,
+        state: AppState,
+        label: str,
+    ):
         super().__init__(root)
 
         self.ctx = ctx
+        self.state = state
 
         self.label = Text(
             root=self.root,
@@ -54,10 +61,10 @@ class UIScaleInput(PanelComponent):
         )
 
         self.inputChangeSub = self.input.onChange.listen(self.handleScaleChange)
-        self.onScaleChange = EventDispatcher[float]()
+        self.scaleChangeSub = self.state.uiScale.listen(lambda _: self.resetValue())
 
     def scaleStr(self) -> str:
-        return str(int(self.ctx.anchors.scale * 100))
+        return str(int(self.state.uiScale.value * 100))
 
     def resetValue(self) -> None:
         self.input.setText(self.scaleStr())
@@ -71,9 +78,8 @@ class UIScaleInput(PanelComponent):
 
         if newScale < self.MIN_SCALE or newScale > self.MAX_SCALE:
             newScale = min(self.MAX_SCALE, max(self.MIN_SCALE, newScale))
-            self.input.setText(str(newScale))
 
-        self.onScaleChange.send(newScale / 100.0)
+        self.state.uiScale.setValue(newScale / 100.0)
 
     def getHeight(self) -> float:
         return UIConstants.panelInputHeight
@@ -82,7 +88,6 @@ class UIScaleInput(PanelComponent):
         super().destroy()
 
         self.inputChangeSub.cancel()
-        self.onScaleChange.close()
 
         self.label.destroy()
         self.input.destroy()
