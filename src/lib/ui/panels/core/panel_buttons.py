@@ -29,7 +29,7 @@ class PanelButtons:
             icon = settings[1]
 
             button = IconToggleButton(
-                ctx.anchors.bottomLeft,
+                ctx.anchors.topLeft,
                 icon,
                 x=i * (UIConstants.panelWidth / len(self.buttonConfig)),
                 width=UIConstants.panelWidth / len(self.buttonConfig),
@@ -37,7 +37,7 @@ class PanelButtons:
                 iconWidth=UIConstants.headerFooterHeight,
                 iconHeight=UIConstants.headerFooterHeight,
                 hAlign=HAlign.LEFT,
-                vAlign=VAlign.BOTTOM,
+                vAlign=VAlign.TOP,
             )
 
             sub = button.onClick.listen(self.handleClick(panelType))
