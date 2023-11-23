@@ -40,7 +40,7 @@ class Slider:
             frameColor=UIColors.WHITE,
             range=valueRange,
             value=initialValue,
-            pageSize=valueRange[1] - valueRange[0],
+            pageSize=abs(valueRange[1] - valueRange[0]),
             thumb_frameSize=(
                 -UIConstants.sliderHandleWidth,
                 UIConstants.sliderHandleWidth,
