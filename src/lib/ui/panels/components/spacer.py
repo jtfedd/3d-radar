@@ -6,7 +6,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.panels.core.panel_component import PanelComponent
 
 
-class PanelSpacer(PanelComponent):
+class SpacerComponent(PanelComponent):
     def __init__(
         self,
         root: NodePath[PandaNode],

@@ -17,7 +17,7 @@ class PanelHeader:
             text=text,
             x=UIConstants.panelWidth / 2,
             y=-UIConstants.headerFooterHeight - (UIConstants.panelHeaderHeight / 2),
-            size=UIConstants.fontSizeTitle,
+            size=UIConstants.fontSizeHeader,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.CENTER,
         )
