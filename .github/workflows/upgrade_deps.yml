@@ -27,7 +27,7 @@ jobs:
         run: |
           make upgrade
 
-      - name: Cache Resolved Dependencies
+      - name: Publish Resolved Dependencies
         uses: actions/upload-artifact@v3
         with:
           name: requirements-lock
