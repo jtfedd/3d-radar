@@ -19,5 +19,8 @@
 # Test Reports
 reports/*
 
+# Build output
+build/*
+
 # Requirements lock file
 requirements-lock.txt
