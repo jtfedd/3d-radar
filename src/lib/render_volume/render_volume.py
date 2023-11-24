@@ -7,22 +7,23 @@ from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.core import GeomEnums, GraphicsWindow, PTA_float, Shader, Texture
 
+from lib.app.state import AppState
 from lib.model.scan import Scan
+from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 
 class VolumeRenderer(DirectObject):
-    def __init__(self, showbase: ShowBase) -> None:
-        self.base = showbase
+    def __init__(self, base: ShowBase, state: AppState) -> None:
+        self.base = base
+        self.state = state
+        self.listener = Listener()
 
         shader = Shader.load(
             Shader.SL_GLSL,
             vertex="shader/vertex.glsl",
             fragment="shader/fragment.glsl",
         )
-
-        self.densityMin = 0.0
-        self.densityMax = 1.0
 
         manager = FilterManager(self.base.win, self.base.cam)  # type: ignore
         scene = Texture()
@@ -42,6 +43,13 @@ class VolumeRenderer(DirectObject):
             self.base.cam.node().getLens().getProjectionMatInv(),
         )
 
+        self.setDensityParams()
+        self.listener.listen(self.state.volumeMin, lambda _: self.setDensityParams())
+        self.listener.listen(self.state.volumeMax, lambda _: self.setDensityParams())
+        self.listener.listen(
+            self.state.volumeFalloff, lambda _: self.setDensityParams()
+        )
+
         # For some reason this seems to be typed incorrectly; override the type
         window: GraphicsWindow = self.base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
@@ -53,14 +61,8 @@ class VolumeRenderer(DirectObject):
 
     def updateVolumeData(self, scan: Scan) -> None:
         # velocity scale: -100 to 100
-        # reflectivity scale: -35 to 80
-
-        # density curve
-        # k -0.5..1
-        # density = abs(d)^(10^k)
-        k = 0.5
-
-        scaleMin = -35
+        # reflectivity scale: -20 to 80
+        scaleMin = -20
         scaleMax = 80
 
         # Scale the data to 0..1, based on the scale range, and clip any outliers
@@ -74,16 +76,6 @@ class VolumeRenderer(DirectObject):
 
         # Get the bytes
         dataBytes = data.flatten().tobytes()
-
-        # Params for rendering the volume
-        densityMin = 0
-        densityMax = 1
-        densityScale = densityMax - densityMin
-        densityExp = math.pow(10, k)
-
-        self.plane.setShaderInput("d_min", densityMin)
-        self.plane.setShaderInput("d_scale", densityScale)
-        self.plane.setShaderInput("d_exp", densityExp)
 
         # Params to change to get velocity to be both negative and positive
         # reflectivity = 0, 1
@@ -121,18 +113,16 @@ class VolumeRenderer(DirectObject):
         self.plane.setShaderInput("r_min", float(scan.ranges[0]))
         self.plane.setShaderInput("r_step", 0.25)
 
-    def updateDensityExponent(self, k: float) -> None:
-        densityExp = math.pow(10, k)
+    def setDensityParams(self) -> None:
+        # Params for rendering the volume
+        densityMin = self.state.volumeMin.value
+        densityMax = self.state.volumeMax.value
+        densityScale = densityMax - densityMin
+        densityExp = math.pow(10, self.state.volumeFalloff.value)
+
+        self.plane.setShaderInput("d_min", densityMin)
+        self.plane.setShaderInput("d_scale", densityScale)
         self.plane.setShaderInput("d_exp", densityExp)
-
-    def updateMin(self, value: float) -> None:
-        self.densityMin = value
-        self.plane.setShaderInput("d_min", self.densityMin)
-        self.plane.setShaderInput("d_scale", self.densityMax - self.densityMin)
-
-    def updateMax(self, value: float) -> None:
-        self.densityMax = value
-        self.plane.setShaderInput("d_scale", self.densityMax - self.densityMin)
 
     def handleWindowEvent(self, win: GraphicsWindow) -> None:
         newSize = (win.getXSize(), win.getYSize())

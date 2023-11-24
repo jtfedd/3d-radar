@@ -26,7 +26,7 @@ class App:
         self.cameraControl = CameraControl(self.base)
         defaultLight(self.base)
 
-        self.volumeRenderer = VolumeRenderer(self.base)
+        self.volumeRenderer = VolumeRenderer(self.base, self.state)
 
         scan = getData()
         self.volumeRenderer.updateVolumeData(scan)
