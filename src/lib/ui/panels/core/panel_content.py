@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List, TypeVar
 
+from lib.app.state import AppState
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
-from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.context import UIContext
 from lib.ui.core.layers import UILayer
+from lib.ui.events import UIEvents
 from lib.ui.panels.core.panel_component import PanelComponent
 from lib.ui.panels.core.panel_component_manager import PanelComponentManager
 from lib.ui.panels.core.panel_header import PanelHeader
@@ -16,11 +18,16 @@ T = TypeVar("T", bound=PanelComponent)
 
 
 class PanelContent(ABC):
-    def __init__(self, config: UIConfig) -> None:
+    def __init__(
+        self,
+        ctx: UIContext,
+        state: AppState,
+        events: UIEvents,
+    ) -> None:
         self.components: List[PanelComponent] = []
 
         self.background = BackgroundCard(
-            config.anchors.left,
+            ctx.anchors.left,
             width=UIConstants.panelWidth,
             height=UIConstants.infinity,
             color=UIColors.GRAY,
@@ -28,10 +35,10 @@ class PanelContent(ABC):
             hAlign=HAlign.LEFT,
         )
 
-        self.header = PanelHeader(config, self.headerText())
+        self.header = PanelHeader(ctx, self.headerText())
 
         self.footer = BackgroundCard(
-            config.anchors.bottomLeft,
+            ctx.anchors.bottomLeft,
             y=UIConstants.headerFooterHeight,
             width=UIConstants.panelWidth,
             height=UIConstants.panelBorderWidth,
@@ -42,7 +49,7 @@ class PanelContent(ABC):
         )
 
         self.componentManager = PanelComponentManager()
-        self.scroller = PanelScroller(config, self.componentManager)
+        self.scroller = PanelScroller(ctx, self.componentManager, state, events)
         self.root = self.scroller.getCanvas()
 
         self.hide()

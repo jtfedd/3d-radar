@@ -5,17 +5,15 @@ from direct.task.Task import Task
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
-from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.context import UIContext
 
 
 class Clock(DirectObject):
-    def __init__(self, config: UIConfig):
-        self.config = config
-
+    def __init__(self, ctx: UIContext):
         self.text = Text(
-            config.anchors.top,
-            config.fonts.bold,
+            ctx.anchors.top,
+            ctx.fonts.bold,
             self.getClockStr(),
             y=-UIConstants.headerFooterHeight / 2,
             hAlign=HAlign.CENTER,

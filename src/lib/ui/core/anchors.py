@@ -4,18 +4,29 @@ from direct.showbase.DirectObject import DirectObject
 from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
+from lib.app.state import AppState
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.keybindings.keybinding_manager import KeybindingManager
-from lib.util.events.event_dispatcher import EventDispatcher
+from lib.ui.events import UIEvents
+from lib.util.events.listener import Listener
 
 
 class UIAnchors(DirectObject):
     ANIMATION_TIME = 0.1
 
-    def __init__(self, base: ShowBase, keybindings: KeybindingManager, scale: float):
+    def __init__(
+        self,
+        base: ShowBase,
+        keybindings: KeybindingManager,
+        state: AppState,
+        events: UIEvents,
+    ):
         self.base = base
         self.keybindings = keybindings
-        self.scale = scale
+        self.state = state
+        self.events = events
+
+        self.listener = Listener()
 
         self.animating = False
         self.hidden = False
@@ -38,11 +49,10 @@ class UIAnchors(DirectObject):
         self.bottomLeft = root.attachNewNode("bottom-left")
         self.bottomRight = root.attachNewNode("bottom-right")
 
-        self.onUpdate = EventDispatcher[None]()
-
         self.update()
         self.accept("window-event", lambda _: self.update())
-        self.hideSub = self.keybindings.hideEvent.listen(lambda _: self.toggleHide())
+        self.listener.listen(self.keybindings.hideEvent, lambda _: self.toggleHide())
+        self.listener.listen(self.state.uiScale, lambda _: self.update())
 
     def toggleHide(self) -> None:
         if self.animating:
@@ -95,12 +105,12 @@ class UIAnchors(DirectObject):
             width = 1.0
             height = 1 / aspectRatio
 
-        top = height + (self.hideFactor * UIConstants.headerFooterHeight * self.scale)
-        bottom = -height - (
-            self.hideFactor * UIConstants.headerFooterHeight * self.scale
-        )
+        scale = self.state.uiScale.value
+
+        top = height + (self.hideFactor * UIConstants.headerFooterHeight * scale)
+        bottom = -height - (self.hideFactor * UIConstants.headerFooterHeight * scale)
         right = width
-        left = -width - (self.hideFactor * UIConstants.panelWidth * self.scale)
+        left = -width - (self.hideFactor * UIConstants.panelWidth * scale)
 
         self.height = top - bottom
         self.width = right - left
@@ -119,26 +129,23 @@ class UIAnchors(DirectObject):
         self.bottomRight.setPos(right, 0, bottom)
 
         # Update scale
-        self.center.setScale(self.scale)
+        self.center.setScale(scale)
 
-        self.top.setScale(self.scale)
-        self.bottom.setScale(self.scale)
-        self.left.setScale(self.scale)
-        self.right.setScale(self.scale)
+        self.top.setScale(scale)
+        self.bottom.setScale(scale)
+        self.left.setScale(scale)
+        self.right.setScale(scale)
 
-        self.topLeft.setScale(self.scale)
-        self.topRight.setScale(self.scale)
-        self.bottomLeft.setScale(self.scale)
-        self.bottomRight.setScale(self.scale)
+        self.topLeft.setScale(scale)
+        self.topRight.setScale(scale)
+        self.bottomLeft.setScale(scale)
+        self.bottomRight.setScale(scale)
 
-        self.onUpdate.send(None)
-
-    def updateScale(self, newScale: float) -> None:
-        self.scale = newScale
-        self.update()
+        self.events.onAnchorUpdate.send(None)
 
     def destroy(self) -> None:
-        self.onUpdate.close()
+        self.ignoreAll()
+        self.listener.destroy()
 
         self.removeAllTasks()
 
@@ -154,6 +161,3 @@ class UIAnchors(DirectObject):
 
         self.bottomLeft.removeNode()
         self.bottomRight.removeNode()
-
-        self.ignoreAll()
-        self.hideSub.cancel()
