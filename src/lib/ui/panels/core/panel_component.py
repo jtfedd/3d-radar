@@ -9,7 +9,7 @@ from lib.util.events.event_dispatcher import EventDispatcher
 
 class PanelComponent(ABC):
     def __init__(self, root: NodePath[PandaNode]) -> None:
-        self.onChange = EventDispatcher[None]()
+        self.onHeightChange = EventDispatcher[None]()
         self.root = root.attachNewNode("component-root")
 
     @abstractmethod
@@ -20,5 +20,5 @@ class PanelComponent(ABC):
         self.root.setZ(-offset)
 
     def destroy(self) -> None:
-        self.onChange.close()
+        self.onHeightChange.close()
         self.root.removeNode()

@@ -49,6 +49,7 @@ class Slider:
             ),
             thumb_frameColor=UIColors.WHITE,
             thumb_relief=DGG.FLAT,
+            command=self.handleValueChange,
         )
 
         self.slider.setTransparency(TransparencyAttrib.MAlpha)

@@ -10,7 +10,6 @@ from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.context import UIContext
 from lib.ui.panels.core.panel_component import PanelComponent
-from lib.util.events.observable import Observable
 
 
 class SliderComponent(PanelComponent):
@@ -18,14 +17,13 @@ class SliderComponent(PanelComponent):
         self,
         root: NodePath[PandaNode],
         ctx: UIContext,
-        valueObservable: Observable[float],
+        initialValue: float,
         valueRange: Tuple[float, float],
         label: str,
     ):
         super().__init__(root)
 
         self.ctx = ctx
-        self.valueObservable = valueObservable
 
         self.label = Text(
             root=self.root,
@@ -43,7 +41,7 @@ class SliderComponent(PanelComponent):
             y=-UIConstants.panelInputHeight / 2,
             width=UIConstants.panelSliderWidth,
             hAlign=HAlign.RIGHT,
-            initialValue=valueObservable.value,
+            initialValue=initialValue,
             valueRange=valueRange,
         )
 

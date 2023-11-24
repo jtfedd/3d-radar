@@ -15,7 +15,9 @@ class PanelComponentManager:
     def add(self, component: PanelComponent) -> None:
         component.setOffset(self.getHeight())
         self.components.append(component)
-        self.subscriptions.append(component.onChange.listen(lambda _: self.update()))
+        self.subscriptions.append(
+            component.onHeightChange.listen(lambda _: self.update())
+        )
 
     def update(self) -> None:
         height = 0.0
