@@ -18,7 +18,6 @@ class SettingsPanel(PanelContent):
                 self.root,
                 ctx,
                 state,
-                label="UI Scale",
             )
         )
 

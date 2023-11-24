@@ -8,6 +8,7 @@ from lib.ui.core.components.text import Text
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.context import UIContext
+from lib.ui.panels.components.label import ComponentLabel
 from lib.ui.panels.core.panel_component import PanelComponent
 
 
@@ -20,22 +21,13 @@ class UIScaleInput(PanelComponent):
         root: NodePath[PandaNode],
         ctx: UIContext,
         state: AppState,
-        label: str,
     ):
         super().__init__(root)
 
         self.ctx = ctx
         self.state = state
 
-        self.label = Text(
-            root=self.root,
-            font=ctx.fonts.bold,
-            text=label,
-            x=UIConstants.panelPadding,
-            y=-UIConstants.panelInputHeight / 2,
-            hAlign=HAlign.LEFT,
-            vAlign=VAlign.CENTER,
-        )
+        self.label = ComponentLabel(self.root, ctx, "UI Scale")
 
         self.input = TextInput(
             ctx=ctx,

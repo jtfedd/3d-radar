@@ -4,11 +4,11 @@ from typing import Tuple
 
 from panda3d.core import NodePath, PandaNode
 
-from lib.ui.core.alignment import HAlign, VAlign
+from lib.ui.core.alignment import HAlign
 from lib.ui.core.components.slider import Slider
-from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.context import UIContext
+from lib.ui.panels.components.label import ComponentLabel
 from lib.ui.panels.core.panel_component import PanelComponent
 
 
@@ -25,15 +25,7 @@ class SliderComponent(PanelComponent):
 
         self.ctx = ctx
 
-        self.label = Text(
-            root=self.root,
-            font=ctx.fonts.bold,
-            text=label,
-            x=UIConstants.panelPadding,
-            y=-UIConstants.panelInputHeight / 2,
-            hAlign=HAlign.LEFT,
-            vAlign=VAlign.CENTER,
-        )
+        self.label = ComponentLabel(self.root, ctx, label)
 
         self.slider = Slider(
             root=self.root,
