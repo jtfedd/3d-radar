@@ -17,11 +17,9 @@ class Viewer:
         base.setBackgroundColor(0, 0, 0, 1)
         defaultLight(base)
 
-        self.events = AppEvents()
-        self.state = AppState()
-        self.ctx = AppContext(base, self.events, self.state)
-
-        self.cameraControl = CameraControl(self.ctx, self.events)
+        events = AppEvents()
+        state = AppState()
+        self.cameraControl = CameraControl(AppContext(base, events, state), events)
         base.accept("w", base.toggle_wireframe)
 
         scan = getData()
