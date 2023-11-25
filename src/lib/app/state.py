@@ -16,6 +16,8 @@ class AppState:
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.6)
 
+        self.hideKeybinding = self.createField("hideKeybinding", "h")
+
     def toJson(self) -> str:
         raw: Dict[str, Any] = {}  # type:ignore
 

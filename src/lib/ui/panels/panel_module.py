@@ -1,6 +1,6 @@
+from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.core.context import UIContext
-from lib.ui.events import UIEvents
+from lib.ui.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.panel_type import PanelType
@@ -12,7 +12,7 @@ from lib.util.errors import InvalidArgumentException
 
 
 class PanelModule:
-    def __init__(self, ctx: UIContext, state: AppState, events: UIEvents) -> None:
+    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         self.events = events
         self.state = state
 
@@ -23,7 +23,7 @@ class PanelModule:
 
         self.currentPanel: PanelContent = self.settingsPanel
 
-        self.buttons = PanelButtons(ctx, self.events.panels)
+        self.buttons = PanelButtons(ctx, self.events.ui.panels)
         self.buttonsSub = self.buttons.onClick.listen(self.panelTypeClicked)
 
     def panelTypeClicked(self, newPanelType: PanelType) -> None:
@@ -39,7 +39,7 @@ class PanelModule:
         self.panelType = PanelType.NONE
         self.currentPanel.hide()
 
-        self.events.panels.panelChanged.send(self.panelType)
+        self.events.ui.panels.panelChanged.send(self.panelType)
 
     def openPanel(self, panel: PanelType) -> None:
         self.currentPanel.hide()
@@ -54,7 +54,7 @@ class PanelModule:
         self.currentPanel.show()
 
         self.panelType = panel
-        self.events.panels.panelChanged.send(self.panelType)
+        self.events.ui.panels.panelChanged.send(self.panelType)
 
     def destroy(self) -> None:
         self.events.destroy()

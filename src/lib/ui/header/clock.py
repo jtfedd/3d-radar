@@ -1,15 +1,14 @@
 import datetime
 
-from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
 
+from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.context import UIContext
 
 
-class Clock(DirectObject):
+class Clock:
     def __init__(self, ctx: UIContext):
         self.text = Text(
             ctx.anchors.top,
@@ -20,7 +19,9 @@ class Clock(DirectObject):
             vAlign=VAlign.BOTTOM,
         )
 
-        self.updateTask = self.addTask(self.update, "update-clock", delay=1)
+        self.updateTask = ctx.appContext.base.addTask(
+            self.update, "update-clock", delay=1
+        )
 
     def update(self, task: Task) -> int:
         self.text.updateText(self.getClockStr())

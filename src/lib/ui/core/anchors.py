@@ -1,32 +1,29 @@
 from __future__ import annotations
 
-from direct.showbase.DirectObject import DirectObject
-from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
+from panda3d.core import PythonTask
 
+from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.keybindings.keybinding_manager import KeybindingManager
-from lib.ui.events import UIEvents
 from lib.util.events.listener import Listener
 
 
-class UIAnchors(DirectObject):
+class UIAnchors(Listener):
     ANIMATION_TIME = 0.1
 
     def __init__(
         self,
-        base: ShowBase,
-        keybindings: KeybindingManager,
+        ctx: AppContext,
         state: AppState,
-        events: UIEvents,
+        events: AppEvents,
     ):
-        self.base = base
-        self.keybindings = keybindings
+        super().__init__()
+
+        self.ctx = ctx
         self.state = state
         self.events = events
-
-        self.listener = Listener()
 
         self.animating = False
         self.hidden = False
@@ -35,7 +32,7 @@ class UIAnchors(DirectObject):
         self.width = 1.0
         self.height = 1.0
 
-        root = base.aspect2dp
+        root = self.ctx.base.aspect2dp
 
         self.center = root.attachNewNode("center")
 
@@ -50,9 +47,11 @@ class UIAnchors(DirectObject):
         self.bottomRight = root.attachNewNode("bottom-right")
 
         self.update()
-        self.accept("window-event", lambda _: self.update())
-        self.listener.listen(self.keybindings.hideEvent, lambda _: self.toggleHide())
-        self.listener.listen(self.state.uiScale, lambda _: self.update())
+        self.listen(self.events.window.onWindowUpdate, lambda _: self.update())
+        self.listen(self.events.input.onHide, lambda _: self.toggleHide())
+        self.listen(self.state.uiScale, lambda _: self.update())
+
+        self.hideTask: PythonTask | None = None
 
     def toggleHide(self) -> None:
         if self.animating:
@@ -61,9 +60,9 @@ class UIAnchors(DirectObject):
         self.animating = True
 
         if self.hidden:
-            self.addTask(self.show, "show-anchors")
+            self.hideTask = self.ctx.base.addTask(self.show, "show-anchors")
         else:
-            self.addTask(self.hide, "hide-anchors")
+            self.hideTask = self.ctx.base.addTask(self.hide, "hide-anchors")
 
     def hide(self, task: Task) -> int:
         progress = task.time / self.ANIMATION_TIME
@@ -96,7 +95,7 @@ class UIAnchors(DirectObject):
         return task.cont
 
     def update(self) -> None:
-        aspectRatio = self.base.getAspectRatio()
+        aspectRatio = self.ctx.base.getAspectRatio()
 
         width = aspectRatio
         height = 1.0
@@ -141,13 +140,13 @@ class UIAnchors(DirectObject):
         self.bottomLeft.setScale(scale)
         self.bottomRight.setScale(scale)
 
-        self.events.onAnchorUpdate.send(None)
+        self.events.ui.onAnchorUpdate.send(None)
 
     def destroy(self) -> None:
-        self.ignoreAll()
-        self.listener.destroy()
+        super().destroy()
 
-        self.removeAllTasks()
+        if self.hideTask:
+            self.hideTask.cancel()
 
         self.center.removeNode()
 

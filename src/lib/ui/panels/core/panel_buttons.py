@@ -1,9 +1,9 @@
 from typing import Callable, List, Tuple
 
+from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.icon_toggle_button import IconToggleButton
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.context import UIContext
 from lib.ui.core.icons import Icons
 from lib.ui.panels.panel_events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
@@ -30,6 +30,7 @@ class PanelButtons:
 
             button = IconToggleButton(
                 ctx.anchors.topLeft,
+                ctx,
                 icon,
                 x=i * (UIConstants.panelWidth / len(self.buttonConfig)),
                 width=UIConstants.panelWidth / len(self.buttonConfig),

@@ -2,20 +2,19 @@ from __future__ import annotations
 
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectScrolledFrame import DirectScrolledFrame
-from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
+from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.ui.context import UIContext
 from lib.ui.core.colors import UIColors
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.context import UIContext
 from lib.ui.core.layers import UILayer
-from lib.ui.events import UIEvents
 from lib.ui.panels.core.panel_component_manager import PanelComponentManager
 
 
-class PanelScroller(DirectObject):
+class PanelScroller:
     SCROLLBAR_FADE_IN = 0.1
     SCROLLBAR_FADE_OUT = 0.4
 
@@ -24,7 +23,7 @@ class PanelScroller(DirectObject):
         ctx: UIContext,
         components: PanelComponentManager,
         state: AppState,
-        events: UIEvents,
+        events: AppEvents,
     ) -> None:
         self.ctx = ctx
         self.components = components
@@ -52,11 +51,13 @@ class PanelScroller(DirectObject):
 
         self.scrollbarAlpha = 0.0
         self.lastScrollbarUpdate = 0.0
-        self.addTask(self.updateScrollbar)
+        self.updateTask = self.ctx.appContext.base.addTask(self.updateScrollbar)
 
         self.updateFrame()
 
-        self.windowSub = self.events.onAnchorUpdate.listen(lambda _: self.updateFrame())
+        self.windowSub = self.events.ui.onAnchorUpdate.listen(
+            lambda _: self.updateFrame()
+        )
         self.contentSub = self.components.onUpdate.listen(self.updateFrameForCanvasSize)
 
         self.inBounds = False
@@ -64,8 +65,7 @@ class PanelScroller(DirectObject):
         self.frame.bind(DGG.WITHIN, lambda w, _: self.updateInBounds(w), [True])
         self.frame.bind(DGG.WITHOUT, lambda w, _: self.updateInBounds(w), [False])
 
-        self.accept("wheel_up-up", self.handleScroll, [-1])
-        self.accept("wheel_down-up", self.handleScroll, [1])
+        self.scrollSub = self.events.input.scroll.listen(self.handleScroll)
 
     def hide(self) -> None:
         self.frame.hide()
@@ -148,8 +148,8 @@ class PanelScroller(DirectObject):
         return self.frame.getCanvas()
 
     def destroy(self) -> None:
-        self.ignoreAll()
-        self.removeAllTasks()
+        self.updateTask.cancel()
+        self.scrollSub.cancel()
         self.windowSub.cancel()
         self.contentSub.cancel()
         self.frame.destroy()

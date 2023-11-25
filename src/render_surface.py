@@ -3,20 +3,25 @@ import numpy.typing as npt
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import TransparencyAttrib
 
+from lib.app.context import AppContext
+from lib.app.events import AppEvents
+from lib.app.state import AppState
 from lib.camera.camera_control import CameraControl
 from lib.geometry import marching_cubes, reshape, triangles_to_geometry
 from lib.model.scan import Scan
 from lib.util.util import defaultLight, getData
 
 
-class Viewer(ShowBase):
-    def __init__(self) -> None:
-        ShowBase.__init__(self)
-        self.setBackgroundColor(0, 0, 0, 1)
-        defaultLight(self)
+class Viewer:
+    def __init__(self, base: ShowBase) -> None:
+        self.base = base
+        base.setBackgroundColor(0, 0, 0, 1)
+        defaultLight(base)
 
-        self.cameraControl = CameraControl(self)
-        self.accept("w", self.toggle_wireframe)
+        events = AppEvents()
+        state = AppState()
+        self.cameraControl = CameraControl(AppContext(base, events, state), events)
+        base.accept("w", base.toggle_wireframe)
 
         scan = getData()
 
@@ -26,7 +31,7 @@ class Viewer(ShowBase):
         vertices, triangles = marching_cubes.getIsosurface(booleanData, 0.5)
         vertices = reshape.reshape(vertices, scan)
         geom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
-        node = self.render.attachNewNode(geom)
+        node = base.render.attachNewNode(geom)
         node.setTransparency(TransparencyAttrib.MAlpha)
         node.setColorScale(1, 1, 1, 0.1)
         node.setLightOff()
@@ -61,12 +66,13 @@ class Viewer(ShowBase):
         vertices = reshape.reshape(vertices, scan)
         geom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
 
-        node = self.render.attachNewNode(geom)
+        node = self.base.render.attachNewNode(geom)
         node.setTransparency(TransparencyAttrib.MAlpha)
         node.setColorScale(red, green, blue, alpha)
         node.setLightOff()
         node.setBin("fixed", renderBin)
 
 
-app = Viewer()
-app.run()
+b = ShowBase()
+app = Viewer(b)
+b.run()

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectButton import DirectButton
-from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
+from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -15,10 +15,11 @@ from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
-class IconToggleButton(DirectObject):
+class IconToggleButton:
     def __init__(
         self,
         root: NodePath[PandaNode],
+        ctx: UIContext,
         icon: str,
         width: float,
         height: float,
@@ -92,7 +93,7 @@ class IconToggleButton(DirectObject):
 
         self.onClick = EventDispatcher[None]()
 
-        self.addTask(self.update, "button-update")
+        self.updateTask = ctx.appContext.base.addTask(self.update, "button-update")
 
     def update(self, task: Task) -> int:
         buttonState = self.button.guiItem.getState()  # type: ignore
@@ -117,7 +118,7 @@ class IconToggleButton(DirectObject):
         self.toggleState = toggleState
 
     def destroy(self) -> None:
-        self.removeAllTasks()
+        self.updateTask.cancel()
         self.button.destroy()
         self.background.destroy()
         self.icon.destroy()
