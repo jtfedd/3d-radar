@@ -2,19 +2,19 @@ import math
 
 import numpy as np
 from direct.filter.FilterManager import FilterManager
-from direct.showbase.DirectObject import DirectObject
 from direct.task import Task
 from panda3d.core import GeomEnums, GraphicsWindow, PTA_float, Shader, Texture
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.scan import Scan
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 
-class VolumeRenderer(DirectObject):
-    def __init__(self, ctx: AppContext, state: AppState) -> None:
+class VolumeRenderer:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         self.ctx = ctx
         self.state = state
         self.listener = Listener()
@@ -54,8 +54,8 @@ class VolumeRenderer(DirectObject):
         window: GraphicsWindow = self.ctx.base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
         self.plane.setShaderInput("resolution", self.windowSize)
+        self.listener.listen(events.window.onWindowUpdate, self.handleWindowEvent)
 
-        self.accept("window-event", self.handleWindowEvent)
         self.ctx.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
         self.ctx.base.taskMgr.add(self.updateTime, "update-time")
 

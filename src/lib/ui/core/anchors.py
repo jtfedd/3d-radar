@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
+from panda3d.core import PythonTask
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
@@ -10,7 +10,7 @@ from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
 
 
-class UIAnchors(DirectObject):
+class UIAnchors:
     ANIMATION_TIME = 0.1
 
     def __init__(
@@ -47,9 +47,11 @@ class UIAnchors(DirectObject):
         self.bottomRight = root.attachNewNode("bottom-right")
 
         self.update()
-        self.accept("window-event", lambda _: self.update())
+        self.listener.listen(self.events.window.onWindowUpdate, lambda _: self.update())
         self.listener.listen(self.events.input.onHide, lambda _: self.toggleHide())
         self.listener.listen(self.state.uiScale, lambda _: self.update())
+
+        self.hideTask: PythonTask | None = None
 
     def toggleHide(self) -> None:
         if self.animating:
@@ -58,9 +60,9 @@ class UIAnchors(DirectObject):
         self.animating = True
 
         if self.hidden:
-            self.addTask(self.show, "show-anchors")
+            self.hideTask = self.ctx.base.addTask(self.show, "show-anchors")
         else:
-            self.addTask(self.hide, "hide-anchors")
+            self.hideTask = self.ctx.base.addTask(self.hide, "hide-anchors")
 
     def hide(self, task: Task) -> int:
         progress = task.time / self.ANIMATION_TIME
@@ -141,10 +143,10 @@ class UIAnchors(DirectObject):
         self.events.ui.onAnchorUpdate.send(None)
 
     def destroy(self) -> None:
-        self.ignoreAll()
         self.listener.destroy()
 
-        self.removeAllTasks()
+        if self.hideTask:
+            self.hideTask.cancel()
 
         self.center.removeNode()
 

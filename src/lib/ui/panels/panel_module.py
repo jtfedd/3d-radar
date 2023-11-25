@@ -18,8 +18,8 @@ class PanelModule:
 
         self.panelType = PanelType.NONE
 
-        self.settingsPanel = SettingsPanel(ctx, state, events.ui)
-        self.radarVizPanel = RadarVisualizationPanel(ctx, state, events.ui)
+        self.settingsPanel = SettingsPanel(ctx, state, events)
+        self.radarVizPanel = RadarVisualizationPanel(ctx, state, events)
 
         self.currentPanel: PanelContent = self.settingsPanel
 

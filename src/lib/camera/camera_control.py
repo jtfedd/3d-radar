@@ -1,11 +1,12 @@
-from direct.showbase.DirectObject import DirectObject
 from direct.task import Task
 from panda3d.core import Vec3
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
+from lib.util.events.listener import Listener
 
 
-class CameraControl(DirectObject):
+class CameraControl(Listener):
     DEFAULT_X = 0
     DEFAULT_Y = 0
 
@@ -13,7 +14,9 @@ class CameraControl(DirectObject):
     DEFAULT_HEADING = 0
     DEFAULT_ZOOM = 300
 
-    def __init__(self, ctx: AppContext, enable: bool = True):
+    def __init__(self, ctx: AppContext, events: AppEvents):
+        super().__init__()
+
         self.base = ctx.base
 
         # Disable the built-in mouse camera control
@@ -50,25 +53,11 @@ class CameraControl(DirectObject):
         self.dragging = False
         self.rotating = False
 
-        if enable:
-            self.enable()
+        self.listen(events.input.leftMouse, self.handleDrag)
+        self.listen(events.input.rightMouse, self.handleRotate)
+        self.listen(events.input.zoom, self.handleZoom)
 
-        self.base.task_mgr.add(self.update, "camera-update")
-
-    def enable(self) -> None:
-        self.accept("mouse1", self.handleDragStart)
-        self.accept("mouse1-up", self.handleDragStop)
-
-        self.accept("mouse3", self.handleRotateStart)
-        self.accept("mouse3-up", self.handleRotateStop)
-
-        self.accept("wheel_up", self.handleZoomIn)
-        self.accept("wheel_down", self.handleZoomOut)
-
-    def disable(self) -> None:
-        self.dragging = False
-        self.rotating = False
-        self.ignoreAll()
+        self.updateTask = ctx.base.taskMgr.add(self.update, "camera-update")
 
     def resetPosition(
         self,
@@ -141,20 +130,11 @@ class CameraControl(DirectObject):
         self.lastMouseX = mouseX
         self.lastMouseY = mouseY
 
-    def handleDragStart(self) -> None:
-        self.dragging = True
+    def handleDrag(self, value: bool) -> None:
+        self.dragging = value
 
-    def handleDragStop(self) -> None:
-        self.dragging = False
+    def handleRotate(self, value: bool) -> None:
+        self.rotating = value
 
-    def handleRotateStart(self) -> None:
-        self.rotating = True
-
-    def handleRotateStop(self) -> None:
-        self.rotating = False
-
-    def handleZoomIn(self) -> None:
-        self.zoom = self.zoom / self.zoomFactor
-
-    def handleZoomOut(self) -> None:
-        self.zoom = self.zoom * self.zoomFactor
+    def handleZoom(self, direction: int) -> None:
+        self.zoom = self.zoom * pow(self.zoomFactor, direction)

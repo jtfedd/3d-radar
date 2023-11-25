@@ -1,6 +1,6 @@
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.context import UIContext
-from lib.ui.events import UIEvents
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
@@ -8,7 +8,7 @@ from lib.util.events.listener import Listener
 
 
 class RadarVisualizationPanel(PanelContent):
-    def __init__(self, ctx: UIContext, state: AppState, events: UIEvents) -> None:
+    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
         self.state = state
@@ -46,6 +46,9 @@ class RadarVisualizationPanel(PanelContent):
                 valueRange=(0, 1),
             )
         )
+
+        for i in range(100):
+            self.addComponent(TitleComponent(self.root, ctx, str(i)))
 
         self.listener.listen(self.minSlider.slider.onValueChange, self.handleMinChange)
         self.listener.listen(self.maxSlider.slider.onValueChange, self.handleMaxChange)

@@ -5,6 +5,7 @@ from .files.manager import FileManager
 from .focus.manager import FocusManager
 from .input.manager import InputManager
 from .state import AppState
+from .window.manager import WindowManager
 
 
 class AppContext:
@@ -13,6 +14,8 @@ class AppContext:
         self.fileManager = FileManager()
         self.focusManager = FocusManager()
         self.keybindings = InputManager(self.focusManager, state, events.input)
+        self.windowManager = WindowManager(events.window)
 
     def destroy(self) -> None:
         self.keybindings.destroy()
+        self.windowManager.destroy()

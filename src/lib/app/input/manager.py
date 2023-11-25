@@ -23,6 +23,18 @@ class InputManager(DirectObject):
         self.ignoreAll()
         self.accept("h", lambda: self.send(self.events.onHide))
 
+        self.accept("wheel_up-up", lambda: self.events.scroll.send(-1))
+        self.accept("wheel_down-up", lambda: self.events.scroll.send(1))
+
+        self.accept("wheel_up", lambda: self.events.zoom.send(-1))
+        self.accept("wheel_down", lambda: self.events.zoom.send(1))
+
+        self.accept("mouse1", lambda: self.events.leftMouse.send(True))
+        self.accept("mouse1-up", lambda: self.events.leftMouse.send(False))
+
+        self.accept("mouse3", lambda: self.events.rightMouse.send(True))
+        self.accept("mouse3-up", lambda: self.events.rightMouse.send(False))
+
     def send(self, event: EventDispatcher[None]) -> None:
         if self.focusManager.focused():
             return

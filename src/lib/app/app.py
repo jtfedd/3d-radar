@@ -15,6 +15,7 @@ from .state import AppState
 class App:
     def __init__(self, base: ShowBase) -> None:
         base.setBackgroundColor(0, 0, 0, 1)
+        defaultLight(base)
 
         self.events = AppEvents()
         self.state = AppState()
@@ -24,10 +25,8 @@ class App:
 
         self.ui = UI(self.ctx, self.state, self.events)
 
-        self.cameraControl = CameraControl(self.ctx)
-        defaultLight(self.ctx.base)
-
-        self.volumeRenderer = VolumeRenderer(self.ctx, self.state)
+        self.cameraControl = CameraControl(self.ctx, self.events)
+        self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
 
         scan = getData()
         self.volumeRenderer.updateVolumeData(scan)

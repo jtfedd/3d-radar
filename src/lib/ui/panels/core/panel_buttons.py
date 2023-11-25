@@ -30,6 +30,7 @@ class PanelButtons:
 
             button = IconToggleButton(
                 ctx.anchors.topLeft,
+                ctx,
                 icon,
                 x=i * (UIConstants.panelWidth / len(self.buttonConfig)),
                 width=UIConstants.panelWidth / len(self.buttonConfig),
