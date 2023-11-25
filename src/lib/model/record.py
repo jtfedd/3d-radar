@@ -7,7 +7,7 @@ class Record:
         self.time = time
 
     def awsKey(self) -> str:
-        return self.format("{1:02}/{2:02}/{3:02}/{0}/" + self.cacheKey())
+        return self.format("{1:02}/{2:02}/{3:02}/{0}/" + self.cacheKey() + "_V06")
 
     def cacheKey(self) -> str:
         return self.format("{0}{1:02}{2:02}{3:02}_{4:02}{5:02}{6:02}")
