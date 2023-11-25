@@ -14,6 +14,7 @@ from lib.util.util import defaultLight, getData
 
 class Viewer:
     def __init__(self, base: ShowBase) -> None:
+        self.base = base
         base.setBackgroundColor(0, 0, 0, 1)
         defaultLight(base)
 
@@ -65,7 +66,7 @@ class Viewer:
         vertices = reshape.reshape(vertices, scan)
         geom = triangles_to_geometry.getGeometry(vertices, triangles, smooth=False)
 
-        node = self.ctx.base.render.attachNewNode(geom)
+        node = self.base.render.attachNewNode(geom)
         node.setTransparency(TransparencyAttrib.MAlpha)
         node.setColorScale(red, green, blue, alpha)
         node.setLightOff()
