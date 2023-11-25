@@ -1,6 +1,6 @@
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.core.context import UIContext
+from lib.ui.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.panel_type import PanelType

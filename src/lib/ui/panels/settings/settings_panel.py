@@ -1,5 +1,5 @@
 from lib.app.state import AppState
-from lib.ui.core.context import UIContext
+from lib.ui.context import UIContext
 from lib.ui.events import UIEvents
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.core.panel_content import PanelContent

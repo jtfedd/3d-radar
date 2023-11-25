@@ -1,8 +1,8 @@
+from lib.ui.context import UIContext
 from lib.ui.core.alignment import VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.context import UIContext
 
 
 class Footer:

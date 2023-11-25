@@ -7,9 +7,9 @@ from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
 from lib.app.state import AppState
+from lib.ui.context import UIContext
 from lib.ui.core.colors import UIColors
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.context import UIContext
 from lib.ui.core.layers import UILayer
 from lib.ui.events import UIEvents
 from lib.ui.panels.core.panel_component_manager import PanelComponentManager

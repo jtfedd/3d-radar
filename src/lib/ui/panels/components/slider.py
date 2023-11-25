@@ -4,10 +4,10 @@ from typing import Tuple
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign
 from lib.ui.core.components.slider import Slider
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.context import UIContext
 from lib.ui.panels.components.label import ComponentLabel
 from lib.ui.panels.core.panel_component import PanelComponent
 
