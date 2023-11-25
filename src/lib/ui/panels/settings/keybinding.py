@@ -37,7 +37,7 @@ class KeybindingInput(PanelComponent):
             y=-UIConstants.panelInputHeight / 2,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.CENTER,
-            width=UIConstants.panelContentWidth / 4,
+            width=UIConstants.panelContentWidth / 6,
             size=UIConstants.fontSizeRegular,
             initialText=self.keybinding.value,
         )
