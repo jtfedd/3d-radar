@@ -1,5 +1,5 @@
 blosc>=1.11.1
-boto3>=1.29.3
+boto3>=1.29.6
 metpy>=1.5.1
 numpy>=1.26.2
 panda3d>=1.10.13
