@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from direct.showbase.DirectObject import DirectObject
-from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
+from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.keybindings.keybinding_manager import KeybindingManager
-from lib.ui.events import UIEvents
 from lib.util.events.listener import Listener
 
 
@@ -16,13 +15,11 @@ class UIAnchors(DirectObject):
 
     def __init__(
         self,
-        base: ShowBase,
-        keybindings: KeybindingManager,
+        ctx: AppContext,
         state: AppState,
-        events: UIEvents,
+        events: AppEvents,
     ):
-        self.base = base
-        self.keybindings = keybindings
+        self.ctx = ctx
         self.state = state
         self.events = events
 
@@ -35,7 +32,7 @@ class UIAnchors(DirectObject):
         self.width = 1.0
         self.height = 1.0
 
-        root = base.aspect2dp
+        root = self.ctx.base.aspect2dp
 
         self.center = root.attachNewNode("center")
 
@@ -51,7 +48,7 @@ class UIAnchors(DirectObject):
 
         self.update()
         self.accept("window-event", lambda _: self.update())
-        self.listener.listen(self.keybindings.hideEvent, lambda _: self.toggleHide())
+        self.listener.listen(self.events.input.onHide, lambda _: self.toggleHide())
         self.listener.listen(self.state.uiScale, lambda _: self.update())
 
     def toggleHide(self) -> None:
@@ -96,7 +93,7 @@ class UIAnchors(DirectObject):
         return task.cont
 
     def update(self) -> None:
-        aspectRatio = self.base.getAspectRatio()
+        aspectRatio = self.ctx.base.getAspectRatio()
 
         width = aspectRatio
         height = 1.0
@@ -141,7 +138,7 @@ class UIAnchors(DirectObject):
         self.bottomLeft.setScale(scale)
         self.bottomRight.setScale(scale)
 
-        self.events.onAnchorUpdate.send(None)
+        self.events.ui.onAnchorUpdate.send(None)
 
     def destroy(self) -> None:
         self.ignoreAll()

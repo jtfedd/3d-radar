@@ -1,7 +1,8 @@
 from direct.showbase.DirectObject import DirectObject
-from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.core import Vec3
+
+from lib.app.context import AppContext
 
 
 class CameraControl(DirectObject):
@@ -12,8 +13,8 @@ class CameraControl(DirectObject):
     DEFAULT_HEADING = 0
     DEFAULT_ZOOM = 300
 
-    def __init__(self, base: ShowBase, enable: bool = True):
-        self.base = base
+    def __init__(self, ctx: AppContext, enable: bool = True):
+        self.base = ctx.base
 
         # Disable the built-in mouse camera control
         self.base.disableMouse()
@@ -35,13 +36,13 @@ class CameraControl(DirectObject):
         self.lastMouseY: float = 0
 
         # Set up nodes
-        self.slider = base.render.attachNewNode("camera-slider")
-        self.pivot = base.render.attachNewNode("camera-pivot")
-        self.mount = base.render.attachNewNode("camera-mount")
+        self.slider = self.base.render.attachNewNode("camera-slider")
+        self.pivot = self.base.render.attachNewNode("camera-pivot")
+        self.mount = self.base.render.attachNewNode("camera-mount")
 
         self.pivot.reparentTo(self.slider)
         self.mount.reparentTo(self.pivot)
-        base.camera.reparentTo(self.mount)
+        self.base.camera.reparentTo(self.mount)
 
         self.updatePositions()
 

@@ -3,10 +3,10 @@ import math
 import numpy as np
 from direct.filter.FilterManager import FilterManager
 from direct.showbase.DirectObject import DirectObject
-from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.core import GeomEnums, GraphicsWindow, PTA_float, Shader, Texture
 
+from lib.app.context import AppContext
 from lib.app.state import AppState
 from lib.model.scan import Scan
 from lib.util.events.listener import Listener
@@ -14,8 +14,8 @@ from lib.util.optional import unwrap
 
 
 class VolumeRenderer(DirectObject):
-    def __init__(self, base: ShowBase, state: AppState) -> None:
-        self.base = base
+    def __init__(self, ctx: AppContext, state: AppState) -> None:
+        self.ctx = ctx
         self.state = state
         self.listener = Listener()
 
@@ -25,7 +25,7 @@ class VolumeRenderer(DirectObject):
             fragment="shader/fragment.glsl",
         )
 
-        manager = FilterManager(self.base.win, self.base.cam)  # type: ignore
+        manager = FilterManager(self.ctx.base.win, self.ctx.base.cam)  # type: ignore
         scene = Texture()
         depth = Texture()
         self.plane = unwrap(manager.renderSceneInto(colortex=scene, depthtex=depth))
@@ -35,12 +35,12 @@ class VolumeRenderer(DirectObject):
         self.plane.setShaderInput("depth", depth)
         self.plane.setShaderInput("bounds_start", (-1000, -1000, 0))
         self.plane.setShaderInput("bounds_end", (1000, 1000, 20))
-        self.plane.setShaderInput("camera", self.base.camera)
+        self.plane.setShaderInput("camera", self.ctx.base.camera)
         self.plane.setShaderInput("time_ms", 0)
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",
-            self.base.cam.node().getLens().getProjectionMatInv(),
+            self.ctx.base.cam.node().getLens().getProjectionMatInv(),
         )
 
         self.setDensityParams()
@@ -51,13 +51,13 @@ class VolumeRenderer(DirectObject):
         )
 
         # For some reason this seems to be typed incorrectly; override the type
-        window: GraphicsWindow = self.base.win  # type: ignore
+        window: GraphicsWindow = self.ctx.base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
         self.plane.setShaderInput("resolution", self.windowSize)
 
         self.accept("window-event", self.handleWindowEvent)
-        self.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
-        self.base.taskMgr.add(self.updateTime, "update-time")
+        self.ctx.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
+        self.ctx.base.taskMgr.add(self.updateTime, "update-time")
 
     def updateVolumeData(self, scan: Scan) -> None:
         # velocity scale: -100 to 100
@@ -84,7 +84,7 @@ class VolumeRenderer(DirectObject):
         self.plane.setShaderInput("d_factor", 1)
 
         # Load the color scale image and send it to the shader
-        colorScale = self.base.loader.loadTexture("assets/reflectivity_scale.png")
+        colorScale = self.ctx.base.loader.loadTexture("assets/reflectivity_scale.png")
         self.plane.setShaderInput("color_scale", colorScale)
 
         buffer = Texture("volume_data")
@@ -135,12 +135,12 @@ class VolumeRenderer(DirectObject):
     def updateCameraParams(self, task: Task.Task) -> int:
         self.plane.setShaderInput(
             "camera_position",
-            self.base.camera.getPos(self.base.render),
+            self.ctx.base.camera.getPos(self.ctx.base.render),
         )
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",
-            self.base.cam.node().getLens().getProjectionMatInv(),
+            self.ctx.base.cam.node().getLens().getProjectionMatInv(),
         )
 
         return task.cont

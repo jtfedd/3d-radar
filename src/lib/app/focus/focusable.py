@@ -1,4 +1,4 @@
-from lib.ui.core.focus.focus_manager import FocusManager
+from lib.app.focus.manager import FocusManager
 from lib.util.uuid import uuid
 
 

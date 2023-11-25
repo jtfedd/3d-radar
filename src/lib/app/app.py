@@ -7,26 +7,27 @@ from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight, getData
 
-from .file_manager import FileManager
+from .context import AppContext
+from .events import AppEvents
 from .state import AppState
 
 
 class App:
     def __init__(self, base: ShowBase) -> None:
-        self.base = base
-        self.base.setBackgroundColor(0, 0, 0, 1)
+        base.setBackgroundColor(0, 0, 0, 1)
 
-        self.fileManager = FileManager()
-
+        self.events = AppEvents()
         self.state = AppState()
+        self.ctx = AppContext(base, self.events, self.state)
+
         self.loadConfig()
 
-        self.ui = UI(self.base, self.state)
+        self.ui = UI(self.ctx, self.state, self.events)
 
-        self.cameraControl = CameraControl(self.base)
-        defaultLight(self.base)
+        self.cameraControl = CameraControl(self.ctx)
+        defaultLight(self.ctx.base)
 
-        self.volumeRenderer = VolumeRenderer(self.base, self.state)
+        self.volumeRenderer = VolumeRenderer(self.ctx, self.state)
 
         scan = getData()
         self.volumeRenderer.updateVolumeData(scan)
@@ -34,7 +35,7 @@ class App:
         atexit.register(self.saveConfig)
 
     def loadConfig(self) -> None:
-        configPath = self.fileManager.getConfigFile()
+        configPath = self.ctx.fileManager.getConfigFile()
         if not configPath.exists():
             return
 
@@ -43,5 +44,5 @@ class App:
             self.state.fromJson(jsonStr)
 
     def saveConfig(self) -> None:
-        with self.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
+        with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
             f.write(self.state.toJson())

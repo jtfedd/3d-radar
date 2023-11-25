@@ -3,7 +3,7 @@ from typing import Optional
 
 import blosc
 
-from lib.app.file_manager import FileManager
+from lib.app.files.manager import FileManager
 from lib.data_provider.abstract_data_provider import AbstractDataProvider
 from lib.model.convert.serialization import deserializeScan, serializeScan
 from lib.model.record import Record
