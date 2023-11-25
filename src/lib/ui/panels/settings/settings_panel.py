@@ -2,8 +2,10 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.panels.components.spacer import SpacerComponent
+from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
 
+from .keybinding import KeybindingInput
 from .ui_scale import UIScaleInput
 
 
@@ -19,6 +21,12 @@ class SettingsPanel(PanelContent):
                 ctx,
                 state,
             )
+        )
+
+        self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
+
+        self.addComponent(
+            KeybindingInput(self.root, ctx, "Hide UI:", state.hideKeybinding)
         )
 
     def headerText(self) -> str:

@@ -47,9 +47,6 @@ class RadarVisualizationPanel(PanelContent):
             )
         )
 
-        for i in range(100):
-            self.addComponent(TitleComponent(self.root, ctx, str(i)))
-
         self.listener.listen(self.minSlider.slider.onValueChange, self.handleMinChange)
         self.listener.listen(self.maxSlider.slider.onValueChange, self.handleMaxChange)
         self.listener.listen(
