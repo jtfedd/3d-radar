@@ -53,7 +53,7 @@ class CameraControl(DirectObject):
         if enable:
             self.enable()
 
-        base.task_mgr.add(self.update, "camera-update")
+        self.base.task_mgr.add(self.update, "camera-update")
 
     def enable(self) -> None:
         self.accept("mouse1", self.handleDragStart)
