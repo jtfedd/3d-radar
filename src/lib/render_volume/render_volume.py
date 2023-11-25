@@ -13,11 +13,12 @@ from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 
-class VolumeRenderer:
+class VolumeRenderer(Listener):
     def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
+        super().__init__()
+
         self.ctx = ctx
         self.state = state
-        self.listener = Listener()
 
         shader = Shader.load(
             Shader.SL_GLSL,
@@ -44,17 +45,15 @@ class VolumeRenderer:
         )
 
         self.setDensityParams()
-        self.listener.listen(self.state.volumeMin, lambda _: self.setDensityParams())
-        self.listener.listen(self.state.volumeMax, lambda _: self.setDensityParams())
-        self.listener.listen(
-            self.state.volumeFalloff, lambda _: self.setDensityParams()
-        )
+        self.listen(self.state.volumeMin, lambda _: self.setDensityParams())
+        self.listen(self.state.volumeMax, lambda _: self.setDensityParams())
+        self.listen(self.state.volumeFalloff, lambda _: self.setDensityParams())
 
         # For some reason this seems to be typed incorrectly; override the type
         window: GraphicsWindow = self.ctx.base.win  # type: ignore
         self.windowSize = (window.getXSize(), window.getYSize())
         self.plane.setShaderInput("resolution", self.windowSize)
-        self.listener.listen(events.window.onWindowUpdate, self.handleWindowEvent)
+        self.listen(events.window.onWindowUpdate, self.handleWindowEvent)
 
         self.ctx.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
         self.ctx.base.taskMgr.add(self.updateTime, "update-time")

@@ -10,7 +10,7 @@ from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
 
 
-class UIAnchors:
+class UIAnchors(Listener):
     ANIMATION_TIME = 0.1
 
     def __init__(
@@ -19,11 +19,11 @@ class UIAnchors:
         state: AppState,
         events: AppEvents,
     ):
+        super().__init__()
+
         self.ctx = ctx
         self.state = state
         self.events = events
-
-        self.listener = Listener()
 
         self.animating = False
         self.hidden = False
@@ -47,9 +47,9 @@ class UIAnchors:
         self.bottomRight = root.attachNewNode("bottom-right")
 
         self.update()
-        self.listener.listen(self.events.window.onWindowUpdate, lambda _: self.update())
-        self.listener.listen(self.events.input.onHide, lambda _: self.toggleHide())
-        self.listener.listen(self.state.uiScale, lambda _: self.update())
+        self.listen(self.events.window.onWindowUpdate, lambda _: self.update())
+        self.listen(self.events.input.onHide, lambda _: self.toggleHide())
+        self.listen(self.state.uiScale, lambda _: self.update())
 
         self.hideTask: PythonTask | None = None
 
@@ -143,7 +143,7 @@ class UIAnchors:
         self.events.ui.onAnchorUpdate.send(None)
 
     def destroy(self) -> None:
-        self.listener.destroy()
+        super().destroy()
 
         if self.hideTask:
             self.hideTask.cancel()
