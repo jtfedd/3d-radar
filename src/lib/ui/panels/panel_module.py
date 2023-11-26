@@ -4,6 +4,7 @@ from lib.ui.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.panel_type import PanelType
+from lib.ui.panels.radar_data.radar_data_panel import RadarDataPanel
 from lib.ui.panels.radar_visualization.radar_visualization_panel import (
     RadarVisualizationPanel,
 )
@@ -19,6 +20,7 @@ class PanelModule:
         self.panelType = PanelType.NONE
 
         self.settingsPanel = SettingsPanel(ctx, state, events)
+        self.radarDataPanel = RadarDataPanel(ctx, state, events)
         self.radarVizPanel = RadarVisualizationPanel(ctx, state, events)
 
         self.currentPanel: PanelContent = self.settingsPanel
@@ -46,6 +48,8 @@ class PanelModule:
 
         if panel is PanelType.SETTINGS:
             self.currentPanel = self.settingsPanel
+        elif panel is PanelType.RADAR_DATA:
+            self.currentPanel = self.radarDataPanel
         elif panel is PanelType.RADAR_VISUALIZATION:
             self.currentPanel = self.radarVizPanel
         else:
