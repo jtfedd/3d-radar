@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectEntry import DirectEntry
 from panda3d.core import DynamicTextFont, NodePath, PandaNode
 
+from lib.app.events import AppEvents
 from lib.app.focus.focusable import Focusable
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
@@ -17,6 +19,7 @@ class TextInput(Focusable):
     def __init__(
         self,
         ctx: UIContext,
+        events: AppEvents,
         root: NodePath[PandaNode],
         font: DynamicTextFont,
         size: float,
@@ -44,7 +47,6 @@ class TextInput(Focusable):
             frameColor=UIColors.DARKGRAY,
             text_fg=UIColors.WHITE,
             text_align=horizontalAlignToTextNodeAlign(hAlign),
-            command=self.onCommit,
             focusInCommand=self.onFocus,
             focusInExtraArgs=[True],
             focusOutCommand=self.onFocus,
@@ -53,7 +55,30 @@ class TextInput(Focusable):
 
         self.entry.setBin("fixed", layer.value)
 
+        self.inBounds = False
+        self.entry["state"] = DGG.NORMAL
+        self.entry.bind(DGG.WITHIN, lambda w, _: self.updateInBounds(w), [True])
+        self.entry.bind(DGG.WITHOUT, lambda w, _: self.updateInBounds(w), [False])
+
+        events.input.leftMouse.listen(lambda _: self.checkFocus())
+        events.input.rightMouse.listen(lambda _: self.checkFocus())
+
         self.onChange = EventDispatcher[str]()
+
+    def onFocus(self, focused: bool) -> None:
+        super().onFocus(focused)
+
+        if not focused:
+            self.onChange.send(self.entry.get())
+
+    def checkFocus(self) -> None:
+        if self.inBounds:
+            self.entry["focus"] = True
+        else:
+            self.entry["focus"] = False
+
+    def updateInBounds(self, inBounds: bool) -> None:
+        self.inBounds = inBounds
 
     def onCommit(self, value: str) -> None:
         self.onChange.send(value)
