@@ -55,7 +55,7 @@ class UIScaleInput(PanelComponent):
             vAlign=VAlign.CENTER,
         )
 
-        self.inputChangeSub = self.input.onChange.listen(self.handleScaleChange)
+        self.inputChangeSub = self.input.onCommit.listen(self.handleScaleChange)
         self.scaleChangeSub = self.state.uiScale.listen(lambda _: self.resetValue())
 
     def scaleStr(self) -> str:

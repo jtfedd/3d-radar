@@ -47,7 +47,7 @@ class PanelTextInput(PanelComponent):
 
         self.onChange = EventDispatcher[str]()
 
-        self.listener.listen(self.input.onChange, self.onChange.send)
+        self.listener.listen(self.input.onCommit, self.onChange.send)
 
     def getHeight(self) -> float:
         return UIConstants.panelInputHeight

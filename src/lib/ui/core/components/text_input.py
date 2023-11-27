@@ -55,21 +55,25 @@ class TextInput(Focusable):
 
         self.entry.setBin("fixed", layer.value)
 
+        self.onChange = EventDispatcher[str]()
+        self.onCommit = EventDispatcher[str]()
+
         self.inBounds = False
         self.entry["state"] = DGG.NORMAL
         self.entry.bind(DGG.WITHIN, lambda w, _: self.updateInBounds(w), [True])
         self.entry.bind(DGG.WITHOUT, lambda w, _: self.updateInBounds(w), [False])
 
+        self.entry.bind(DGG.TYPE, lambda _: self.onChange.send(self.entry.get()))
+        self.entry.bind(DGG.ERASE, lambda _: self.onChange.send(self.entry.get()))
+
         events.input.leftMouse.listen(lambda _: self.checkFocus())
         events.input.rightMouse.listen(lambda _: self.checkFocus())
-
-        self.onChange = EventDispatcher[str]()
 
     def onFocus(self, focused: bool) -> None:
         super().onFocus(focused)
 
         if not focused:
-            self.onChange.send(self.entry.get())
+            self.onCommit.send(self.entry.get())
 
     def checkFocus(self) -> None:
         if self.inBounds:
@@ -79,9 +83,6 @@ class TextInput(Focusable):
 
     def updateInBounds(self, inBounds: bool) -> None:
         self.inBounds = inBounds
-
-    def onCommit(self, value: str) -> None:
-        self.onChange.send(value)
 
     def setText(self, value: str) -> None:
         self.entry.enterText(value)
