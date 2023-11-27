@@ -36,7 +36,9 @@ class PanelTextInput(PanelComponent):
             events=events,
             root=self.root,
             font=ctx.fonts.regular,
-            x=UIConstants.panelContentWidth + UIConstants.panelPadding,
+            x=UIConstants.panelContentWidth
+            + UIConstants.panelPadding
+            - (UIConstants.inputPaddingVertical * UIConstants.fontSizeRegular),
             y=-UIConstants.panelInputHeight / 2,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.CENTER,

@@ -4,29 +4,27 @@ from typing import Optional
 import blosc
 
 from lib.app.files.manager import FileManager
-from lib.data_provider.abstract_data_provider import AbstractDataProvider
 from lib.model.convert.serialization import deserializeScan, serializeScan
 from lib.model.record import Record
 from lib.model.scan import Scan
+from lib.network.radar.data_provider import DataProvider
 
 
-class DataConnector:
+class Network:
     def __init__(
         self,
-        provider: AbstractDataProvider,
+        radar: DataProvider,
         fileManager: FileManager,
-        useCaching: bool = True,
     ):
-        self.provider = provider
+        self.radar = radar
         self.fileManager = fileManager
-        self.useCaching = useCaching
 
     def load(self, record: Record) -> Scan:
         scan = self.loadCached(record)
         if scan:
             return scan
 
-        scan = self.provider.load(record)
+        scan = self.radar.load(record)
         self.saveCached(record, scan)
 
         return scan
@@ -36,9 +34,6 @@ class DataConnector:
         return self.fileManager.getCacheFile(fileName)
 
     def loadCached(self, record: Record) -> Optional[Scan]:
-        if not self.useCaching:
-            return None
-
         filePath = self.getFilepath(record)
 
         if not filePath.exists():
@@ -57,9 +52,6 @@ class DataConnector:
         return scan
 
     def saveCached(self, record: Record, scan: Scan) -> None:
-        if not self.useCaching:
-            return
-
         filePath = self.getFilepath(record)
 
         print("Writing", filePath)

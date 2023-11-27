@@ -4,12 +4,12 @@ from panda3d.core import NodePath, PandaNode
 
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.text import Text
+from lib.ui.core.components.button import Button
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.core.panel_component import PanelComponent
 
 
-class TitleComponent(PanelComponent):
+class PanelButton(PanelComponent):
     def __init__(
         self,
         root: NodePath[PandaNode],
@@ -18,21 +18,21 @@ class TitleComponent(PanelComponent):
     ):
         super().__init__(root)
 
-        self.text = Text(
+        self.button = Button(
             root=self.root,
-            font=ctx.fonts.bold,
+            ctx=ctx,
+            x=UIConstants.panelPadding,
+            width=UIConstants.panelContentWidth,
+            height=UIConstants.panelInputHeight,
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.TOP,
             text=text,
-            size=UIConstants.fontSizeTitle,
-            x=UIConstants.panelPadding + UIConstants.panelContentWidth / 2,
-            y=-UIConstants.panelTitleHeight / 2,
-            hAlign=HAlign.CENTER,
-            vAlign=VAlign.CENTER,
         )
 
     def getHeight(self) -> float:
-        return UIConstants.panelTitleHeight
+        return UIConstants.panelInputHeight
 
     def destroy(self) -> None:
         super().destroy()
 
-        self.text.destroy()
+        self.button.destroy()

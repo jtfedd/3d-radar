@@ -43,5 +43,8 @@ class Text:
     def updateText(self, text: str) -> None:
         self.text.setText(text)
 
+    def updateColor(self, color: Vec4) -> None:
+        self.text.setColor(color)
+
     def destroy(self) -> None:
         self.text.destroy()

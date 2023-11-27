@@ -43,7 +43,10 @@ class TextInput(Focusable):
             pos=(x, 0, yPos),
             width=width / size,
             scale=size,
-            borderWidth=(UIConstants.inputPadding, UIConstants.inputPadding),
+            borderWidth=(
+                UIConstants.inputPaddingVertical,
+                UIConstants.inputPaddingHorizontal,
+            ),
             frameColor=UIColors.DARKGRAY,
             text_fg=UIColors.WHITE,
             text_align=horizontalAlignToTextNodeAlign(hAlign),

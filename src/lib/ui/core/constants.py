@@ -13,7 +13,8 @@ class UIConstants:
     panelInputHeight = 0.06
     panelTitleHeight = 0.08
 
-    inputPadding = 0.3
+    inputPaddingVertical = 0.3
+    inputPaddingHorizontal = 0.1
 
     panelSliderWidth = panelContentWidth * 0.66
     sliderHeight = 0.03
