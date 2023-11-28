@@ -1,3 +1,6 @@
+from datetime import timedelta
+from typing import List
+
 import boto3
 import botocore
 from metpy.io import Level2File
@@ -10,29 +13,25 @@ from .data_provider import DataProvider
 
 
 class S3DataProvider(DataProvider):
+    RADAR_BUCKET = "noaa-nexrad-level2"
+
     def __init__(self) -> None:
         config = botocore.client.Config(
             signature_version=botocore.UNSIGNED, user_agent_extra="Resource"
         )
-        awsS3 = boto3.resource("s3", config=config)
 
-        self.bucket = awsS3.Bucket("noaa-nexrad-level2")
+        self.bucket = boto3.resource("s3", config=config).Bucket(self.RADAR_BUCKET)
+        self.client = boto3.client("s3", config=config)
 
     def load(self, record: Record) -> Scan:
         key = record.awsKey()
         print("Fetching from s3:", key)
 
-        # There may be multiple matching objects because file formats have changed in
-        # the past. The key should be unique enough to guarantee that any duplicates are
-        # different formats of the same data. We should be fine to load the first one.
-        obj = list(self.bucket.objects.filter(Prefix=key))[0]
-        print("Reading from s3:", obj.key)
-
-        data = obj.get()
-        print("Fetched", obj.key)
+        obj = self.client.get_object(Bucket=self.RADAR_BUCKET, Key=key)
+        data = obj["Body"]
 
         print("Parsing", key)
-        level2File = Level2File(data["Body"])
+        level2File = Level2File(data)
         print("Parsed", key)
 
         print("Post-processing", key)
@@ -40,3 +39,50 @@ class S3DataProvider(DataProvider):
         print("Post-processing finished", key)
 
         return scan
+
+    def search(self, record: Record, count: int) -> List[Record]:
+        records = self.getScans(
+            record.station,
+            record.time.year,
+            record.time.month,
+            record.time.day,
+        )
+
+        if len(records) < count:
+            previousDay = record.time - timedelta(days=1)
+
+            records.extend(
+                self.getScans(
+                    record.station,
+                    previousDay.year,
+                    previousDay.month,
+                    previousDay.day,
+                )
+            )
+
+        records = list(filter(lambda r: r.time <= record.time, records))
+        records.sort(key=lambda r: r.time)
+
+        if len(records) <= count:
+            return records
+
+        return records[-count:]
+
+    def getScans(self, radar: str, year: int, month: int, day: int) -> List[Record]:
+        prefix = Record.PREFIX_FMT.format(radar, year, month, day)
+
+        resp = self.bucket.meta.client.list_objects(
+            Bucket="noaa-nexrad-level2",
+            Prefix=prefix,
+            Delimiter="/",
+        )
+
+        records = []
+
+        for scan in resp.get("Contents", []):
+            key = scan.get("Key")
+            record = Record.parse(key)
+            if record:
+                records.append(record)
+
+        return records

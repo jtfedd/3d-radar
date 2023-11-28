@@ -1,5 +1,8 @@
+import datetime
+
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.record import Record
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
@@ -13,9 +16,12 @@ class RadarDataPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
+        self.ctx = ctx
+        self.events = events
+
         self.addComponent(SpacerComponent(self.root))
 
-        self.addComponent(
+        self.radarInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 ctx,
@@ -28,7 +34,7 @@ class RadarDataPanel(PanelContent):
 
         self.addComponent(TitleComponent(self.root, ctx, "Date and Time"))
 
-        self.addComponent(
+        self.yearInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 ctx,
@@ -39,7 +45,7 @@ class RadarDataPanel(PanelContent):
             )
         )
 
-        self.addComponent(
+        self.monthInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 ctx,
@@ -50,7 +56,7 @@ class RadarDataPanel(PanelContent):
             )
         )
 
-        self.addComponent(
+        self.dayInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 ctx,
@@ -61,7 +67,7 @@ class RadarDataPanel(PanelContent):
             )
         )
 
-        self.addComponent(
+        self.timeInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 ctx,
@@ -74,13 +80,44 @@ class RadarDataPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        self.addComponent(
+        loadDataButton = self.addComponent(
             PanelButton(
                 self.root,
                 ctx,
                 "Load Data",
             )
         )
+
+        loadDataButton.button.onClick.listen(lambda _: self.search())
+
+    def search(self) -> None:
+        radar = self.radarInput.input.entry.get()
+        year = int(self.yearInput.input.entry.get())
+        month = int(self.monthInput.input.entry.get())
+        day = int(self.dayInput.input.entry.get())
+        time = self.timeInput.input.entry.get()
+        hour = int(time.split(":")[0])
+        minute = int(time.split(":")[1])
+
+        records = self.ctx.appContext.network.search(
+            Record(
+                radar,
+                datetime.datetime(
+                    year=year,
+                    month=month,
+                    day=day,
+                    hour=hour,
+                    minute=minute,
+                    tzinfo=datetime.timezone.utc,
+                ),
+            ),
+            1,
+        )
+
+        if len(records) == 0:
+            raise ValueError("No Records Found")
+
+        self.events.ui.panels.requestData.send(records[0])
 
     def headerText(self) -> str:
         return "Radar Data"

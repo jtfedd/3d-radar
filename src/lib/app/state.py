@@ -12,9 +12,9 @@ class AppState:
 
         self.uiScale = self.createField("uiScale", 1.0)
 
-        self.volumeMin = self.createField("volumeMin", 0.0)
+        self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
-        self.volumeFalloff = self.createField("volumeFalloff", 0.6)
+        self.volumeFalloff = self.createField("volumeFalloff", 0.7)
 
         self.hideKeybinding = self.createField("hideKeybinding", "h")
 

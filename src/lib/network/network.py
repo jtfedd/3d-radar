@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import blosc
 
@@ -18,6 +18,9 @@ class Network:
     ):
         self.radar = radar
         self.fileManager = fileManager
+
+    def search(self, record: Record, count: int) -> List[Record]:
+        return self.radar.search(record, count)
 
     def load(self, record: Record) -> Scan:
         scan = self.loadCached(record)

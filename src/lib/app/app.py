@@ -3,6 +3,7 @@ import atexit
 from direct.showbase.ShowBase import ShowBase
 
 from lib.camera.camera_control import CameraControl
+from lib.model.record import Record
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight, getData
@@ -31,7 +32,13 @@ class App:
         scan = getData()
         self.volumeRenderer.updateVolumeData(scan)
 
+        self.events.ui.panels.requestData.listen(self.loadData)
+
         atexit.register(self.saveConfig)
+
+    def loadData(self, record: Record) -> None:
+        scan = self.ctx.network.load(record)
+        self.volumeRenderer.updateVolumeData(scan)
 
     def loadConfig(self) -> None:
         configPath = self.ctx.fileManager.getConfigFile()
