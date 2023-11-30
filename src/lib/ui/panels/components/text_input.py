@@ -22,6 +22,7 @@ class PanelTextInput(PanelComponent):
         label: str,
         initialValue: str,
         inputWidth: float,
+        rightMargin: float = 0,
     ):
         super().__init__(root)
 
@@ -38,6 +39,7 @@ class PanelTextInput(PanelComponent):
             font=ctx.fonts.regular,
             x=UIConstants.panelContentWidth
             + UIConstants.panelPadding
+            - rightMargin
             - (UIConstants.inputPaddingVertical * UIConstants.fontSizeRegular),
             y=-UIConstants.panelInputHeight / 2,
             hAlign=HAlign.RIGHT,
