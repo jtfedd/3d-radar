@@ -54,7 +54,7 @@ class Record:
         time = fileParts[1]
         extension = fileParts[2]
 
-        check = "{0}{1:02}{2:02}{3:02}".format(station, year, month, day)
+        check = f"{station}{year:02}{month:02}{day:02}"
 
         if stationDate != check:
             return None
