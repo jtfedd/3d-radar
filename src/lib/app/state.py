@@ -12,9 +12,15 @@ class AppState:
 
         self.uiScale = self.createField("uiScale", 1.0)
 
-        self.volumeMin = self.createField("volumeMin", 0.0)
+        self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
-        self.volumeFalloff = self.createField("volumeFalloff", 0.6)
+        self.volumeFalloff = self.createField("volumeFalloff", 0.7)
+
+        self.station = self.createField("station", "KDMX")
+        self.year = self.createField("year", 2023)
+        self.month = self.createField("month", 11)
+        self.day = self.createField("day", 27)
+        self.time = self.createField("time", "11:24")
 
         self.hideKeybinding = self.createField("hideKeybinding", "h")
 

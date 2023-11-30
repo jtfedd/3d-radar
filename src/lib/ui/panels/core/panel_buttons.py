@@ -2,7 +2,7 @@ from typing import Callable, List, Tuple
 
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.icon_toggle_button import IconToggleButton
+from lib.ui.core.components.button import Button
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
 from lib.ui.panels.panel_events import PanelEvents
@@ -21,17 +21,16 @@ class PanelButtons:
     def __init__(self, ctx: UIContext, panelEvents: PanelEvents) -> None:
         self.onClick = EventDispatcher[PanelType]()
 
-        self.buttons: List[IconToggleButton] = []
+        self.buttons: List[Button] = []
         self.subs: List[EventSubscription[None]] = []
 
         for i, settings in enumerate(self.buttonConfig):
             panelType = settings[0]
             icon = settings[1]
 
-            button = IconToggleButton(
+            button = Button(
                 ctx.anchors.topLeft,
                 ctx,
-                icon,
                 x=i * (UIConstants.panelWidth / len(self.buttonConfig)),
                 width=UIConstants.panelWidth / len(self.buttonConfig),
                 height=UIConstants.headerFooterHeight,
@@ -39,6 +38,7 @@ class PanelButtons:
                 iconHeight=UIConstants.headerFooterHeight,
                 hAlign=HAlign.LEFT,
                 vAlign=VAlign.TOP,
+                icon=icon,
             )
 
             sub = button.onClick.listen(self.handleClick(panelType))

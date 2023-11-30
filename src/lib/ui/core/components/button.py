@@ -10,27 +10,31 @@ from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.components.image import Image
+from lib.ui.core.components.text import Text
+from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
-class IconToggleButton:
+class Button:
     def __init__(
         self,
         root: NodePath[PandaNode],
         ctx: UIContext,
-        icon: str,
         width: float,
         height: float,
-        iconWidth: float,
-        iconHeight: float,
         x: float = 0,
         y: float = 0,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.INTERACTION,
         toggleState: bool = False,
+        text: str | None = None,
+        textSize: float = UIConstants.fontSizeRegular,
+        icon: str | None = None,
+        iconWidth: float = 0.0,
+        iconHeight: float = 0.0,
     ) -> None:
         self.toggleState = toggleState
 
@@ -63,17 +67,32 @@ class IconToggleButton:
             layer=UILayer(layer.value - 2),
         )
 
-        self.icon = Image(
-            root=root,
-            image=icon,
-            width=iconWidth,
-            height=iconHeight,
-            x=xPos,
-            y=yPos,
-            hAlign=HAlign.CENTER,
-            vAlign=VAlign.CENTER,
-            layer=UILayer(layer.value - 1),
-        )
+        self.content: Text | Image
+
+        if icon:
+            self.content = Image(
+                root=root,
+                image=icon,
+                width=iconWidth,
+                height=iconHeight,
+                x=xPos,
+                y=yPos,
+                hAlign=HAlign.CENTER,
+                vAlign=VAlign.CENTER,
+                layer=UILayer(layer.value - 1),
+            )
+        elif text:
+            self.content = Text(
+                root=root,
+                font=ctx.fonts.medium,
+                text=text,
+                x=xPos,
+                y=yPos,
+                hAlign=HAlign.CENTER,
+                vAlign=VAlign.CENTER,
+                size=textSize,
+                layer=UILayer(layer.value - 1),
+            )
 
         self.button = DirectButton(
             parent=root,
@@ -104,10 +123,10 @@ class IconToggleButton:
             DGG.BUTTON_ROLLOVER_STATE,
         ):
             self.background.updateColor(UIColors.WHITE)
-            self.icon.updateColor(UIColors.GRAY)
+            self.content.updateColor(UIColors.GRAY)
         else:
             self.background.updateColor(self.backgroundColorMap[buttonState])
-            self.icon.updateColor(self.iconColorMap[buttonState])
+            self.content.updateColor(self.iconColorMap[buttonState])
 
         return task.cont
 
@@ -121,5 +140,5 @@ class IconToggleButton:
         self.updateTask.cancel()
         self.button.destroy()
         self.background.destroy()
-        self.icon.destroy()
+        self.content.destroy()
         self.onClick.close()

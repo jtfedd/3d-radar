@@ -4,10 +4,10 @@ from direct.showbase.ShowBase import ShowBase
 from panda3d.core import AmbientLight, DirectionalLight
 
 from lib.app.files.manager import FileManager
-from lib.data_connector.data_connector import DataConnector
-from lib.data_provider.s3_data_provider import S3DataProvider
 from lib.model.record import Record
 from lib.model.scan import Scan
+from lib.network.network import Network
+from lib.network.radar.s3_data_provider import S3DataProvider
 
 
 def getData() -> Scan:
@@ -26,7 +26,7 @@ def getData() -> Scan:
 
     provider = S3DataProvider()
     fileManager = FileManager()
-    connector = DataConnector(provider, fileManager)
+    connector = Network(provider, fileManager)
 
     return connector.load(record)
 
