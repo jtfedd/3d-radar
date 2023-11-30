@@ -1,8 +1,5 @@
-import datetime
-
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.model.record import Record
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
@@ -97,8 +94,6 @@ class RadarDataPanel(PanelContent):
         month = int(self.monthInput.input.entry.get())
         day = int(self.dayInput.input.entry.get())
         time = self.timeInput.input.entry.get()
-        hour = int(time.split(":")[0])
-        minute = int(time.split(":")[1])
 
         self.state.station.setValue(radar)
         self.state.year.setValue(year)
@@ -106,25 +101,7 @@ class RadarDataPanel(PanelContent):
         self.state.day.setValue(day)
         self.state.time.setValue(time)
 
-        records = self.ctx.appContext.network.search(
-            Record(
-                radar,
-                datetime.datetime(
-                    year=year,
-                    month=month,
-                    day=day,
-                    hour=hour,
-                    minute=minute,
-                    tzinfo=datetime.timezone.utc,
-                ),
-            ),
-            1,
-        )
-
-        if len(records) == 0:
-            raise ValueError("No Records Found")
-
-        self.events.ui.panels.requestData.send(records[0])
+        self.events.requestData.send(None)
 
     def headerText(self) -> str:
         return "Radar Data"
