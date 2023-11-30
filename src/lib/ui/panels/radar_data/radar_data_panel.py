@@ -18,6 +18,7 @@ class RadarDataPanel(PanelContent):
 
         self.ctx = ctx
         self.events = events
+        self.state = state
 
         self.addComponent(SpacerComponent(self.root))
 
@@ -27,7 +28,7 @@ class RadarDataPanel(PanelContent):
                 ctx,
                 events,
                 "Radar Station:",
-                "KDMX",
+                state.station.value,
                 UIConstants.panelContentWidth / 4,
             )
         )
@@ -40,7 +41,7 @@ class RadarDataPanel(PanelContent):
                 ctx,
                 events,
                 "Year:",
-                "2023",
+                str(state.year.value),
                 UIConstants.panelContentWidth / 4,
             )
         )
@@ -51,7 +52,7 @@ class RadarDataPanel(PanelContent):
                 ctx,
                 events,
                 "Month:",
-                "11",
+                str(state.month.value),
                 UIConstants.panelContentWidth / 4,
             )
         )
@@ -62,7 +63,7 @@ class RadarDataPanel(PanelContent):
                 ctx,
                 events,
                 "Day:",
-                "27",
+                str(state.day.value),
                 UIConstants.panelContentWidth / 4,
             )
         )
@@ -73,7 +74,7 @@ class RadarDataPanel(PanelContent):
                 ctx,
                 events,
                 "Time:",
-                "11:24",
+                state.time.value,
                 UIConstants.panelContentWidth / 4,
             )
         )
@@ -98,6 +99,12 @@ class RadarDataPanel(PanelContent):
         time = self.timeInput.input.entry.get()
         hour = int(time.split(":")[0])
         minute = int(time.split(":")[1])
+
+        self.state.station.setValue(radar)
+        self.state.year.setValue(year)
+        self.state.month.setValue(month)
+        self.state.day.setValue(day)
+        self.state.time.setValue(time)
 
         records = self.ctx.appContext.network.search(
             Record(
