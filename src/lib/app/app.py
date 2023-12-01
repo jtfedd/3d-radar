@@ -1,4 +1,5 @@
 import atexit
+import datetime
 
 from direct.showbase.ShowBase import ShowBase
 
@@ -6,7 +7,7 @@ from lib.camera.camera_control import CameraControl
 from lib.model.record import Record
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
-from lib.util.util import defaultLight, getData
+from lib.util.util import defaultLight
 
 from .context import AppContext
 from .events import AppEvents
@@ -29,15 +30,40 @@ class App:
         self.cameraControl = CameraControl(self.ctx, self.events)
         self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
 
-        scan = getData()
-        self.volumeRenderer.updateVolumeData(scan)
-
-        self.events.ui.panels.requestData.listen(self.loadData)
+        self.loadData()
+        self.events.requestData.listen(lambda _: self.loadData())
 
         atexit.register(self.saveConfig)
 
-    def loadData(self, record: Record) -> None:
-        scan = self.ctx.network.load(record)
+    def loadData(self) -> None:
+        radar = self.state.station.value
+        year = self.state.year.value
+        month = self.state.month.value
+        day = self.state.day.value
+        time = self.state.time.value
+
+        hour = int(time.split(":")[0])
+        minute = int(time.split(":")[1])
+
+        records = self.ctx.network.search(
+            Record(
+                radar,
+                datetime.datetime(
+                    year=year,
+                    month=month,
+                    day=day,
+                    hour=hour,
+                    minute=minute,
+                    tzinfo=datetime.timezone.utc,
+                ),
+            ),
+            1,
+        )
+
+        if len(records) == 0:
+            raise ValueError("No Records Found")
+
+        scan = self.ctx.network.load(records[0])
         self.volumeRenderer.updateVolumeData(scan)
 
     def loadConfig(self) -> None:

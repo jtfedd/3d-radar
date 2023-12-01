@@ -13,6 +13,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctYForTextAlignment, horizontalAlignToTextNodeAlign
 from lib.util.events.event_dispatcher import EventDispatcher
+from lib.util.events.listener import Listener
 
 
 class TextInput(Focusable):
@@ -31,7 +32,8 @@ class TextInput(Focusable):
         layer: UILayer = UILayer.INTERACTION,
         initialText: str = "",
     ):
-        super().__init__(ctx.appContext.focusManager)
+        super().__init__(ctx.appContext.focusManager, events.input)
+        self.listener = Listener()
 
         yPos = correctYForTextAlignment(y, font, size, vAlign)
 
@@ -69,8 +71,14 @@ class TextInput(Focusable):
         self.entry.bind(DGG.TYPE, lambda _: self.onChange.send(self.entry.get()))
         self.entry.bind(DGG.ERASE, lambda _: self.onChange.send(self.entry.get()))
 
-        events.input.leftMouse.listen(lambda _: self.checkFocus())
-        events.input.rightMouse.listen(lambda _: self.checkFocus())
+        self.listener.listen(events.input.leftMouse, lambda _: self.checkFocus())
+        self.listener.listen(events.input.rightMouse, lambda _: self.checkFocus())
+
+    def focus(self) -> None:
+        self.entry["focus"] = True
+
+    def blur(self) -> None:
+        self.entry["focus"] = False
 
     def onFocus(self, focused: bool) -> None:
         super().onFocus(focused)
@@ -80,9 +88,9 @@ class TextInput(Focusable):
 
     def checkFocus(self) -> None:
         if self.inBounds:
-            self.entry["focus"] = True
+            self.focus()
         else:
-            self.entry["focus"] = False
+            self.blur()
 
     def updateInBounds(self, inBounds: bool) -> None:
         self.inBounds = inBounds
@@ -92,6 +100,7 @@ class TextInput(Focusable):
 
     def destroy(self) -> None:
         super().destroy()
+        self.listener.destroy()
 
         self.entry.destroy()
         self.onChange.close()

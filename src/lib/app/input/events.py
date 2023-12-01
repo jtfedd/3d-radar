@@ -8,6 +8,8 @@ class InputEvents:
         self.zoom = EventDispatcher[int]()
         self.leftMouse = EventDispatcher[bool]()
         self.rightMouse = EventDispatcher[bool]()
+        self.tab = EventDispatcher[bool]()
+        self.shiftTab = EventDispatcher[bool]()
 
     def destroy(self) -> None:
         self.onHide.close()
@@ -15,3 +17,5 @@ class InputEvents:
         self.zoom.close()
         self.leftMouse.close()
         self.rightMouse.close()
+        self.tab.close()
+        self.shiftTab.close()

@@ -43,6 +43,9 @@ class InputManager(DirectObject):
         self.accept("mouse3", lambda: self.events.rightMouse.send(True))
         self.accept("mouse3-up", lambda: self.events.rightMouse.send(False))
 
+        self.accept("tab", lambda: self.events.tab.send(True))
+        self.accept("shift-tab", lambda: self.events.shiftTab.send(True))
+
     def send(self, event: EventDispatcher[None]) -> None:
         if self.focusManager.focused():
             return
