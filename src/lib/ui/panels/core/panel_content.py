@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, TypeVar
 
 from lib.app.events import AppEvents
+from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
@@ -74,6 +75,14 @@ class PanelContent(ABC):
         self.componentManager.add(component)
         self.components.append(component)
         return component
+
+    def setupFocusLoop(self, items: List[Focusable]) -> None:
+        for i in range(0, len(items) - 1):
+            items[i].nextFocusable = items[i + 1]
+            items[i + 1].prevFocusable = items[i]
+
+        items[len(items) - 1].nextFocusable = items[0]
+        items[0].prevFocusable = items[len(items) - 1]
 
     def destroy(self) -> None:
         for component in self.components:

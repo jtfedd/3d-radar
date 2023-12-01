@@ -88,6 +88,16 @@ class RadarDataPanel(PanelContent):
 
         loadDataButton.button.onClick.listen(lambda _: self.search())
 
+        self.setupFocusLoop(
+            [
+                self.radarInput.input,
+                self.yearInput.input,
+                self.monthInput.input,
+                self.dayInput.input,
+                self.timeInput.input,
+            ]
+        )
+
     def search(self) -> None:
         radar = self.radarInput.input.entry.get()
         year = int(self.yearInput.input.entry.get())
