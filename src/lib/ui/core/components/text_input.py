@@ -66,7 +66,7 @@ class TextInput(Focusable):
             focusOutExtraArgs=[False],
         )
 
-        self.validationAlert = BackgroundCard(
+        self.validationUnderline = BackgroundCard(
             root=root,
             width=width + (UIConstants.inputPaddingVertical) * size * 2,
             height=UIConstants.inputUnderlineHeight,
@@ -102,9 +102,9 @@ class TextInput(Focusable):
         self.valid = valid
 
         if valid:
-            self.validationAlert.hide()
+            self.validationUnderline.hide()
         else:
-            self.validationAlert.show()
+            self.validationUnderline.show()
 
     def focus(self) -> None:
         self.entry["focus"] = True
