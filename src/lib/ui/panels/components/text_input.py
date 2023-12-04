@@ -5,6 +5,8 @@ from panda3d.core import NodePath, PandaNode
 from lib.app.events import AppEvents
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
+from lib.ui.core.colors import UIColors
+from lib.ui.core.components.text import Text
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.label import ComponentLabel
@@ -23,10 +25,14 @@ class PanelTextInput(PanelComponent):
         initialValue: str,
         inputWidth: float,
         rightMargin: float = 0,
+        valid: bool = True,
+        validationText: str = "",
     ):
         super().__init__(root)
 
         self.ctx = ctx
+        self.valid = valid
+        self.validationText = validationText
 
         self.listener = Listener()
 
@@ -47,14 +53,46 @@ class PanelTextInput(PanelComponent):
             width=inputWidth,
             size=UIConstants.fontSizeRegular,
             initialText=initialValue,
+            valid=valid,
         )
+
+        self.validationAlert = Text(
+            root=self.root,
+            font=ctx.fonts.regular,
+            text=validationText,
+            x=UIConstants.panelPadding + UIConstants.panelContentWidth,
+            y=-UIConstants.panelInputHeight,
+            hAlign=HAlign.RIGHT,
+            vAlign=VAlign.TOP,
+            size=UIConstants.fontSizeDetail,
+            color=UIColors.RED,
+        )
+
+        self.setValid(valid)
 
         self.onChange = EventDispatcher[str]()
 
         self.listener.listen(self.input.onCommit, self.onChange.send)
 
+    def setValid(self, valid: bool) -> None:
+        self.input.setValid(valid)
+
+        self.valid = valid
+
+        if valid:
+            self.validationAlert.hide()
+        else:
+            self.validationAlert.show()
+
+        self.onHeightChange.send(None)
+
     def getHeight(self) -> float:
-        return UIConstants.panelInputHeight
+        height = UIConstants.panelInputHeight
+
+        if not self.valid and self.validationText != "":
+            height += UIConstants.panelValidationHeight
+
+        return height
 
     def destroy(self) -> None:
         super().destroy()

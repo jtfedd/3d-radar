@@ -40,6 +40,12 @@ class Text:
 
         self.text.setBin("fixed", layer.value)
 
+    def hide(self) -> None:
+        self.text.hide()
+
+    def show(self) -> None:
+        self.text.show()
+
     def updateText(self, text: str) -> None:
         self.text.setText(text)
 

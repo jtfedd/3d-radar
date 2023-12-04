@@ -2,6 +2,7 @@ class UIConstants:
     fontSizeRegular = 0.03
     fontSizeTitle = 0.04
     fontSizeHeader = 0.05
+    fontSizeDetail = 0.025
 
     headerFooterHeight = 0.08
 
@@ -11,10 +12,12 @@ class UIConstants:
     panelHeaderHeight = 0.08
     panelContentWidth = panelWidth - (panelPadding * 2)
     panelInputHeight = 0.06
+    panelValidationHeight = 0.04
     panelTitleHeight = 0.08
 
     inputPaddingVertical = 0.3
     inputPaddingHorizontal = 0.1
+    inputUnderlineHeight = 0.005
 
     panelSliderWidth = panelContentWidth * 0.66
     sliderHeight = 0.03
