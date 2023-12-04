@@ -9,9 +9,14 @@ from lib.app.focus.focusable import Focusable
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
+from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
-from lib.ui.core.util import correctYForTextAlignment, horizontalAlignToTextNodeAlign
+from lib.ui.core.util import (
+    correctYForTextAlignment,
+    getBaseline,
+    horizontalAlignToTextNodeAlign,
+)
 from lib.util.events.event_dispatcher import EventDispatcher
 from lib.util.events.listener import Listener
 
@@ -31,9 +36,12 @@ class TextInput(Focusable):
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.INTERACTION,
         initialText: str = "",
+        valid: bool = True,
     ):
         super().__init__(ctx.appContext.focusManager, events.input)
         self.listener = Listener()
+
+        self.valid = valid
 
         yPos = correctYForTextAlignment(y, font, size, vAlign)
 
@@ -58,6 +66,22 @@ class TextInput(Focusable):
             focusOutExtraArgs=[False],
         )
 
+        self.validationAlert = BackgroundCard(
+            root=root,
+            width=width + (UIConstants.inputPaddingVertical) * size * 2,
+            height=UIConstants.inputUnderlineHeight,
+            x=x + UIConstants.inputPaddingVertical * size,
+            y=yPos
+            - getBaseline(font, size)
+            - (UIConstants.inputPaddingHorizontal * size),
+            color=UIColors.RED,
+            hAlign=hAlign,
+            vAlign=VAlign.TOP,
+            layer=layer,
+        )
+
+        self.setValid(valid)
+
         self.entry.setBin("fixed", layer.value)
 
         self.onChange = EventDispatcher[str]()
@@ -73,6 +97,14 @@ class TextInput(Focusable):
 
         self.listener.listen(events.input.leftMouse, lambda _: self.checkFocus())
         self.listener.listen(events.input.rightMouse, lambda _: self.checkFocus())
+
+    def setValid(self, valid: bool) -> None:
+        self.valid = valid
+
+        if valid:
+            self.validationAlert.hide()
+        else:
+            self.validationAlert.show()
 
     def focus(self) -> None:
         self.entry["focus"] = True

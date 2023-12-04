@@ -1,3 +1,5 @@
+import datetime
+
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.context import UIContext
@@ -27,6 +29,7 @@ class RadarDataPanel(PanelContent):
                 "Radar Station:",
                 state.station.value,
                 UIConstants.panelContentWidth / 4,
+                validationText="Unknown radar station",
             )
         )
 
@@ -40,6 +43,7 @@ class RadarDataPanel(PanelContent):
                 "Year:",
                 str(state.year.value),
                 UIConstants.panelContentWidth / 4,
+                validationText="Invalid Year",
             )
         )
 
@@ -51,6 +55,7 @@ class RadarDataPanel(PanelContent):
                 "Month:",
                 str(state.month.value),
                 UIConstants.panelContentWidth / 4,
+                validationText="Invalid Month",
             )
         )
 
@@ -62,6 +67,7 @@ class RadarDataPanel(PanelContent):
                 "Day:",
                 str(state.day.value),
                 UIConstants.panelContentWidth / 4,
+                validationText="Invalid Day",
             )
         )
 
@@ -73,6 +79,7 @@ class RadarDataPanel(PanelContent):
                 "Time:",
                 state.time.value,
                 UIConstants.panelContentWidth / 4,
+                validationText="Invalid Time",
             )
         )
 
@@ -98,12 +105,63 @@ class RadarDataPanel(PanelContent):
             ]
         )
 
+    def resetValidation(self) -> None:
+        self.radarInput.setValid(True)
+        self.yearInput.setValid(True)
+        self.monthInput.setValid(True)
+        self.dayInput.setValid(True)
+        self.timeInput.setValid(True)
+
     def search(self) -> None:
+        valid = True
+
+        self.resetValidation()
+
         radar = self.radarInput.input.entry.get()
-        year = int(self.yearInput.input.entry.get())
-        month = int(self.monthInput.input.entry.get())
-        day = int(self.dayInput.input.entry.get())
+        # Validate radar station
+
+        try:
+            year = int(self.yearInput.input.entry.get())
+            if year < 1991 or year > 9999:
+                raise ValueError("Invalid year value")
+        except ValueError:
+            valid = False
+            self.yearInput.setValid(False)
+
+        try:
+            month = int(self.monthInput.input.entry.get())
+            if month < 1 or month > 12:
+                raise ValueError("Invalid month value")
+        except ValueError:
+            valid = False
+            self.monthInput.setValid(False)
+
+        try:
+            day = int(self.dayInput.input.entry.get())
+            if day < 1 or day > 31:
+                raise ValueError("Invalid day value")
+        except ValueError:
+            valid = False
+            self.dayInput.setValid(False)
+
         time = self.timeInput.input.entry.get()
+        try:
+            self.validateTime(time)
+        except ValueError:
+            valid = False
+            self.timeInput.setValid(False)
+
+        if not valid:
+            return
+
+        try:
+            datetime.datetime(year=year, month=month, day=day)
+        except ValueError:
+            valid = False
+            self.dayInput.setValid(False)
+
+        if not valid:
+            return
 
         self.state.station.setValue(radar)
         self.state.year.setValue(year)
@@ -112,6 +170,35 @@ class RadarDataPanel(PanelContent):
         self.state.time.setValue(time)
 
         self.events.requestData.send(None)
+
+    def validateTime(self, time: str) -> None:
+        parts = time.split(":")
+        if len(parts) != 2:
+            raise ValueError("Time should be in the format HH:MM")
+
+        hour = parts[0]
+        minute = parts[1]
+
+        if len(minute) != 2:
+            raise ValueError("Minute should be formatted as MM")
+
+        hourInt = int(hour)
+        minuteInt = int(minute)
+
+        if minuteInt < 0 or minuteInt > 59:
+            raise ValueError("Minute invalid")
+
+        # This should take into account 12/24 hour time eventually
+        if hourInt < 1 or hourInt > 24:
+            raise ValueError("Hour invalid")
+
+    def validateYear(self, year: str) -> bool:
+        try:
+            yearInt = int(year)
+        except ValueError:
+            return False
+
+        return 1991 <= yearInt
 
     def headerText(self) -> str:
         return "Radar Data"

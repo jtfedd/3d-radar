@@ -24,12 +24,12 @@ class PanelComponentManager:
 
         for component in self.components:
             component.setOffset(height)
-            height += component.getHeight()
+            height += component.height()
 
         self.onUpdate.send(height)
 
     def getHeight(self) -> float:
-        return sum(c.getHeight() for c in self.components)
+        return sum(c.height() for c in self.components)
 
     def destroy(self) -> None:
         self.components.clear()

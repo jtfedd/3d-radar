@@ -66,3 +66,7 @@ def correctYForTextAlignment(
         return y + textSize * (font.line_height - 1)
 
     raise InvalidArgumentException("align has invalid value " + align.value)
+
+
+def getBaseline(font: DynamicTextFont, size: float) -> float:
+    return (font.line_height - 1) * size
