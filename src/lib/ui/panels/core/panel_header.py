@@ -10,13 +10,14 @@ from lib.ui.core.layers import UILayer
 class PanelHeader:
     def __init__(self, ctx: UIContext, text: str) -> None:
         self.root = ctx.anchors.topLeft.attachNewNode("panel-header")
+        self.root.setZ(-UIConstants.headerFooterHeight)
 
         self.text = Text(
             root=self.root,
             font=ctx.fonts.bold,
             text=text,
             x=UIConstants.panelWidth / 2,
-            y=-UIConstants.headerFooterHeight - (UIConstants.panelHeaderHeight / 2),
+            y=-(UIConstants.panelHeaderHeight / 2),
             size=UIConstants.fontSizeHeader,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.CENTER,
@@ -27,8 +28,8 @@ class PanelHeader:
             width=UIConstants.panelWidth,
             height=UIConstants.panelBorderWidth,
             x=0,
-            y=-UIConstants.headerFooterHeight,
-            color=UIColors.WHITE,
+            y=0,
+            color=UIColors.BACKGROUND_LIGHT,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
             layer=UILayer.BACKGROUND_DECORATION,

@@ -4,7 +4,7 @@ from panda3d.core import NodePath, PandaNode
 
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.button import Button
+from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.core.panel_component import PanelComponent
 
@@ -27,6 +27,7 @@ class PanelButton(PanelComponent):
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
             text=text,
+            skin=ButtonSkin.ACCENT,
         )
 
     def getHeight(self) -> float:

@@ -38,8 +38,8 @@ class PanelScroller:
             frameColor=UIColors.TRANSPARENT,
             scrollBarWidth=UIConstants.scrollbarWidth,
             verticalScroll_borderWidth=(0, 0),
-            verticalScroll_frameColor=UIColors.BLACK,
-            verticalScroll_thumb_frameColor=UIColors.WHITE,
+            verticalScroll_frameColor=UIColors.INSET,
+            verticalScroll_thumb_frameColor=UIColors.CONTENT,
         )
 
         self.frame.setBin("fixed", UILayer.INTERACTION.value)

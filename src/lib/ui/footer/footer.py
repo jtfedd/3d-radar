@@ -11,7 +11,7 @@ class Footer:
             ctx.anchors.bottom,
             width=UIConstants.infinity,
             height=UIConstants.headerFooterHeight,
-            color=UIColors.GRAY,
+            color=UIColors.BACKGROUND,
             vAlign=VAlign.BOTTOM,
         )
 

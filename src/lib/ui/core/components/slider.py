@@ -37,7 +37,7 @@ class Slider:
                 UIConstants.sliderHeight / 2,
                 -UIConstants.sliderHeight / 2,
             ),
-            frameColor=UIColors.WHITE,
+            frameColor=UIColors.SLIDER_BAR,
             range=valueRange,
             value=initialValue,
             pageSize=abs(valueRange[1] - valueRange[0]),
@@ -47,7 +47,7 @@ class Slider:
                 UIConstants.sliderHandleHeight,
                 -UIConstants.sliderHandleHeight,
             ),
-            thumb_frameColor=UIColors.WHITE,
+            thumb_frameColor=UIColors.SLIDER_THUMB,
             thumb_relief=DGG.FLAT,
             command=self.handleValueChange,
         )
