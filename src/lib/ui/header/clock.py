@@ -14,20 +14,22 @@ from lib.ui.core.layers import UILayer
 class Clock:
     def __init__(self, ctx: UIContext):
         self.text = Text(
-            ctx.anchors.top,
-            ctx.fonts.bold,
+            ctx.anchors.topRight,
+            ctx.fonts.medium,
             self.getClockStr(),
+            x=-UIConstants.clockPadding,
             y=-UIConstants.headerFooterHeight / 2,
-            hAlign=HAlign.CENTER,
+            hAlign=HAlign.RIGHT,
             vAlign=VAlign.BOTTOM,
         )
 
         self.background = BackgroundCard(
-            ctx.anchors.top,
+            ctx.anchors.topRight,
             width=UIConstants.clockWidth,
             height=UIConstants.headerFooterHeight,
             color=UIColors.INSET,
             vAlign=VAlign.TOP,
+            hAlign=HAlign.RIGHT,
             layer=UILayer.BACKGROUND_DECORATION,
         )
 
@@ -41,7 +43,7 @@ class Clock:
         return task.again
 
     def getClockStr(self) -> str:
-        dateStr = "%A, %d %B %Y"
+        dateStr = "%d %b %Y"
         timeStr = "%I:%M %p"
 
         return datetime.datetime.now().strftime(dateStr + "\n" + timeStr)

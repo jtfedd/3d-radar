@@ -19,6 +19,7 @@ from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class ButtonSkin:
+    INSET: ButtonSkin
     DARK: ButtonSkin
     ACCENT: ButtonSkin
     LIGHT: ButtonSkin
@@ -56,6 +57,15 @@ class ButtonSkin:
 
         return self.content
 
+
+ButtonSkin.INSET = ButtonSkin(
+    ready=UIColors.INSET,
+    hover=UIColors.HOVER,
+    depressed=UIColors.INSET,
+    disabled=UIColors.BACKGROUND_DISABLED,
+    content=UIColors.CONTENT,
+    contentDisabled=UIColors.CONTENT_DISABLED,
+)
 
 ButtonSkin.DARK = ButtonSkin(
     ready=UIColors.BACKGROUND,

@@ -5,7 +5,9 @@ class UIConstants:
     fontSizeDetail = 0.025
 
     headerFooterHeight = 0.08
-    clockWidth = 0.6
+
+    clockWidth = 0.22
+    clockPadding = 0.01
 
     panelWidth = 0.7
     panelPadding = 0.03
@@ -27,6 +29,13 @@ class UIConstants:
 
     scrollbarWidth = 0.01
     scrollbarPadding = panelPadding / 2
+
+    animationControlsWidth = 1.2
+    animationSliderWidth = 0.6
+    animationSliderPadding = headerFooterHeight / 2
+    animationButtonGroupWidth = (animationControlsWidth / 2) - (
+        (animationSliderWidth / 2) + animationSliderPadding
+    )
 
     # Higher number means slower scrolling
     scrollSensitivity = 10

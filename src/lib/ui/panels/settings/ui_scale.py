@@ -13,8 +13,8 @@ from lib.ui.panels.core.panel_component import PanelComponent
 
 
 class UIScaleInput(PanelComponent):
-    MIN_SCALE = 25
-    MAX_SCALE = 300
+    MIN_SCALE = 50
+    MAX_SCALE = 150
 
     def __init__(
         self,
