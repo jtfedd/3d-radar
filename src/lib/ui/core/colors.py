@@ -24,15 +24,15 @@ def fromHex(hexColor: str) -> Vec4:
 
 class UIColors:
     # Palette colors, dark to light
-    PALETTE_0 = fromHex("#212529")  # Inset, depressed
-    PALETTE_1 = fromHex("#343A40")  # Background, Content Dark
-    PALETTE_2 = fromHex("#495057")  # Lighter button
-    PALETTE_3 = fromHex("#6C757D")  # Hover dark
+    PALETTE_0 = fromHex("#212529")
+    PALETTE_1 = fromHex("#343A40")
+    PALETTE_2 = fromHex("#495057")
+    PALETTE_3 = fromHex("#6C757D")
     PALETTE_4 = fromHex("#ADB5BD")
-    PALETTE_5 = fromHex("#CED4DA")  # Slider bar, depressed light
+    PALETTE_5 = fromHex("#CED4DA")
     PALETTE_6 = fromHex("#DEE2E6")
-    PALETTE_7 = fromHex("#E9ECEF")  # Content Light, light button
-    PALETTE_8 = fromHex("#F8F9FA")  # Hover light
+    PALETTE_7 = fromHex("#E9ECEF")
+    PALETTE_8 = fromHex("#F8F9FA")
 
     # Generic colors
     TRANSPARENT = fromHexWithAlpha("#000000", 0)
