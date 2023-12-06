@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Callable
+
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectButton import DirectButton
 from direct.task.Task import Task
@@ -136,31 +138,34 @@ class Button:
         )
 
         self.content: Text | Image
+        self.imageContentFactory: Callable[[str], Image] = lambda i: Image(
+            root=root,
+            image=i,
+            width=iconWidth,
+            height=iconHeight,
+            x=xPos,
+            y=yPos,
+            hAlign=HAlign.CENTER,
+            vAlign=VAlign.CENTER,
+            layer=UILayer(layer.value - 1),
+        )
+
+        self.textContentFactory: Callable[[str], Text] = lambda t: Text(
+            root=root,
+            font=ctx.fonts.medium,
+            text=t,
+            x=xPos,
+            y=yPos,
+            hAlign=HAlign.CENTER,
+            vAlign=VAlign.CENTER,
+            size=textSize,
+            layer=UILayer(layer.value - 1),
+        )
 
         if icon:
-            self.content = Image(
-                root=root,
-                image=icon,
-                width=iconWidth,
-                height=iconHeight,
-                x=xPos,
-                y=yPos,
-                hAlign=HAlign.CENTER,
-                vAlign=VAlign.CENTER,
-                layer=UILayer(layer.value - 1),
-            )
+            self.content = self.imageContentFactory(icon)
         elif text:
-            self.content = Text(
-                root=root,
-                font=ctx.fonts.medium,
-                text=text,
-                x=xPos,
-                y=yPos,
-                hAlign=HAlign.CENTER,
-                vAlign=VAlign.CENTER,
-                size=textSize,
-                layer=UILayer(layer.value - 1),
-            )
+            self.content = self.textContentFactory(text)
 
         self.button = DirectButton(
             parent=root,
@@ -198,6 +203,10 @@ class Button:
             self.content.updateColor(self.skin.getContentColor(buttonState))
 
         return Task.cont
+
+    def setIcon(self, icon: str) -> None:
+        self.content.destroy()
+        self.content = self.imageContentFactory(icon)
 
     def handleClick(self) -> None:
         self.onClick.send(None)
