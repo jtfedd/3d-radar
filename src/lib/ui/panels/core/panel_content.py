@@ -36,7 +36,7 @@ class PanelContent(ABC):
             hAlign=HAlign.LEFT,
         )
 
-        self.header = PanelHeader(ctx, self.headerText())
+        self.header = PanelHeader(ctx, events.ui.panels, self.headerText())
 
         self.footer = BackgroundCard(
             ctx.anchors.bottomLeft,

@@ -5,9 +5,7 @@ from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.panel_type import PanelType
 from lib.ui.panels.radar_data.radar_data_panel import RadarDataPanel
-from lib.ui.panels.radar_visualization.radar_visualization_panel import (
-    RadarVisualizationPanel,
-)
+from lib.ui.panels.radar_viewer.radar_viewer_panel import RadarViewerPanel
 from lib.ui.panels.settings.settings_panel import SettingsPanel
 from lib.util.errors import InvalidArgumentException
 
@@ -21,14 +19,14 @@ class PanelModule:
 
         self.settingsPanel = SettingsPanel(ctx, state, events)
         self.radarDataPanel = RadarDataPanel(ctx, state, events)
-        self.radarVizPanel = RadarVisualizationPanel(ctx, state, events)
+        self.radarVizPanel = RadarViewerPanel(ctx, state, events)
 
         self.currentPanel: PanelContent = self.settingsPanel
 
         self.buttons = PanelButtons(ctx, self.events.ui.panels)
-        self.buttonsSub = self.buttons.onClick.listen(self.panelTypeClicked)
+        self.buttonsSub = events.ui.panels.panelChanged.listen(self.panelTypeChanged)
 
-    def panelTypeClicked(self, newPanelType: PanelType) -> None:
+    def panelTypeChanged(self, newPanelType: PanelType) -> None:
         if self.panelType == PanelType.NONE and newPanelType == PanelType.NONE:
             return
 
@@ -50,7 +48,7 @@ class PanelModule:
             self.currentPanel = self.settingsPanel
         elif panel is PanelType.RADAR_DATA:
             self.currentPanel = self.radarDataPanel
-        elif panel is PanelType.RADAR_VISUALIZATION:
+        elif panel is PanelType.RADAR_VIEWER:
             self.currentPanel = self.radarVizPanel
         else:
             raise InvalidArgumentException("Unsupported panel type: " + str(panel))
@@ -58,7 +56,6 @@ class PanelModule:
         self.currentPanel.show()
 
         self.panelType = panel
-        self.events.ui.panels.panelChanged.send(self.panelType)
 
     def destroy(self) -> None:
         self.events.destroy()

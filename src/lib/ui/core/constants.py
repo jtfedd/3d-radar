@@ -30,11 +30,14 @@ class UIConstants:
     scrollbarWidth = 0.01
     scrollbarPadding = panelPadding / 2
 
-    animationControlsWidth = 1.2
     animationSliderWidth = 0.6
     animationSliderPadding = headerFooterHeight / 2
-    animationButtonGroupWidth = (animationControlsWidth / 2) - (
-        (animationSliderWidth / 2) + animationSliderPadding
+    animationButtonWidth = headerFooterHeight
+    animationButtonGroupWidth = 3 * animationButtonWidth
+    animationControlsWidth = (
+        animationSliderWidth
+        + 2 * animationSliderPadding
+        + 2 * animationButtonGroupWidth
     )
 
     # Higher number means slower scrolling
