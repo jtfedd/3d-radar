@@ -1,6 +1,7 @@
 import json
 from typing import Any, Dict, TypeVar
 
+from lib.model.data_type import DataType
 from lib.util.events.observable import Observable
 
 T = TypeVar("T")
@@ -23,6 +24,8 @@ class AppState:
         self.time = self.createField("time", "11:24")
 
         self.hideKeybinding = self.createField("hideKeybinding", "h")
+
+        self.dataType = self.createField("dataType", DataType.REFLECTIVITY)
 
     def toJson(self) -> str:
         raw: Dict[str, Any] = {}  # type:ignore

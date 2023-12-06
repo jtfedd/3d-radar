@@ -73,6 +73,8 @@ class App:
 
         with configPath.open("r", encoding="utf-8") as f:
             jsonStr = f.read()
+            if jsonStr == "":
+                return
             self.state.fromJson(jsonStr)
 
     def saveConfig(self) -> None:
