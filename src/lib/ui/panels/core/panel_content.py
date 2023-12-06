@@ -31,7 +31,7 @@ class PanelContent(ABC):
             ctx.anchors.left,
             width=UIConstants.panelWidth,
             height=UIConstants.infinity,
-            color=UIColors.GRAY,
+            color=UIColors.BACKGROUND,
             vAlign=VAlign.CENTER,
             hAlign=HAlign.LEFT,
         )
@@ -43,7 +43,7 @@ class PanelContent(ABC):
             y=UIConstants.headerFooterHeight,
             width=UIConstants.panelWidth,
             height=UIConstants.panelBorderWidth,
-            color=UIColors.WHITE,
+            color=UIColors.BACKGROUND_LIGHT,
             vAlign=VAlign.BOTTOM,
             hAlign=HAlign.LEFT,
             layer=UILayer.BACKGROUND_DECORATION,

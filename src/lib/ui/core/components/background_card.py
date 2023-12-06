@@ -5,6 +5,7 @@ from panda3d.core import NodePath, PandaNode, Vec4
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.image import Image
+from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
 
 
@@ -23,7 +24,7 @@ class BackgroundCard:
     ) -> None:
         self.image = Image(
             root,
-            "assets/white.png",
+            Icons.BLANK,
             width=width,
             height=height,
             x=x,

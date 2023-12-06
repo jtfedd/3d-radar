@@ -5,6 +5,7 @@ class UIConstants:
     fontSizeDetail = 0.025
 
     headerFooterHeight = 0.08
+    clockWidth = 0.6
 
     panelWidth = 0.7
     panelPadding = 0.03

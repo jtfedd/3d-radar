@@ -12,7 +12,7 @@ class Header:
             ctx.anchors.top,
             width=UIConstants.infinity,
             height=UIConstants.headerFooterHeight,
-            color=UIColors.GRAY,
+            color=UIColors.BACKGROUND,
             vAlign=VAlign.TOP,
         )
 
