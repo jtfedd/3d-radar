@@ -71,7 +71,7 @@ class AnimationControls(Listener):
             skin=ButtonSkin.INSET,
         )
 
-        self.back = Button(
+        self.previous = Button(
             ctx.anchors.bottom,
             ctx,
             UIConstants.animationButtonWidth,
@@ -86,7 +86,7 @@ class AnimationControls(Listener):
             skin=ButtonSkin.INSET,
         )
 
-        self.forward = Button(
+        self.next = Button(
             ctx.anchors.bottom,
             ctx,
             UIConstants.animationButtonWidth,
@@ -132,6 +132,11 @@ class AnimationControls(Listener):
             lambda dt: self.velButton.setToggleState(dt == DataType.VELOCITY),
         )
 
+        self.listen(self.play.onClick, events.animation.play.send)
+        self.listen(self.next.onClick, events.animation.next.send)
+        self.listen(self.previous.onClick, events.animation.previous.send)
+        self.listen(self.animationSlider.onValueChange, events.animation.slider.send)
+
     def destroy(self) -> None:
         super().destroy()
 
@@ -139,5 +144,5 @@ class AnimationControls(Listener):
         self.refButton.destroy()
         self.velButton.destroy()
         self.play.destroy()
-        self.back.destroy()
-        self.forward.destroy()
+        self.previous.destroy()
+        self.next.destroy()
