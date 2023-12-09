@@ -1,9 +1,6 @@
 name: Upgrade Dependencies
 
-on:
-  schedule:
-    - cron: '0 13 * * 6'
-  workflow_dispatch: # Allow the workflow to be started manually
+on: workflow_dispatch
 
 jobs:
   upgrade-deps:
