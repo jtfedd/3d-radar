@@ -5,6 +5,7 @@ from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.components.button import Button
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
 from lib.ui.panels.panel_events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
@@ -52,7 +53,7 @@ class PanelHeader(Listener):
             y=-UIConstants.panelBorderWidth,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.TOP,
-            icon="assets/x.png",
+            icon=Icons.X,
             iconWidth=closeButtonSize,
             iconHeight=closeButtonSize,
         )
