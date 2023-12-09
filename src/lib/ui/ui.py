@@ -12,7 +12,7 @@ class UI:
         self.ctx = UIContext(ctx, state, events)
 
         self.header = Header(self.ctx)
-        self.footer = Footer(self.ctx)
+        self.footer = Footer(self.ctx, state, events)
         self.panels = PanelModule(self.ctx, state, events)
 
     def destroy(self) -> None:

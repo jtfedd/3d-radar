@@ -1,7 +1,9 @@
-from lib.app.input.events import InputEvents
-from lib.app.window.events import WindowEvents
 from lib.ui.events import UIEvents
 from lib.util.events.event_dispatcher import EventDispatcher
+
+from .animation.events import AnimationEvents
+from .input.events import InputEvents
+from .window.events import WindowEvents
 
 
 class AppEvents:
@@ -9,6 +11,7 @@ class AppEvents:
         self.ui = UIEvents()
         self.input = InputEvents()
         self.window = WindowEvents()
+        self.animation = AnimationEvents()
 
         self.requestData = EventDispatcher[None]()
 
@@ -16,5 +19,6 @@ class AppEvents:
         self.ui.destroy()
         self.input.destroy()
         self.window.destroy()
+        self.animation.destroy()
 
         self.requestData.close()

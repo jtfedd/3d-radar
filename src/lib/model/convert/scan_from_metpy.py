@@ -1,21 +1,16 @@
 import math
-from enum import Enum
 from typing import List
 
 import numpy as np
 import numpy.typing as npt
 from metpy.io import Level2File
 
+from lib.model.data_type import DataType
 from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.util.errors import UnsupportedScanException
 
 RAY_LENGTH = 2000
-
-
-class DataType(Enum):
-    REFLECTIVITY = b"REF"
-    VELOCITY = b"VEL"
 
 
 class RayData:

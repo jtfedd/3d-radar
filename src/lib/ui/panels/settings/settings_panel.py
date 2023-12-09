@@ -34,6 +34,7 @@ class SettingsPanel(PanelContent):
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
         self.addKeybindingInput("Hide UI:", state.hideKeybinding)
+        self.addKeybindingInput("Play/Pause:", state.playKeybinding)
 
     def addKeybindingInput(self, label: str, observable: Observable[str]) -> None:
         textInput = self.addComponent(

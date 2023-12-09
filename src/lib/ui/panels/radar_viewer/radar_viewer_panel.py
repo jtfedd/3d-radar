@@ -7,7 +7,7 @@ from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
 
 
-class RadarVisualizationPanel(PanelContent):
+class RadarViewerPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
@@ -71,7 +71,7 @@ class RadarVisualizationPanel(PanelContent):
         self.state.volumeFalloff.setValue(newFalloff)
 
     def headerText(self) -> str:
-        return "Radar Visualization"
+        return "Radar Viewer"
 
     def destroy(self) -> None:
         super().destroy()

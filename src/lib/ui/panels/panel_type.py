@@ -5,4 +5,4 @@ class PanelType(Enum):
     NONE = 0
     SETTINGS = 1
     RADAR_DATA = 2
-    RADAR_VISUALIZATION = 3
+    RADAR_VIEWER = 3

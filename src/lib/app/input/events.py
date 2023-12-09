@@ -4,6 +4,7 @@ from lib.util.events.event_dispatcher import EventDispatcher
 class InputEvents:
     def __init__(self) -> None:
         self.onHide = EventDispatcher[None]()
+        self.onPlay = EventDispatcher[None]()
         self.scroll = EventDispatcher[int]()
         self.zoom = EventDispatcher[int]()
         self.leftMouse = EventDispatcher[bool]()
@@ -13,6 +14,7 @@ class InputEvents:
 
     def destroy(self) -> None:
         self.onHide.close()
+        self.onPlay.close()
         self.scroll.close()
         self.zoom.close()
         self.leftMouse.close()
