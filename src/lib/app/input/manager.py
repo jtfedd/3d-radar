@@ -23,12 +23,17 @@ class InputManager(DirectObject):
 
         self.listener = Listener()
         self.listener.listen(self.state.hideKeybinding, lambda _: self.createBindings())
+        self.listener.listen(self.state.playKeybinding, lambda _: self.createBindings())
 
     def createBindings(self) -> None:
         self.ignoreAll()
 
         self.accept(
             self.state.hideKeybinding.value, lambda: self.send(self.events.onHide)
+        )
+
+        self.accept(
+            self.state.playKeybinding.value, lambda: self.send(self.events.onPlay)
         )
 
         self.accept("wheel_up-up", lambda: self.events.scroll.send(-1))

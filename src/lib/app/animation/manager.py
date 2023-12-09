@@ -14,6 +14,11 @@ class AnimationManager(Listener):
             lambda _: self.playing.setValue(not self.playing.value),
         )
 
+        self.listen(
+            events.input.onPlay,
+            lambda _: self.playing.setValue(not self.playing.value),
+        )
+
         self.listen(events.animation.next, lambda _: self.playing.setValue(False))
         self.listen(events.animation.previous, lambda _: self.playing.setValue(False))
         self.listen(events.animation.slider, lambda _: self.playing.setValue(False))

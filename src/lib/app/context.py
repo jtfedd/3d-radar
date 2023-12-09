@@ -17,12 +17,12 @@ class AppContext:
         self.base = base
         self.fileManager = FileManager()
         self.focusManager = FocusManager()
-        self.keybindings = InputManager(self.focusManager, state, events.input)
+        self.inputManager = InputManager(self.focusManager, state, events.input)
         self.windowManager = WindowManager(events.window)
         self.network = Network(S3DataProvider(), self.fileManager)
         self.animationManager = AnimationManager(events)
 
     def destroy(self) -> None:
-        self.keybindings.destroy()
+        self.inputManager.destroy()
         self.windowManager.destroy()
         self.animationManager.destroy()

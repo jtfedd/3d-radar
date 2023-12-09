@@ -24,6 +24,7 @@ class AppState:
         self.time = self.createField("time", "11:24")
 
         self.hideKeybinding = self.createField("hideKeybinding", "h")
+        self.playKeybinding = self.createField("playKeybinding", "space")
 
         self.dataType = self.createField("dataType", DataType.REFLECTIVITY)
 
