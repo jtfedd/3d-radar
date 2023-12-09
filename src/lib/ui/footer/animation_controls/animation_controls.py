@@ -17,6 +17,8 @@ class AnimationControls(Listener):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__()
 
+        self.ctx = ctx
+
         self.background = BackgroundCard(
             ctx.anchors.bottom,
             width=UIConstants.animationControlsWidth,
@@ -136,6 +138,17 @@ class AnimationControls(Listener):
         self.listen(self.next.onClick, events.animation.next.send)
         self.listen(self.previous.onClick, events.animation.previous.send)
         self.listen(self.animationSlider.onValueChange, events.animation.slider.send)
+
+        self.updatePlayButton()
+        self.listen(
+            ctx.appContext.animationManager.playing, lambda _: self.updatePlayButton()
+        )
+
+    def updatePlayButton(self) -> None:
+        if self.ctx.appContext.animationManager.playing.value:
+            self.play.setIcon(Icons.PAUSE)
+        else:
+            self.play.setIcon(Icons.PLAY)
 
     def destroy(self) -> None:
         super().destroy()
