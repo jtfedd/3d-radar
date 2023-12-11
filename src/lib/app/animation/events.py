@@ -8,6 +8,8 @@ class AnimationEvents:
         self.previous = EventDispatcher[None]()
         self.slider = EventDispatcher[float]()
 
+        self.animationProgress = EventDispatcher[float]()
+
     def destroy(self) -> None:
         self.play.close()
         self.next.close()

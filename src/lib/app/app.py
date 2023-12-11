@@ -54,17 +54,22 @@ class App:
                     day=day,
                     hour=hour,
                     minute=minute,
+                    second=59,
                     tzinfo=datetime.timezone.utc,
                 ),
             ),
-            1,
+            self.state.frames.value,
         )
 
         if len(records) == 0:
             raise ValueError("No Records Found")
 
-        scan = self.ctx.network.load(records[0])
-        self.volumeRenderer.updateVolumeData(scan)
+        scans = {}
+        for record in records:
+            scans[record.key()] = self.ctx.network.load(record)
+
+        self.volumeRenderer.setData(scans)
+        self.ctx.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:
         configPath = self.ctx.fileManager.getConfigFile()

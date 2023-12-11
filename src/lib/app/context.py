@@ -20,7 +20,7 @@ class AppContext:
         self.inputManager = InputManager(self.focusManager, state, events.input)
         self.windowManager = WindowManager(events.window)
         self.network = Network(S3DataProvider(), self.fileManager)
-        self.animationManager = AnimationManager(events)
+        self.animationManager = AnimationManager(state, events)
 
     def destroy(self) -> None:
         self.inputManager.destroy()

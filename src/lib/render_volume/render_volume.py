@@ -1,4 +1,5 @@
 import math
+from typing import Dict
 
 import numpy as np
 from direct.filter.FilterManager import FilterManager
@@ -19,6 +20,8 @@ class VolumeRenderer(Listener):
 
         self.ctx = ctx
         self.state = state
+
+        self.data: Dict[str, Scan] = {}
 
         shader = Shader.load(
             Shader.SL_GLSL,
@@ -57,6 +60,22 @@ class VolumeRenderer(Listener):
 
         self.ctx.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
         self.ctx.base.taskMgr.add(self.updateTime, "update-time")
+
+        self.listen(state.animationFrame, lambda _: self.updateFrame())
+        self.listen(state.dataType, lambda _: self.updateFrame())
+
+    def setData(self, data: Dict[str, Scan]) -> None:
+        self.data = data
+        self.updateFrame()
+
+    def updateFrame(self) -> None:
+        if not self.state.animationFrame:
+            return
+
+        if self.state.animationFrame.value not in self.data:
+            return
+
+        self.updateVolumeData(self.data[self.state.animationFrame.value])
 
     def updateVolumeData(self, scan: Scan) -> None:
         # velocity scale: -100 to 100
