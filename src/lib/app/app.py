@@ -1,4 +1,5 @@
 import atexit
+import concurrent.futures
 import datetime
 
 from direct.showbase.ShowBase import ShowBase
@@ -65,8 +66,14 @@ class App:
             raise ValueError("No Records Found")
 
         scans = {}
-        for record in records:
-            scans[record.key()] = self.ctx.network.load(record)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = {
+                executor.submit(self.ctx.network.load, record) for record in records
+            }
+            for future in concurrent.futures.as_completed(futures):
+                scan = future.result()
+                scans[scan.record.key()] = scan
 
         self.volumeRenderer.setData(scans)
         self.ctx.animationManager.setRecords(records)
