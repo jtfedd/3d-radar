@@ -59,10 +59,10 @@ class VolumeRenderer(Listener):
         self.buffer: Texture
         self.setupBuffer()
 
-        self.setDensityParams()
-        self.listen(self.state.volumeMin, lambda _: self.setDensityParams())
-        self.listen(self.state.volumeMax, lambda _: self.setDensityParams())
-        self.listen(self.state.volumeFalloff, lambda _: self.setDensityParams())
+        self.updateDensityParams()
+        self.listen(self.state.volumeMin, lambda _: self.updateDensityParams())
+        self.listen(self.state.volumeMax, lambda _: self.updateDensityParams())
+        self.listen(self.state.volumeFalloff, lambda _: self.updateDensityParams())
 
         # For some reason this seems to be typed incorrectly; override the type
         window: GraphicsWindow = self.ctx.base.win  # type: ignore
@@ -78,6 +78,16 @@ class VolumeRenderer(Listener):
         self.updateDataType(state.dataType.value)
         self.listen(state.dataType, self.updateDataType)
         self.listen(state.dataType, lambda _: self.updateFrame())
+
+    def setupBuffer(self) -> None:
+        self.buffer = Texture("volume_data")
+        self.buffer.setupBufferTexture(
+            int(self.bufferSize / 4),  # buffer size is in bytes
+            Texture.T_float,
+            Texture.F_r32,
+            GeomEnums.UH_dynamic,
+        )
+        self.plane.setShaderInput("volume_data", self.buffer)
 
     def setData(self, data: Dict[str, Scan]) -> None:
         self.data = data
@@ -108,16 +118,6 @@ class VolumeRenderer(Listener):
 
         self.updateVolumeData(self.data[self.state.animationFrame.value])
 
-    def setupBuffer(self) -> None:
-        self.buffer = Texture("volume_data")
-        self.buffer.setupBufferTexture(
-            int(self.bufferSize / 4),  # buffer size is in bytes
-            Texture.T_float,
-            Texture.F_r32,
-            GeomEnums.UH_dynamic,
-        )
-        self.plane.setShaderInput("volume_data", self.buffer)
-
     def updateVolumeData(self, scan: Scan) -> None:
         dataBytes = scan.reflectivityBytes
         if self.state.dataType.value == DataType.VELOCITY:
@@ -134,6 +134,8 @@ class VolumeRenderer(Listener):
         dataView = memoryview(self.buffer.modifyRamImage())  # type: ignore
         dataView[0 : len(dataBytes)] = dataBytes
 
+        # At some point I would like to optimize all of these meta inputs into a packed
+        # struct or something but it doesn't seem to be a performance issue yet
         self.plane.setShaderInput("el_min", float(scan.elevations[0]))
         self.plane.setShaderInput("el_max", float(scan.elevations[-1]))
         self.plane.setShaderInput("el_length", len(scan.elevations))
@@ -150,7 +152,7 @@ class VolumeRenderer(Listener):
         self.plane.setShaderInput("r_min", float(scan.ranges[0]))
         self.plane.setShaderInput("r_step", 0.25)
 
-    def setDensityParams(self) -> None:
+    def updateDensityParams(self) -> None:
         # Params for rendering the volume
         densityMin = self.state.volumeMin.value
         densityMax = self.state.volumeMax.value
