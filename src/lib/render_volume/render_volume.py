@@ -127,7 +127,7 @@ class VolumeRenderer(Listener):
         self.plane.setShaderInput("az_length", 720)
         self.plane.setShaderInput("az_step", math.pi / 360)
 
-        self.plane.setShaderInput("r_length", 2001)
+        self.plane.setShaderInput("r_length", scan.reflectivity.shape[2])
         self.plane.setShaderInput("r_min", float(scan.ranges[0]))
         self.plane.setShaderInput("r_step", 0.25)
 

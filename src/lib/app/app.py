@@ -19,8 +19,8 @@ class App:
         base.setBackgroundColor(0, 0, 0, 1)
         defaultLight(base)
 
-        self.events = AppEvents()
         self.state = AppState()
+        self.events = AppEvents()
         self.ctx = AppContext(base, self.events, self.state)
 
         self.loadConfig()
@@ -33,7 +33,7 @@ class App:
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())
 
-        atexit.register(self.saveConfig)
+        atexit.register(self.destroy)
 
     def loadData(self) -> None:
         radar = self.state.station.value
@@ -85,3 +85,13 @@ class App:
     def saveConfig(self) -> None:
         with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
             f.write(self.state.toJson())
+
+    def destroy(self) -> None:
+        self.volumeRenderer.destroy()
+        self.cameraControl.destroy()
+        self.ui.destroy()
+        self.ctx.destroy()
+        self.events.destroy()
+
+        self.saveConfig()
+        self.state.destroy()

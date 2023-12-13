@@ -11,6 +11,8 @@ from .input.manager import InputManager
 from .state import AppState
 from .window.manager import WindowManager
 
+# from lib.network.radar.pyart_data_provider import S3DataProvider
+
 
 class AppContext:
     def __init__(self, base: ShowBase, events: AppEvents, state: AppState) -> None:

@@ -58,7 +58,6 @@ class PanelModule:
         self.panelType = panel
 
     def destroy(self) -> None:
-        self.events.destroy()
         self.buttons.destroy()
         self.buttonsSub.cancel()
 

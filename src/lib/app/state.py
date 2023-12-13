@@ -1,16 +1,56 @@
 import json
-from typing import Any, Dict, List, TypeVar
+from typing import Any, Callable, Dict, Generic, List, TypeVar
 
 from lib.model.data_type import DataType
 from lib.util.events.observable import Observable
 
 T = TypeVar("T")
+U = TypeVar("U")
+
+
+class SerializableField(Generic[T, U]):
+    def __init__(
+        self,
+        initialValue: T,
+        toJson: Callable[[T], U],
+        fromJson: Callable[[U], T],
+    ):
+        self.observable = Observable[T](initialValue)
+        self.toJson = toJson
+        self.fromJson = fromJson
+
+    def save(self) -> U:
+        return self.toJson(self.observable.value)
+
+    def load(self, value: U) -> None:
+        self.observable.setValue(self.fromJson(value))
+
+    def destroy(self) -> None:
+        self.observable.close()
+
+
+def serializeDataType(dataType: DataType) -> int:
+    if dataType == DataType.REFLECTIVITY:
+        return 0
+    elif dataType == DataType.VELOCITY:
+        return 1
+
+    raise ValueError("Unrecognized data type", dataType)
+
+
+def deserializeDataType(dataType: int) -> DataType:
+    if dataType == 0:
+        return DataType.REFLECTIVITY
+    elif dataType == 1:
+        return DataType.VELOCITY
+
+    raise ValueError("Unrecognized data type", dataType)
 
 
 class AppState:
     def __init__(self) -> None:
         # Persisted fields
-        self.config: Dict[str, Observable[Any]] = {}  # type: ignore
+        self.config: Dict[str, SerializableField[Any, Any]] = {}  # type: ignore
 
         self.uiScale = self.createField("uiScale", 1.0)
 
@@ -28,7 +68,12 @@ class AppState:
         self.hideKeybinding = self.createField("hideKeybinding", "h")
         self.playKeybinding = self.createField("playKeybinding", "space")
 
-        self.dataType = self.createField("dataType", DataType.REFLECTIVITY)
+        self.dataType = self.createFieldCustomSerialization(
+            "dataType",
+            DataType.REFLECTIVITY,
+            serializeDataType,
+            deserializeDataType,
+        )
 
         # Ephemeral fields
         self.state: List[Observable[Any]] = []  # type: ignore
@@ -40,7 +85,7 @@ class AppState:
         raw: Dict[str, Any] = {}  # type:ignore
 
         for item in self.config.items():
-            raw[item[0]] = item[1].value
+            raw[item[0]] = item[1].save()
 
         return json.dumps(
             raw,
@@ -49,20 +94,45 @@ class AppState:
         )
 
     def fromJson(self, jsonStr: str) -> None:
-        raw = json.loads(jsonStr)
+        try:
+            raw = json.loads(jsonStr)
+        except json.JSONDecodeError:
+            return
 
         for item in self.config.items():
             if item[0] in raw:
-                item[1].setValue(raw[item[0]])
+                try:
+                    item[1].load(raw[item[0]])
+                except ValueError:
+                    continue
 
     def createField(self, name: str, initialValue: T) -> Observable[T]:
-        observable = Observable[T](initialValue)
-        self.config[name] = observable
-        return observable
+        field = SerializableField[T, T](
+            initialValue,
+            fromJson=lambda t: t,
+            toJson=lambda t: t,
+        )
+        self.config[name] = field
+        return field.observable
+
+    def createFieldCustomSerialization(
+        self,
+        name: str,
+        initialValue: T,
+        toJson: Callable[[T], U],
+        fromJson: Callable[[U], T],
+    ) -> Observable[T]:
+        field = SerializableField[T, U](
+            initialValue,
+            toJson,
+            fromJson,
+        )
+        self.config[name] = field
+        return field.observable
 
     def destroy(self) -> None:
-        for observable in self.config.values():
-            observable.close()
+        for field in self.config.values():
+            field.destroy()
 
         for observable in self.state:
             observable.close()
