@@ -124,9 +124,6 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
     spacing: float = 0
 
     for sweep in reflectivitySweeps:
-        if len(sweep.rays) == 0:
-            continue
-
         first = sweep.rays[0].first
         spacing = sweep.rays[0].spacing
         sweepReflectivity = np.stack(tuple(ray.data for ray in sweep.rays))
@@ -138,9 +135,6 @@ def scanFromLevel2Data(record: Record, data: Level2File) -> Scan:
         reflectivityLayers.append(sweepReflectivity)
 
     for sweep in velocitySweeps:
-        if len(sweep.rays) == 0:
-            continue
-
         first = sweep.rays[0].first
         spacing = sweep.rays[0].spacing
         sweepVelocity = np.stack(tuple(ray.data for ray in sweep.rays))
