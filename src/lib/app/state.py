@@ -32,7 +32,7 @@ class SerializableField(Generic[T, U]):
 def serializeDataType(dataType: DataType) -> int:
     if dataType == DataType.REFLECTIVITY:
         return 0
-    elif dataType == DataType.VELOCITY:
+    if dataType == DataType.VELOCITY:
         return 1
 
     raise ValueError("Unrecognized data type", dataType)
@@ -41,7 +41,7 @@ def serializeDataType(dataType: DataType) -> int:
 def deserializeDataType(dataType: int) -> DataType:
     if dataType == 0:
         return DataType.REFLECTIVITY
-    elif dataType == 1:
+    if dataType == 1:
         return DataType.VELOCITY
 
     raise ValueError("Unrecognized data type", dataType)
