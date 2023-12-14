@@ -66,9 +66,9 @@ class VolumeRenderer(Listener):
 
         # For some reason this seems to be typed incorrectly; override the type
         window: GraphicsWindow = self.ctx.base.win  # type: ignore
-        self.windowSize = (window.getXSize(), window.getYSize())
-        self.plane.setShaderInput("resolution", self.windowSize)
-        self.listen(events.window.onWindowUpdate, self.handleWindowEvent)
+        self.windowSize = (0, 0)
+        self.updateScreenResolution(window)
+        self.listen(events.window.onWindowUpdate, self.updateScreenResolution)
 
         self.ctx.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
         self.ctx.base.taskMgr.add(self.updateTime, "update-time")
@@ -163,7 +163,7 @@ class VolumeRenderer(Listener):
         self.plane.setShaderInput("d_scale", densityScale)
         self.plane.setShaderInput("d_exp", densityExp)
 
-    def handleWindowEvent(self, win: GraphicsWindow) -> None:
+    def updateScreenResolution(self, win: GraphicsWindow) -> None:
         newSize = (win.getXSize(), win.getYSize())
         if newSize[0] == self.windowSize[0] and newSize[1] == self.windowSize[1]:
             return
