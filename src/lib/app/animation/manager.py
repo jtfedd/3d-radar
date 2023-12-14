@@ -1,5 +1,8 @@
 from typing import List
 
+from direct.task.Task import Task
+
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.record import Record
@@ -7,7 +10,7 @@ from lib.util.events.listener import Listener
 
 
 class AnimationManager(Listener):
-    def __init__(self, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         super().__init__()
         self.state = state
         self.events = events
@@ -25,12 +28,39 @@ class AnimationManager(Listener):
             lambda _: state.animationPlaying.setValue(not state.animationPlaying.value),
         )
 
-        self.listen(events.animation.next, lambda _: self.handleNext())
+        self.listen(events.animation.next, lambda _: self.handleNext(False))
         self.listen(events.animation.previous, lambda _: self.handlePrev())
         self.listen(events.animation.slider, self.handleSlider)
         self.listen(
             events.requestData, lambda _: state.animationPlaying.setValue(False)
         )
+
+        self.taskTime = 0.0
+        self.animationTimer = 0.0
+        self.loopDelay = 1
+        self.frameDelay = 0.1
+        self.updateTask = ctx.base.taskMgr.add(self.update, "animation-update")
+        self.listen(state.animationPlaying, lambda _: self.resetAnimationTimer())
+
+    def resetAnimationTimer(self) -> None:
+        self.animationTimer = 0
+
+    def update(self, task: Task) -> int:
+        dt = task.time - self.taskTime
+        self.taskTime = task.time
+
+        if not self.state.animationPlaying.value:
+            return task.cont
+
+        self.animationTimer -= dt
+        if self.animationTimer < 0:
+            self.handleNext(True)
+            if self.index == len(self.records) - 1:
+                self.animationTimer = max(self.loopDelay, self.frameDelay)
+            else:
+                self.animationTimer = self.frameDelay
+
+        return task.cont
 
     def setRecords(self, records: List[Record]) -> None:
         self.records = records
@@ -49,8 +79,9 @@ class AnimationManager(Listener):
                 self.index / (len(self.records) - 1)
             )
 
-    def handleNext(self) -> None:
-        self.state.animationPlaying.setValue(False)
+    def handleNext(self, continuePlaying: bool) -> None:
+        if not continuePlaying:
+            self.state.animationPlaying.setValue(False)
 
         if len(self.records) == 0:
             self.setFrame(None)
@@ -78,8 +109,6 @@ class AnimationManager(Listener):
         self.setSliderValue()
 
     def handleSlider(self, value: float) -> None:
-        self.state.animationPlaying.setValue(False)
-
         if len(self.records) == 0:
             self.setFrame(None)
             return
@@ -87,3 +116,6 @@ class AnimationManager(Listener):
         value *= len(self.records) - 1
         self.index = int(round(value))
         self.setFrame(self.records[self.index].key())
+
+    def destroy(self) -> None:
+        self.updateTask.cancel()

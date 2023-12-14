@@ -10,6 +10,7 @@ from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight
 
+from .animation.manager import AnimationManager
 from .context import AppContext
 from .events import AppEvents
 from .state import AppState
@@ -30,6 +31,7 @@ class App:
 
         self.cameraControl = CameraControl(self.ctx, self.events)
         self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
+        self.animationManager = AnimationManager(self.ctx, self.state, self.events)
 
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())
@@ -76,7 +78,7 @@ class App:
                 scans[scan.record.key()] = scan
 
         self.volumeRenderer.setData(scans)
-        self.ctx.animationManager.setRecords(records)
+        self.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:
         configPath = self.ctx.fileManager.getConfigFile()
