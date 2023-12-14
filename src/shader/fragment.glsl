@@ -151,7 +151,7 @@ float data_value(vec3 point) {
 float density(float value) {
     if (value < 0) return 0;
 
-    value = abs((value - d_offset) * d_factor);
+    value = abs((value + d_offset) * d_factor);
     return d_min + d_scale * pow(value, d_exp);
 }
 

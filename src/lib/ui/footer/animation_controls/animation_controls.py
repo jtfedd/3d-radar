@@ -138,14 +138,13 @@ class AnimationControls(Listener):
         self.listen(self.next.onClick, events.animation.next.send)
         self.listen(self.previous.onClick, events.animation.previous.send)
         self.listen(self.animationSlider.onValueChange, events.animation.slider.send)
+        self.listen(events.animation.animationProgress, self.animationSlider.setValue)
 
-        self.updatePlayButton()
-        self.listen(
-            ctx.appContext.animationManager.playing, lambda _: self.updatePlayButton()
-        )
+        self.updatePlayButton(state.animationPlaying.value)
+        self.listen(state.animationPlaying, self.updatePlayButton)
 
-    def updatePlayButton(self) -> None:
-        if self.ctx.appContext.animationManager.playing.value:
+    def updatePlayButton(self, playing: bool) -> None:
+        if playing:
             self.play.setIcon(Icons.PAUSE)
         else:
             self.play.setIcon(Icons.PLAY)

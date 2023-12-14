@@ -42,3 +42,7 @@ def defaultLight(base: ShowBase) -> None:
     alight.setColor((0.2, 0.2, 0.2, 1))
     alnp = base.render.attachNewNode(alight)
     base.render.setLight(alnp)
+
+
+def nextPowerOf2(n: int) -> int:
+    return 2 ** (n - 1).bit_length()  # type: ignore

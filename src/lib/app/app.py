@@ -1,4 +1,5 @@
 import atexit
+import concurrent.futures
 import datetime
 
 from direct.showbase.ShowBase import ShowBase
@@ -9,6 +10,7 @@ from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight
 
+from .animation.manager import AnimationManager
 from .context import AppContext
 from .events import AppEvents
 from .state import AppState
@@ -19,8 +21,8 @@ class App:
         base.setBackgroundColor(0, 0, 0, 1)
         defaultLight(base)
 
-        self.events = AppEvents()
         self.state = AppState()
+        self.events = AppEvents()
         self.ctx = AppContext(base, self.events, self.state)
 
         self.loadConfig()
@@ -29,11 +31,12 @@ class App:
 
         self.cameraControl = CameraControl(self.ctx, self.events)
         self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
+        self.animationManager = AnimationManager(self.ctx, self.state, self.events)
 
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())
 
-        atexit.register(self.saveConfig)
+        atexit.register(self.destroy)
 
     def loadData(self) -> None:
         radar = self.state.station.value
@@ -54,17 +57,28 @@ class App:
                     day=day,
                     hour=hour,
                     minute=minute,
+                    second=59,
                     tzinfo=datetime.timezone.utc,
                 ),
             ),
-            1,
+            self.state.frames.value,
         )
 
         if len(records) == 0:
             raise ValueError("No Records Found")
 
-        scan = self.ctx.network.load(records[0])
-        self.volumeRenderer.updateVolumeData(scan)
+        scans = {}
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = {
+                executor.submit(self.ctx.network.load, record) for record in records
+            }
+            for future in concurrent.futures.as_completed(futures):
+                scan = future.result()
+                scans[scan.record.key()] = scan
+
+        self.volumeRenderer.setData(scans)
+        self.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:
         configPath = self.ctx.fileManager.getConfigFile()
@@ -80,3 +94,13 @@ class App:
     def saveConfig(self) -> None:
         with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
             f.write(self.state.toJson())
+
+    def destroy(self) -> None:
+        self.volumeRenderer.destroy()
+        self.cameraControl.destroy()
+        self.ui.destroy()
+        self.ctx.destroy()
+        self.events.destroy()
+
+        self.saveConfig()
+        self.state.destroy()

@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class DataType(str, Enum):
+class DataType(Enum):
     REFLECTIVITY = b"REF"
     VELOCITY = b"VEL"

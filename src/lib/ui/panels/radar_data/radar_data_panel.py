@@ -85,6 +85,20 @@ class RadarDataPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
+        self.framesInput = self.addComponent(
+            PanelTextInput(
+                self.root,
+                ctx,
+                events,
+                "Number of Frames:",
+                str(state.frames.value),
+                UIConstants.panelContentWidth / 4,
+                validationText="1-100",
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
         loadDataButton = self.addComponent(
             PanelButton(
                 self.root,
@@ -102,6 +116,7 @@ class RadarDataPanel(PanelContent):
                 self.monthInput.input,
                 self.dayInput.input,
                 self.timeInput.input,
+                self.framesInput.input,
             ]
         )
 
@@ -111,14 +126,12 @@ class RadarDataPanel(PanelContent):
         self.monthInput.setValid(True)
         self.dayInput.setValid(True)
         self.timeInput.setValid(True)
+        self.framesInput.setValid(True)
 
     def search(self) -> None:
         valid = True
 
         self.resetValidation()
-
-        radar = self.radarInput.input.entry.get()
-        # Validate radar station
 
         try:
             year = int(self.yearInput.input.entry.get())
@@ -151,14 +164,24 @@ class RadarDataPanel(PanelContent):
             valid = False
             self.timeInput.setValid(False)
 
-        if not valid:
-            return
+        # If all the datetime inputs are valid so far, perform this check
+        if valid:
+            try:
+                datetime.datetime(year=year, month=month, day=day)
+            except ValueError:
+                valid = False
+                self.dayInput.setValid(False)
+
+        radar = self.radarInput.input.entry.get()
+        # Validate radar station
 
         try:
-            datetime.datetime(year=year, month=month, day=day)
+            frames = int(self.framesInput.input.entry.get())
+            if frames < 1 or frames > 100:
+                raise ValueError("Invalid frames value")
         except ValueError:
             valid = False
-            self.dayInput.setValid(False)
+            self.framesInput.setValid(False)
 
         if not valid:
             return
@@ -168,6 +191,7 @@ class RadarDataPanel(PanelContent):
         self.state.month.setValue(month)
         self.state.day.setValue(day)
         self.state.time.setValue(time)
+        self.state.frames.setValue(frames)
 
         self.events.requestData.send(None)
 

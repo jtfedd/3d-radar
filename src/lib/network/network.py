@@ -33,7 +33,7 @@ class Network:
         return scan
 
     def getFilepath(self, record: Record) -> Path:
-        fileName = record.cacheKey() + ".dat"
+        fileName = record.key() + ".dat"
         return self.fileManager.getCacheFile(fileName)
 
     def loadCached(self, record: Record) -> Optional[Scan]:

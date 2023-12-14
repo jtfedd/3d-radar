@@ -12,12 +12,12 @@ class Record:
         self.extension = extension
 
     def awsKey(self) -> str:
-        return self.format(self.awsPrefix() + self.cacheKey() + "_" + self.extension)
+        return self.format(self.awsPrefix() + self.key() + "_" + self.extension)
 
     def awsPrefix(self) -> str:
         return self.format(self.PREFIX_FMT)
 
-    def cacheKey(self) -> str:
+    def key(self) -> str:
         return self.format(self.FILE_FMT)
 
     def format(self, fmt: str) -> str:
