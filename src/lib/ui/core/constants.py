@@ -40,6 +40,10 @@ class UIConstants:
         + 2 * animationButtonGroupWidth
     )
 
+    legendPadding = 0.015
+    legendLabelWidth = 0.8
+    legendLabelHeight = 0.05
+
     # Higher number means slower scrolling
     scrollSensitivity = 10
 

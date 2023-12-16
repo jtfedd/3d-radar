@@ -71,3 +71,5 @@ class UIColors:
 
     SLIDER_BAR = PALETTE_3
     SLIDER_THUMB = PALETTE_8
+
+    LEGEND_BACKGROUND = fromHexWithAlpha("#000000", 0.6)

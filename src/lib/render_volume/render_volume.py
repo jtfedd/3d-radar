@@ -1,5 +1,4 @@
 import math
-from typing import Dict
 
 from direct.filter.FilterManager import FilterManager
 from direct.task import Task
@@ -21,8 +20,6 @@ class VolumeRenderer(Listener):
 
         self.ctx = ctx
         self.state = state
-
-        self.data: Dict[str, Scan] = {}
 
         shader = Shader.load(
             Shader.SL_GLSL,
@@ -89,10 +86,6 @@ class VolumeRenderer(Listener):
         )
         self.plane.setShaderInput("volume_data", self.buffer)
 
-    def setData(self, data: Dict[str, Scan]) -> None:
-        self.data = data
-        self.updateFrame()
-
     def updateDataType(self, dataType: DataType) -> None:
         if dataType == DataType.REFLECTIVITY:
             self.plane.setShaderInput("color_scale", self.reflectivityScale)
@@ -113,10 +106,11 @@ class VolumeRenderer(Listener):
         if not self.state.animationFrame.value:
             return
 
-        if self.state.animationFrame.value not in self.data:
+        scan = self.ctx.radarCache.get(self.state.animationFrame.value)
+        if not scan:
             return
 
-        self.updateVolumeData(self.data[self.state.animationFrame.value])
+        self.updateVolumeData(scan)
 
     def updateVolumeData(self, scan: Scan) -> None:
         dataBytes = scan.reflectivityBytes
