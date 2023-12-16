@@ -8,8 +8,10 @@ from lib.ui.core.components.image import Image
 from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
 
+from .component import Component
 
-class BackgroundCard:
+
+class BackgroundCard(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],

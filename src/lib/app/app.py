@@ -77,7 +77,7 @@ class App:
                 scan = future.result()
                 scans[scan.record.key()] = scan
 
-        self.volumeRenderer.setData(scans)
+        self.ctx.radarCache.setData(scans)
         self.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:

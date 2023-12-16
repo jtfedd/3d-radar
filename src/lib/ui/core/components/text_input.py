@@ -20,8 +20,10 @@ from lib.ui.core.util import (
 from lib.util.events.event_dispatcher import EventDispatcher
 from lib.util.events.listener import Listener
 
+from .component import Component
 
-class TextInput(Focusable):
+
+class TextInput(Focusable, Component):
     def __init__(
         self,
         ctx: UIContext,

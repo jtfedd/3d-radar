@@ -5,7 +5,7 @@ from panda3d.core import Vec4
 from lib.util.errors import StateError
 
 
-def fromHexWithAlpha(hexColor: str, alpha: float) -> Vec4:
+def fromHex(hexColor: str) -> Vec4:
     colorStringRegex = re.compile("^#[A-F0-9]{6}$")
 
     if colorStringRegex.match(hexColor) is None:
@@ -15,11 +15,11 @@ def fromHexWithAlpha(hexColor: str, alpha: float) -> Vec4:
     g = int(hexColor[3:5], 16) / 255.0
     b = int(hexColor[5:7], 16) / 255.0
 
-    return Vec4(r, g, b, alpha)
+    return Vec4(r, g, b, 1.0)
 
 
-def fromHex(hexColor: str) -> Vec4:
-    return fromHexWithAlpha(hexColor, 1)
+def withAlpha(color: Vec4, alpha: float) -> Vec4:
+    return Vec4(color.xyz, alpha)
 
 
 class UIColors:
@@ -35,7 +35,6 @@ class UIColors:
     PALETTE_8 = fromHex("#F8F9FA")
 
     # Generic colors
-    TRANSPARENT = fromHexWithAlpha("#000000", 0)
     WHITE = fromHex("#FFFFFF")
     GRAY_0 = fromHex("#595959")
     GRAY_1 = fromHex("#7F7F7F")
@@ -43,6 +42,7 @@ class UIColors:
     GRAY_3 = fromHex("#CCCCCC")
     GRAY_4 = fromHex("#F2F2F2")
     BLACK = fromHex("#000000")
+    TRANSPARENT = Vec4(0, 0, 0, 0)
 
     # Special colors
     RED = fromHex("#E5383B")
@@ -71,3 +71,5 @@ class UIColors:
 
     SLIDER_BAR = PALETTE_3
     SLIDER_THUMB = PALETTE_8
+
+    LEGEND_BACKGROUND = withAlpha(PALETTE_0, 0.6)

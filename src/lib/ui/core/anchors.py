@@ -120,7 +120,7 @@ class UIAnchors(Listener):
         self.top.setPos(0, 0, top)
         self.bottom.setPos(0, 0, bottom)
         self.left.setPos(left, 0, 0)
-        self.right.setPos(0, 0, right)
+        self.right.setPos(right, 0, 0)
 
         self.topLeft.setPos(left, 0, top)
         self.topRight.setPos(right, 0, top)

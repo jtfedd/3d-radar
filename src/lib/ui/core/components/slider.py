@@ -13,8 +13,10 @@ from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctXForAlignment
 from lib.util.events.event_dispatcher import EventDispatcher
 
+from .component import Component
 
-class Slider:
+
+class Slider(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],
