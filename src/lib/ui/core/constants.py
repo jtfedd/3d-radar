@@ -43,6 +43,11 @@ class UIConstants:
     legendPadding = 0.015
     legendLabelWidth = 0.8
     legendLabelHeight = 0.05
+    legendScaleWidth = 0.15
+    legendScaleHeight = 1
+    legendScaleBarWidth = 0.03
+    legendTitleHeight = 0.06
+    legendScaleBarHeight = legendScaleHeight - 4 * legendPadding - legendTitleHeight
 
     # Higher number means slower scrolling
     scrollSensitivity = 10

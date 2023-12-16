@@ -19,6 +19,8 @@ from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 from lib.util.events.event_dispatcher import EventDispatcher
 
+from .component import Component
+
 
 class ButtonSkin:
     INSET: ButtonSkin
@@ -97,7 +99,7 @@ ButtonSkin.LIGHT = ButtonSkin(
 )
 
 
-class Button:
+class Button(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],

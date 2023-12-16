@@ -9,8 +9,10 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctYForTextAlignment, horizontalAlignToTextNodeAlign
 
+from .component import Component
 
-class Text:
+
+class Text(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],

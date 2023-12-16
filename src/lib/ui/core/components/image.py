@@ -8,8 +8,10 @@ from lib.ui.core.colors import UIColors
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 
+from .component import Component
 
-class Image:
+
+class Image(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],
@@ -18,7 +20,7 @@ class Image:
         height: float,
         x: float = 0,
         y: float = 0,
-        color: Vec4 = UIColors.BLACK,
+        color: Vec4 | None = UIColors.BLACK,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.BACKGROUND,
