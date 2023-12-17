@@ -26,7 +26,7 @@ class Slider(Component):
         hAlign: HAlign,
         initialValue: float,
         valueRange: Tuple[float, float],
-        layer: UILayer = UILayer.INTERACTION,
+        layer: UILayer = UILayer.CONTENT_INTERACTION,
     ) -> None:
         xPos = correctXForAlignment(x, width, hAlign)
 

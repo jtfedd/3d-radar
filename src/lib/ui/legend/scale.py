@@ -32,6 +32,7 @@ class Scale(Listener):
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.CENTER,
             color=UIColors.LEGEND_BACKGROUND,
+            layer=UILayer.LABEL_BACKGROUND,
         )
 
         self.components: List[Component] = []
@@ -74,6 +75,7 @@ class Scale(Listener):
                 y=(UIConstants.legendScaleHeight / 2) - UIConstants.legendPadding,
                 hAlign=HAlign.CENTER,
                 vAlign=VAlign.TOP,
+                layer=UILayer.LABEL_CONTENT,
             )
         )
 
@@ -87,8 +89,8 @@ class Scale(Listener):
                 y=-UIConstants.legendScaleHeight / 2 + UIConstants.legendPadding * 2,
                 hAlign=HAlign.RIGHT,
                 vAlign=VAlign.BOTTOM,
-                layer=UILayer.CONTENT,
                 color=None,
+                layer=UILayer.LABEL_CONTENT,
             )
         )
 
@@ -108,6 +110,7 @@ class Scale(Listener):
                     + i * spacing,
                     hAlign=HAlign.RIGHT,
                     vAlign=VAlign.CENTER,
+                    layer=UILayer.LABEL_CONTENT,
                 )
             )
 
