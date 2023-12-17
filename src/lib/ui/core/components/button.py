@@ -109,7 +109,7 @@ class Button(Component):
         y: float = 0,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
-        layer: UILayer = UILayer.INTERACTION,
+        layer: UILayer = UILayer.CONTENT_INTERACTION,
         toggleState: bool = False,
         text: str | None = None,
         textSize: float = UIConstants.fontSizeRegular,

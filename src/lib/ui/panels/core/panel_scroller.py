@@ -42,7 +42,7 @@ class PanelScroller:
             verticalScroll_thumb_frameColor=UIColors.CONTENT,
         )
 
-        self.frame.setBin("fixed", UILayer.INTERACTION.value)
+        self.frame.setBin("fixed", UILayer.CONTENT_INTERACTION.value)
 
         self.frame.horizontalScroll.hide()
         self.frame.verticalScroll.incButton.hide()

@@ -6,6 +6,7 @@ from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
+from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 
 
@@ -23,6 +24,7 @@ class Label(Listener):
             y=UIConstants.headerFooterHeight + UIConstants.legendPadding,
             vAlign=VAlign.BOTTOM,
             color=UIColors.LEGEND_BACKGROUND,
+            layer=UILayer.LABEL_BACKGROUND,
         )
 
         self.product = Text(
@@ -35,6 +37,7 @@ class Label(Listener):
             + (UIConstants.legendLabelHeight / 2),
             vAlign=VAlign.CENTER,
             hAlign=HAlign.LEFT,
+            layer=UILayer.LABEL_CONTENT,
         )
 
         self.unknown = Text(
@@ -46,6 +49,7 @@ class Label(Listener):
             + (UIConstants.legendLabelHeight / 2),
             vAlign=VAlign.CENTER,
             hAlign=HAlign.CENTER,
+            layer=UILayer.LABEL_CONTENT,
         )
 
         self.time = Text(
@@ -58,6 +62,7 @@ class Label(Listener):
             + (UIConstants.legendLabelHeight / 2),
             vAlign=VAlign.CENTER,
             hAlign=HAlign.RIGHT,
+            layer=UILayer.LABEL_CONTENT,
         )
 
         self.updateLabel()

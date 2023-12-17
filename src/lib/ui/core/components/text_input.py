@@ -36,7 +36,7 @@ class TextInput(Focusable, Component):
         y: float = 0,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
-        layer: UILayer = UILayer.INTERACTION,
+        layer: UILayer = UILayer.CONTENT_INTERACTION,
         initialText: str = "",
         valid: bool = True,
     ):
