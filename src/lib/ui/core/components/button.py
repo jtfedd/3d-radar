@@ -14,7 +14,6 @@ from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.components.image import Image
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctXForAlignment, correctYForAlignment
 from lib.util.events.event_dispatcher import EventDispatcher
@@ -171,10 +170,9 @@ class Button(Component):
 
         self.button = DirectButton(
             parent=root,
-            image=Icons.BLANK,
             command=self.handleClick,
             pos=(xPos, 0, yPos),
-            scale=(width / 2, 1, height / 2),
+            frameSize=(-width / 2, width / 2, -height / 2, height / 2),
             borderWidth=(0, 0),
             frameColor=UIColors.TRANSPARENT,
             rolloverSound=None,
