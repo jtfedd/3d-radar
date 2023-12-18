@@ -8,6 +8,7 @@ from lib.network.network import Network
 class NWSService:
     def __init__(self, fileManager: FileManager, network: Network) -> None:
         self.network = network
+        self.fileManager = fileManager
 
         self.radarStations = self.preloadStations()
 
@@ -21,5 +22,7 @@ class NWSService:
         stations = self.network.nws.getRadarStations()
         if stations:
             return stations
+
+        # TODO fall back to cached stations if it couldn't be loaded
 
         raise RuntimeError("Could not load stations")
