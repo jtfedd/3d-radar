@@ -67,6 +67,8 @@ class AppState:
 
         self.hideKeybinding = self.createField("hideKeybinding", "h")
         self.playKeybinding = self.createField("playKeybinding", "space")
+        self.nextKeybinding = self.createField("nextKeybinding", ".")
+        self.prevKeybinding = self.createField("prevKeybinding", ",")
 
         self.dataType = self.createFieldCustomSerialization(
             "dataType",

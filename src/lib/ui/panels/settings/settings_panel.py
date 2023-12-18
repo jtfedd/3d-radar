@@ -35,6 +35,8 @@ class SettingsPanel(PanelContent):
 
         self.addKeybindingInput("Hide UI:", state.hideKeybinding)
         self.addKeybindingInput("Play/Pause:", state.playKeybinding)
+        self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
+        self.addKeybindingInput("Next Frame:", state.nextKeybinding)
 
     def addKeybindingInput(self, label: str, observable: Observable[str]) -> None:
         textInput = self.addComponent(

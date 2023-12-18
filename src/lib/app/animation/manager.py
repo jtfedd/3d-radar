@@ -28,6 +28,9 @@ class AnimationManager(Listener):
             lambda _: state.animationPlaying.setValue(not state.animationPlaying.value),
         )
 
+        self.listen(events.input.nextFrame, lambda _: self.handleNext(False))
+        self.listen(events.input.prevFrame, lambda _: self.handlePrev())
+
         self.listen(events.animation.next, lambda _: self.handleNext(False))
         self.listen(events.animation.previous, lambda _: self.handlePrev())
         self.listen(events.animation.slider, self.handleSlider)
