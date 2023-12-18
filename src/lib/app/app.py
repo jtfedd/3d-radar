@@ -48,7 +48,7 @@ class App:
         hour = int(time.split(":")[0])
         minute = int(time.split(":")[1])
 
-        records = self.ctx.network.search(
+        records = self.ctx.services.radar.search(
             Record(
                 radar,
                 datetime.datetime(
@@ -71,7 +71,8 @@ class App:
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {
-                executor.submit(self.ctx.network.load, record) for record in records
+                executor.submit(self.ctx.services.radar.load, record)
+                for record in records
             }
             for future in concurrent.futures.as_completed(futures):
                 scan = future.result()
