@@ -22,7 +22,7 @@ class SettingsPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        self.addComponent(
+        scaleInput = self.addComponent(
             UIScaleInput(
                 self.root,
                 ctx,
@@ -33,12 +33,26 @@ class SettingsPanel(PanelContent):
 
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
-        self.addKeybindingInput("Hide UI:", state.hideKeybinding)
-        self.addKeybindingInput("Play/Pause:", state.playKeybinding)
-        self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
-        self.addKeybindingInput("Next Frame:", state.nextKeybinding)
+        hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
+        playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
+        prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
+        nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
 
-    def addKeybindingInput(self, label: str, observable: Observable[str]) -> None:
+        self.setupFocusLoop(
+            [
+                scaleInput.input.input,
+                hideKey.input,
+                playKey.input,
+                prevKey.input,
+                nextKey.input,
+            ]
+        )
+
+    def addKeybindingInput(
+        self,
+        label: str,
+        observable: Observable[str],
+    ) -> PanelTextInput:
         textInput = self.addComponent(
             PanelTextInput(
                 self.root,
@@ -52,6 +66,8 @@ class SettingsPanel(PanelContent):
 
         self.listener.listen(textInput.onChange, observable.setValue)
         self.listener.listen(observable, textInput.input.setText)
+
+        return textInput
 
     def headerText(self) -> str:
         return "Settings"
