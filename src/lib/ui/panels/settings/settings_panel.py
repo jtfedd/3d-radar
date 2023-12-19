@@ -13,10 +13,16 @@ from .ui_scale import UIScaleInput
 
 
 class SettingsPanel(PanelContent):
+    MIN_ANIMATION_SPEED = 1
+    MAX_ANIMATION_SPEED = 30
+
+    MAX_LOOP_DELAY = 10.0
+
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
         self.ctx = ctx
         self.events = events
+        self.state = state
 
         self.listener = Listener()
 
@@ -31,6 +37,46 @@ class SettingsPanel(PanelContent):
             )
         )
 
+        self.addComponent(TitleComponent(self.root, ctx, "Animation"))
+
+        self.animationSpeedInput = self.addComponent(
+            PanelTextInput(
+                self.root,
+                self.ctx,
+                self.events,
+                "Animation Speed (fps):",
+                str(state.animationSpeed.value),
+                UIConstants.panelContentWidth / 6,
+            )
+        )
+
+        self.listener.listen(
+            state.animationSpeed,
+            lambda value: self.animationSpeedInput.input.setText(str(value)),
+        )
+
+        self.listener.listen(
+            self.animationSpeedInput.onChange, self.updateAnimationSpeed
+        )
+
+        self.loopDelayInput = self.addComponent(
+            PanelTextInput(
+                self.root,
+                self.ctx,
+                self.events,
+                "Loop Delay (s):",
+                str(state.loopDelay.value),
+                UIConstants.panelContentWidth / 6,
+            )
+        )
+
+        self.listener.listen(
+            state.loopDelay,
+            lambda value: self.loopDelayInput.input.setText(str(value)),
+        )
+
+        self.listener.listen(self.loopDelayInput.onChange, self.updateLoopDelay)
+
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
         hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
@@ -41,12 +87,37 @@ class SettingsPanel(PanelContent):
         self.setupFocusLoop(
             [
                 scaleInput.input.input,
+                self.animationSpeedInput.input,
+                self.loopDelayInput.input,
                 hideKey.input,
                 playKey.input,
                 prevKey.input,
                 nextKey.input,
             ]
         )
+
+    def updateAnimationSpeed(self, valueStr: str) -> None:
+        try:
+            newAnimationSpeed = int(valueStr)
+        except ValueError:
+            self.animationSpeedInput.input.setText(str(self.state.animationSpeed.value))
+            return
+
+        newAnimationSpeed = min(
+            self.MAX_ANIMATION_SPEED, max(self.MIN_ANIMATION_SPEED, newAnimationSpeed)
+        )
+
+        self.state.animationSpeed.setValue(newAnimationSpeed)
+
+    def updateLoopDelay(self, valueStr: str) -> None:
+        try:
+            newLoopDelay = float(valueStr)
+        except ValueError:
+            self.loopDelayInput.input.setText(str(self.state.loopDelay.value))
+
+        newLoopDelay = min(self.MAX_LOOP_DELAY, round(newLoopDelay, 2))
+
+        self.state.loopDelay.setValue(newLoopDelay)
 
     def addKeybindingInput(
         self,

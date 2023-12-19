@@ -65,6 +65,9 @@ class AppState:
         self.time = self.createField("time", "11:24")
         self.frames = self.createField("frames", 5)
 
+        self.animationSpeed = self.createField("animationSpeed", 4)
+        self.loopDelay = self.createField("loopDelay", 1.0)
+
         self.hideKeybinding = self.createField("hideKeybinding", "h")
         self.playKeybinding = self.createField("playKeybinding", "space")
         self.nextKeybinding = self.createField("nextKeybinding", ".")
