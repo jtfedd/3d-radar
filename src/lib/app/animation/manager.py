@@ -28,6 +28,9 @@ class AnimationManager(Listener):
             lambda _: state.animationPlaying.setValue(not state.animationPlaying.value),
         )
 
+        self.listen(events.input.nextFrame, lambda _: self.handleNext(False))
+        self.listen(events.input.prevFrame, lambda _: self.handlePrev())
+
         self.listen(events.animation.next, lambda _: self.handleNext(False))
         self.listen(events.animation.previous, lambda _: self.handlePrev())
         self.listen(events.animation.slider, self.handleSlider)
@@ -35,12 +38,22 @@ class AnimationManager(Listener):
             events.requestData, lambda _: state.animationPlaying.setValue(False)
         )
 
+        self.loopDelay = state.loopDelay.value
+        self.frameDelay = 1 / state.animationSpeed.value
+
+        self.listen(state.loopDelay, self.updateLoopDelay)
+        self.listen(state.animationSpeed, self.updateFrameDelay)
+
         self.taskTime = 0.0
         self.animationTimer = 0.0
-        self.loopDelay = 1
-        self.frameDelay = 0.1
         self.updateTask = ctx.base.taskMgr.add(self.update, "animation-update")
         self.listen(state.animationPlaying, lambda _: self.resetAnimationTimer())
+
+    def updateLoopDelay(self, value: float) -> None:
+        self.loopDelay = value
+
+    def updateFrameDelay(self, value: int) -> None:
+        self.frameDelay = 1 / value
 
     def resetAnimationTimer(self) -> None:
         self.animationTimer = 0
