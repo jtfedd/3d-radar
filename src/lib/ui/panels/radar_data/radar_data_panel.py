@@ -6,14 +6,18 @@ from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.spacer import SpacerComponent
+from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
+from lib.util.events.listener import Listener
 
 
 class RadarDataPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
+
+        self.listener = Listener()
 
         self.ctx = ctx
         self.events = events
@@ -32,6 +36,16 @@ class RadarDataPanel(PanelContent):
                 validationText="Unknown radar station",
             )
         )
+
+        self.radarName = self.addComponent(
+            PanelText(
+                root=self.root,
+                ctx=ctx,
+                text="",
+            )
+        )
+        self.updateRadarName(state.station.value)
+        self.listener.listen(self.radarInput.input.onChange, self.updateRadarName)
 
         self.addComponent(TitleComponent(self.root, ctx, "Date and Time"))
 
@@ -120,6 +134,18 @@ class RadarDataPanel(PanelContent):
             ]
         )
 
+    def updateRadarName(self, radar: str) -> None:
+        radarStation = self.ctx.appContext.services.nws.getStation(radar)
+
+        if not radarStation:
+            self.radarName.setHidden(True)
+            self.radarInput.setValid(False)
+            return
+
+        self.radarName.setHidden(False)
+        self.radarInput.setValid(True)
+        self.radarName.text.updateText(radarStation.name)
+
     def resetValidation(self) -> None:
         self.radarInput.setValid(True)
         self.yearInput.setValid(True)
@@ -173,7 +199,9 @@ class RadarDataPanel(PanelContent):
                 self.dayInput.setValid(False)
 
         radar = self.radarInput.input.entry.get()
-        # Validate radar station
+        if radar not in self.ctx.appContext.services.nws.radarStations:
+            valid = False
+            self.radarInput.setValid(False)
 
         try:
             frames = int(self.framesInput.input.entry.get())
@@ -226,3 +254,8 @@ class RadarDataPanel(PanelContent):
 
     def headerText(self) -> str:
         return "Radar Data"
+
+    def destroy(self) -> None:
+        super().destroy()
+
+        self.listener.destroy()

@@ -17,6 +17,7 @@ class UIConstants:
     panelInputHeight = 0.06
     panelValidationHeight = 0.04
     panelTitleHeight = 0.08
+    panelTextHeight = 0.04
 
     inputPaddingVertical = 0.3
     inputPaddingHorizontal = 0.1

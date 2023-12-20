@@ -19,9 +19,12 @@ class NWSService:
         return self.radarStations[code]
 
     def preloadStations(self) -> Dict[str, RadarStation]:
+        print("Loading stations from NWS")
         stations = self.network.nws.getRadarStations()
         if stations:
             return stations
+
+        print("Loading stations from cache")
 
         # TODO fall back to cached stations if it couldn't be loaded
 
