@@ -24,8 +24,4 @@ class NWSService:
         if stations:
             return stations
 
-        print("Loading stations from cache")
-
-        # TODO fall back to cached stations if it couldn't be loaded
-
         raise RuntimeError("Could not load stations")
