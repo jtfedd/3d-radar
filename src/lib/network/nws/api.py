@@ -29,10 +29,10 @@ class NWSApi:
 
         stations = {}
         for station in responseJson["features"]:
-            code = station["properties"]["id"]
+            stationID = station["properties"]["id"]
             name = station["properties"]["name"]
             long = station["geometry"]["coordinates"][0]
             lat = station["geometry"]["coordinates"][1]
-            stations[code] = RadarStation(code, name, lat, long)
+            stations[stationID] = RadarStation(stationID, name, lat, long)
 
         return stations

@@ -12,11 +12,11 @@ class NWSService:
 
         self.radarStations = self.preloadStations()
 
-    def getStation(self, code: str) -> RadarStation | None:
-        if code not in self.radarStations:
+    def getStation(self, stationID: str) -> RadarStation | None:
+        if stationID not in self.radarStations:
             return None
 
-        return self.radarStations[code]
+        return self.radarStations[stationID]
 
     def preloadStations(self) -> Dict[str, RadarStation]:
         print("Loading stations from NWS")

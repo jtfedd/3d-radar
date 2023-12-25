@@ -17,9 +17,9 @@ class App:
         self.ctx = AppContext(base, self.events, self.state)
         self.cameraControl = CameraControl(self.ctx, self.events)
 
-        self.states = MapLayer(base, "states", UIColors.PALETTE_3)
-        self.counties = MapLayer(base, "counties", UIColors.PALETTE_3)
-        self.roads = MapLayer(base, "roads", UIColors.PALETTE_1)
+        self.states = MapLayer(base, "states", UIColors.MAP_BOUNDARIES)
+        self.counties = MapLayer(base, "counties", UIColors.MAP_BOUNDARIES)
+        self.roads = MapLayer(base, "roads", UIColors.MAP_DETAILS)
 
 
 class MapLayer:
