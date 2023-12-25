@@ -5,6 +5,8 @@ class InputEvents:
     def __init__(self) -> None:
         self.onHide = EventDispatcher[None]()
         self.onPlay = EventDispatcher[None]()
+        self.nextFrame = EventDispatcher[None]()
+        self.prevFrame = EventDispatcher[None]()
         self.scroll = EventDispatcher[int]()
         self.zoom = EventDispatcher[int]()
         self.leftMouse = EventDispatcher[bool]()

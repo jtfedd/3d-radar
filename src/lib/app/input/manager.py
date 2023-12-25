@@ -24,6 +24,8 @@ class InputManager(DirectObject):
         self.listener = Listener()
         self.listener.listen(self.state.hideKeybinding, lambda _: self.createBindings())
         self.listener.listen(self.state.playKeybinding, lambda _: self.createBindings())
+        self.listener.listen(self.state.nextKeybinding, lambda _: self.createBindings())
+        self.listener.listen(self.state.prevKeybinding, lambda _: self.createBindings())
 
     def createBindings(self) -> None:
         self.ignoreAll()
@@ -34,6 +36,14 @@ class InputManager(DirectObject):
 
         self.accept(
             self.state.playKeybinding.value, lambda: self.send(self.events.onPlay)
+        )
+
+        self.accept(
+            self.state.nextKeybinding.value, lambda: self.send(self.events.nextFrame)
+        )
+
+        self.accept(
+            self.state.prevKeybinding.value, lambda: self.send(self.events.prevFrame)
         )
 
         self.accept("wheel_up-up", lambda: self.events.scroll.send(-1))
