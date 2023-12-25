@@ -22,5 +22,5 @@ reports/*
 # Requirements lock file
 requirements-lock.txt
 
-# Raw map files
+# Map json files
 src/assets/maps/*.json
