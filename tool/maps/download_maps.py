@@ -1,3 +1,5 @@
+from typing import List
+
 import requests
 import shapefile
 import shapely
@@ -20,26 +22,10 @@ STATE_20M = "GENZ2022/shp/cb_2022_us_state_20m.zip"
 ROADS = "TIGER2023/PRISECROADS/tl_2023_{0:02d}_prisecroads.zip"
 
 
-def loadStates() -> shapely.geometry.base.BaseGeometry:
-    filename = HOST + STATE_500K
-    print("Downloading", filename)
-    shape = shapely.geometry.shape(shapefile.Reader(filename).shapes())
-    return shape
+def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
+    shapes = []
 
-
-def loadCounties() -> shapely.geometry.base.BaseGeometry:
-    filename = HOST + COUNTY_500K
-    print("Downloading", filename)
-    shape = shapely.geometry.shape(shapefile.Reader(filename).shapes())
-    return shape
-
-
-def loadRoads() -> shapely.geometry.base.BaseGeometry:
-    filenameFmt = HOST + ROADS
-    fileCount = 80
-    roads = []
-    for i in range(fileCount):
-        filename = filenameFmt.format(i)
+    for filename in files:
         print("Downloading", filename)
         r = requests.head(filename, allow_redirects=True, timeout=10)
         if r.status_code == 404:
@@ -47,6 +33,19 @@ def loadRoads() -> shapely.geometry.base.BaseGeometry:
             continue
 
         shape = shapely.geometry.shape(shapefile.Reader(filename).shapes())
-        roads.append(shape)
+        shapes.append(shape)
 
-    return shapely.geometry.GeometryCollection(roads)
+    return shapely.geometry.GeometryCollection(shapes)
+
+
+def loadStates() -> shapely.geometry.base.BaseGeometry:
+    return downloadAndMerge([HOST + STATE_500K])
+
+
+def loadCounties() -> shapely.geometry.base.BaseGeometry:
+    return downloadAndMerge([HOST + COUNTY_500K])
+
+
+def loadRoads() -> shapely.geometry.base.BaseGeometry:
+    filenameFmt = HOST + ROADS
+    return downloadAndMerge([filenameFmt.format(i) for i in range(80)])
