@@ -9,10 +9,8 @@ from lib.model.convert.scan_from_metpy import scanFromLevel2Data
 from lib.model.record import Record
 from lib.model.scan import Scan
 
-from .data_provider import DataProvider
 
-
-class S3DataProvider(DataProvider):
+class RadarProvider:
     RADAR_BUCKET = "noaa-nexrad-level2"
 
     def __init__(self) -> None:

@@ -3,11 +3,9 @@ import datetime
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import AmbientLight, DirectionalLight
 
-from lib.app.files.manager import FileManager
 from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.network.network import Network
-from lib.network.radar.s3_data_provider import S3DataProvider
 
 
 def getData() -> Scan:
@@ -24,11 +22,9 @@ def getData() -> Scan:
 
     record = Record(site, time)
 
-    provider = S3DataProvider()
-    fileManager = FileManager()
-    connector = Network(provider, fileManager)
+    connector = Network()
 
-    return connector.load(record)
+    return connector.radar.load(record)
 
 
 def defaultLight(base: ShowBase) -> None:
