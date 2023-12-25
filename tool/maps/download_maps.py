@@ -25,7 +25,8 @@ ROADS = "TIGER2023/PRISECROADS/tl_2023_{0:02d}_prisecroads.zip"
 def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
     shapes = []
 
-    for filename in files:
+    for f in files:
+        filename = HOST + f
         print("Downloading", filename)
         r = requests.head(filename, allow_redirects=True, timeout=10)
         if r.status_code == 404:
@@ -39,13 +40,12 @@ def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
 
 
 def loadStates() -> shapely.geometry.base.BaseGeometry:
-    return downloadAndMerge([HOST + STATE_500K])
+    return downloadAndMerge([STATE_500K])
 
 
 def loadCounties() -> shapely.geometry.base.BaseGeometry:
-    return downloadAndMerge([HOST + COUNTY_500K])
+    return downloadAndMerge([COUNTY_500K])
 
 
 def loadRoads() -> shapely.geometry.base.BaseGeometry:
-    filenameFmt = HOST + ROADS
-    return downloadAndMerge([filenameFmt.format(i) for i in range(80)])
+    return downloadAndMerge([ROADS.format(i) for i in range(80)])
