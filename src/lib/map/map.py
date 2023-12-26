@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from panda3d.core import NodePath, PandaNode, Plane, PlaneNode, Vec4
+from panda3d.core import GeomNode, LineSegs, NodePath, PandaNode, Plane, PlaneNode, Vec4
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
@@ -29,13 +29,19 @@ class Map(Listener):
         self.longRoot = self.latRoot.attachNewNode("map-long")
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
 
-        clipPlaneOffset = -(EARTH_RADIUS * (1 - math.cos(RADAR_RANGE / EARTH_RADIUS)))
+        self.clipPlane = ctx.base.render.attachNewNode(
+            PlaneNode("clip-plane", Plane((0, 0, 0), (1, 0, 0), (0, 1, 0)))
+        )
 
-        clipPlane = Plane((0, 0, 0), (1, 0, 0), (0, 1, 0))
-        clipPlaneNode = PlaneNode("clip-plane", clipPlane)
-        clipPlaneNP = ctx.base.render.attachNewNode(clipPlaneNode)
-        clipPlaneNP.setZ(clipPlaneOffset)
-        self.mapRoot.setClipPlane(clipPlaneNP)
+        self.mapRoot.setClipPlane(self.clipPlane)
+
+        self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
+        self.boundary.setLightOff()
+
+        clipPlaneOffset = -(EARTH_RADIUS * (1 - math.cos(RADAR_RANGE / EARTH_RADIUS)))
+        self.clipPlane.setZ(clipPlaneOffset)
+        self.boundary.setZ(clipPlaneOffset)
+        self.boundary.setScale(EARTH_RADIUS * math.sin(RADAR_RANGE / EARTH_RADIUS))
 
         self.states = self.loadMapLayer("states", UIColors.MAP_BOUNDARIES)
         self.counties = self.loadMapLayer("counties", UIColors.MAP_BOUNDARIES)
@@ -60,3 +66,26 @@ class Map(Listener):
 
         self.latRoot.setP(-radarStation.lat)
         self.longRoot.setH(-radarStation.long)
+
+    def drawCircle(self) -> GeomNode:
+        lineSegs = LineSegs()
+        lineSegs.setThickness(1)
+        lineSegs.setColor(UIColors.MAP_BOUNDARIES)
+        lineSegs.moveTo(1, 0, 0)
+
+        steps = 720
+        stepSize = 360 / steps
+        for i in range(steps + 1):
+            lineSegs.drawTo(
+                math.cos(math.radians(i * stepSize)),
+                math.sin(math.radians(i * stepSize)),
+                0,
+            )
+
+        return lineSegs.create()
+
+    def destroy(self) -> None:
+        super().destroy()
+
+        self.root.removeNode()
+        self.clipPlane.removeNode()
