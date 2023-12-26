@@ -11,7 +11,7 @@ from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 EARTH_RADIUS = 6378.1
-RADAR_RANGE = 400
+RADAR_RANGE = 460
 
 
 class Map(Listener):
