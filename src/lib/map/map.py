@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from panda3d.core import NodePath, PandaNode, Vec4
+import math
+
+from panda3d.core import NodePath, PandaNode, Plane, PlaneNode, Vec4
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
@@ -9,6 +11,7 @@ from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 EARTH_RADIUS = 6378.1
+RADAR_RANGE = 400
 
 
 class Map(Listener):
@@ -25,6 +28,14 @@ class Map(Listener):
         self.latRoot = self.root.attachNewNode("map-lat")
         self.longRoot = self.latRoot.attachNewNode("map-long")
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
+
+        clipPlaneOffset = -(EARTH_RADIUS * (1 - math.cos(RADAR_RANGE / EARTH_RADIUS)))
+
+        clipPlane = Plane((0, 0, 0), (1, 0, 0), (0, 1, 0))
+        clipPlaneNode = PlaneNode("clip-plane", clipPlane)
+        clipPlaneNP = ctx.base.render.attachNewNode(clipPlaneNode)
+        clipPlaneNP.setZ(clipPlaneOffset)
+        self.mapRoot.setClipPlane(clipPlaneNP)
 
         self.states = self.loadMapLayer("states", UIColors.MAP_BOUNDARIES)
         self.counties = self.loadMapLayer("counties", UIColors.MAP_BOUNDARIES)
@@ -46,9 +57,6 @@ class Map(Listener):
         radarStation = self.ctx.services.nws.getStation(stationID)
         if not radarStation:
             return
-
-        print(radarStation.lat)
-        print(radarStation.long)
 
         self.latRoot.setP(-radarStation.lat)
         self.longRoot.setH(-radarStation.long)
