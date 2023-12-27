@@ -5,6 +5,7 @@ import datetime
 from direct.showbase.ShowBase import ShowBase
 
 from lib.camera.camera_control import CameraControl
+from lib.map.map import Map
 from lib.model.record import Record
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
@@ -32,6 +33,8 @@ class App:
         self.cameraControl = CameraControl(self.ctx, self.events)
         self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
         self.animationManager = AnimationManager(self.ctx, self.state, self.events)
+
+        self.map = Map(self.ctx, self.state)
 
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())

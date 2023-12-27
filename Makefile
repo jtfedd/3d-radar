@@ -88,3 +88,7 @@ coverage-html: ## Generate html coverage report from a previous test coverage ru
 .PHONY: coverage-lcov
 coverage-lcov: ## Generage lcov report from a previous test coverage run
 	cd reports && python -m coverage lcov
+
+.PHONY: maps
+maps: ## Download and generate maps
+	python tool/maps/make_maps.py
