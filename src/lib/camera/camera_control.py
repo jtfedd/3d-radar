@@ -89,6 +89,7 @@ class CameraControl(Listener):
     def update(self, task: Task.Task) -> int:
         self.handleMouseUpdate()
         self.updatePositions()
+        self.updateNearFar()
 
         return task.cont
 
@@ -147,3 +148,33 @@ class CameraControl(Listener):
     def handleZoom(self, direction: int) -> None:
         self.zoom = self.zoom * pow(self.zoomFactor, direction)
         self.zoom = min(self.MAX_ZOOM, max(self.MIN_ZOOM, self.zoom))
+
+    def updateNearFar(self) -> None:
+        # Clips the near and far planes of the camera to reduce z-fighting between
+        # the map and the volume
+
+        # Get a unit vector in the direction the camera is pointing
+        cameraForward = self.base.render.getRelativeVector(
+            self.base.camera, Vec3(0, 1, 0)
+        )
+
+        # Get the near and far points of the scene along the vector the camera is facing
+        # Transform back to be relative to the camera
+        sceneNear = self.base.camera.getRelativePoint(
+            self.base.render, -cameraForward * RADAR_RANGE
+        )
+        sceneFar = self.base.camera.getRelativePoint(
+            self.base.render, cameraForward * RADAR_RANGE
+        )
+
+        # To set the near and far plane to the correct distance we just need to extract
+        # the y-coordinate from the camera-relative points
+        near = sceneNear.y
+        far = sceneFar.y
+
+        # Ensure we don't end up with invalid values
+        near = max(1, near)
+        far = max(far, near + 1)
+
+        # Apply the values to the lens
+        self.base.cam.node().getLens().setNearFar(near, far)
