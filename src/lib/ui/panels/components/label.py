@@ -9,12 +9,18 @@ from lib.ui.core.constants import UIConstants
 
 
 class ComponentLabel:
-    def __init__(self, root: NodePath[PandaNode], ctx: UIContext, text: str):
+    def __init__(
+        self,
+        root: NodePath[PandaNode],
+        ctx: UIContext,
+        text: str,
+        left: float = 0,
+    ):
         self.label = Text(
             root=root,
             font=ctx.fonts.bold,
             text=text,
-            x=UIConstants.panelPadding,
+            x=UIConstants.panelPadding + left,
             y=-UIConstants.panelInputHeight / 2,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.CENTER,
