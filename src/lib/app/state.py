@@ -65,6 +65,10 @@ class AppState:
         self.time = self.createField("time", "11:24")
         self.frames = self.createField("frames", 5)
 
+        self.mapStates = self.createField("mapStates", True)
+        self.mapCounties = self.createField("mapCounties", True)
+        self.mapRoads = self.createField("mapRoads", True)
+
         self.animationSpeed = self.createField("animationSpeed", 4)
         self.loopDelay = self.createField("loopDelay", 1.0)
 

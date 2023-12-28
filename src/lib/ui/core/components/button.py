@@ -114,6 +114,7 @@ class Button(Component):
         text: str | None = None,
         textSize: float = UIConstants.fontSizeRegular,
         icon: str | None = None,
+        toggleIcon: str | None = None,
         iconWidth: float = 0.0,
         iconHeight: float = 0.0,
         skin: ButtonSkin = ButtonSkin.DARK,
@@ -168,6 +169,10 @@ class Button(Component):
         elif text:
             self.content = self.textContentFactory(text)
 
+        self.toggleIcon: Image | None = None
+        if toggleIcon:
+            self.toggleIcon = self.imageContentFactory(toggleIcon)
+
         self.button = DirectButton(
             parent=root,
             command=self.handleClick,
@@ -196,9 +201,16 @@ class Button(Component):
 
         # Toggled state should override ready and hover
         if self.toggleState:
+            if self.toggleIcon:
+                self.toggleIcon.show()
+                self.toggleIcon.updateColor(
+                    self.toggleSkin.getContentColor(buttonState)
+                )
             self.background.updateColor(self.toggleSkin.getBackgroundColor(buttonState))
             self.content.updateColor(self.toggleSkin.getContentColor(buttonState))
         else:
+            if self.toggleIcon:
+                self.toggleIcon.hide()
             self.background.updateColor(self.skin.getBackgroundColor(buttonState))
             self.content.updateColor(self.skin.getContentColor(buttonState))
 

@@ -9,3 +9,6 @@ class Icons:
     PLAY = "assets/play.png"
     PAUSE = "assets/pause.png"
     ARROWS = "assets/arrows.png"
+
+    CHECKBOX = "assets/checkbox.png"
+    CHECKMARK = "assets/checkmark.png"

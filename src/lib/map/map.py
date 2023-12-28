@@ -19,6 +19,7 @@ class Map(Listener):
         super().__init__()
 
         self.ctx = ctx
+        self.state = state
 
         self.root = ctx.base.render.attachNewNode("map-root")
         self.root.setZ(-EARTH_RADIUS)
@@ -49,6 +50,23 @@ class Map(Listener):
 
         self.updatePosition(state.station.value)
         self.listen(state.station, self.updatePosition)
+
+        self.updateLayers()
+        self.listen(state.mapStates, lambda _: self.updateLayers())
+        self.listen(state.mapCounties, lambda _: self.updateLayers())
+        self.listen(state.mapRoads, lambda _: self.updateLayers())
+
+    def updateLayers(self) -> None:
+        self.states.hide()
+        self.counties.hide()
+        self.roads.hide()
+
+        if self.state.mapStates.value:
+            self.states.show()
+        if self.state.mapCounties.value:
+            self.counties.show()
+        if self.state.mapRoads.value:
+            self.roads.show()
 
     def loadMapLayer(self, name: str, color: Vec4) -> NodePath[PandaNode]:
         node = unwrap(self.ctx.base.loader.loadModel("assets/maps/" + name + ".bam"))

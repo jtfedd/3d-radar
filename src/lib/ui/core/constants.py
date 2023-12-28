@@ -28,6 +28,9 @@ class UIConstants:
     sliderHandleWidth = 0.005
     sliderHandleHeight = 0.02
 
+    checkboxSize = 0.04
+    checkboxPadding = 0.015
+
     scrollbarWidth = 0.01
     scrollbarPadding = panelPadding / 2
 
