@@ -7,7 +7,7 @@ from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
-from lib.ui.panels.panel_events import PanelEvents
+from lib.ui.panels.events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
 from lib.util.events.listener import Listener
 
