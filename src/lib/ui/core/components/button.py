@@ -139,7 +139,6 @@ class Button(Component):
             layer=UILayer(layer.value - 2),
         )
 
-        self.content: Text | Image
         self.imageContentFactory: Callable[[str], Image] = lambda i: Image(
             root=root,
             image=i,
@@ -164,6 +163,7 @@ class Button(Component):
             layer=UILayer(layer.value - 1),
         )
 
+        self.content: Text | Image | None = None
         if icon:
             self.content = self.imageContentFactory(icon)
         elif text:
@@ -207,17 +207,22 @@ class Button(Component):
                     self.toggleSkin.getContentColor(buttonState)
                 )
             self.background.updateColor(self.toggleSkin.getBackgroundColor(buttonState))
-            self.content.updateColor(self.toggleSkin.getContentColor(buttonState))
+
+            if self.content:
+                self.content.updateColor(self.toggleSkin.getContentColor(buttonState))
         else:
             if self.toggleIcon:
                 self.toggleIcon.hide()
             self.background.updateColor(self.skin.getBackgroundColor(buttonState))
-            self.content.updateColor(self.skin.getContentColor(buttonState))
+
+            if self.content:
+                self.content.updateColor(self.skin.getContentColor(buttonState))
 
         return Task.cont
 
     def setIcon(self, icon: str) -> None:
-        self.content.destroy()
+        if self.content:
+            self.content.destroy()
         self.content = self.imageContentFactory(icon)
 
     def handleClick(self) -> None:
@@ -230,5 +235,9 @@ class Button(Component):
         self.updateTask.cancel()
         self.button.destroy()
         self.background.destroy()
-        self.content.destroy()
         self.onClick.close()
+
+        if self.content:
+            self.content.destroy()
+        if self.toggleIcon:
+            self.toggleIcon.destroy()

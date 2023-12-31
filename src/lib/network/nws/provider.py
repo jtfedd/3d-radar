@@ -5,7 +5,7 @@ import requests
 from lib.model.radar_station import RadarStation
 
 
-class NWSApi:
+class NWSProvider:
     HOST = "https://api.weather.gov"
 
     def getRadarStations(self) -> Dict[str, RadarStation] | None:

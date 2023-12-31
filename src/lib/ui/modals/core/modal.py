@@ -12,6 +12,8 @@ class Modal(Focusable):
         super().__init__(ctx.appContext.focusManager, events.input)
         self.onFocus(True)
 
+        self.contentWidth = width - UIConstants.modalPadding * 2
+
         self.shadow = BackgroundCard(
             ctx.anchors.center,
             width=UIConstants.infinity,
@@ -28,6 +30,10 @@ class Modal(Focusable):
             layer=UILayer.MODAL_BACKGROUND,
         )
 
+        self.root = ctx.anchors.center.attachNewNode("modal-root")
+        self.root.setX(-width / 2 + UIConstants.modalPadding)
+        self.root.setZ(height / 2 - UIConstants.modalPadding)
+
     def focus(self) -> None:
         pass
 
@@ -39,3 +45,4 @@ class Modal(Focusable):
 
         self.shadow.destroy()
         self.background.destroy()
+        self.root.removeNode()
