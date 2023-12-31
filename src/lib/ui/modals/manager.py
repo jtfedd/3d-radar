@@ -22,7 +22,7 @@ class ModalManager(Listener):
         )
 
     def closeModal(self) -> None:
-        if self.currentModal:
+        if self.currentModal and not self.currentModal.closed:
             self.currentModal.destroy()
 
     def handleStationSearch(self) -> None:

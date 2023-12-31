@@ -39,5 +39,5 @@ class EventDispatcher(Generic[T]):
         if self.closed:
             raise StateError("EventDispatcher cannot send events when closed")
 
-        for subscription in self.subscriptions.values():
+        for subscription in list(self.subscriptions.values()):
             subscription.send(payload)

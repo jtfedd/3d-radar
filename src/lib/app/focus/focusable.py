@@ -60,4 +60,8 @@ class Focusable(ABC):
         self.focusManager.focus(self.focusID, focused)
 
     def destroy(self) -> None:
-        self.onFocus(False)
+        if self.tabForwardSub:
+            self.tabForwardSub.cancel()
+        if self.tabBackwardSub:
+            self.tabBackwardSub.cancel()
+        self.focusManager.focus(self.focusID, False)

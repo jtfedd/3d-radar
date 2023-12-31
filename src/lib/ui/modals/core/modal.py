@@ -8,11 +8,19 @@ from lib.ui.core.layers import UILayer
 
 
 class Modal(Focusable):
-    def __init__(self, ctx: UIContext, events: AppEvents, width: float, height: float):
+    def __init__(
+        self,
+        ctx: UIContext,
+        events: AppEvents,
+        contentWidth: float,
+        contentHeight: float,
+    ):
         super().__init__(ctx.appContext.focusManager, events.input)
         self.onFocus(True)
+        self.closed = False
 
-        self.contentWidth = width - UIConstants.modalPadding * 2
+        self.contentWidth = contentWidth
+        self.contentHeight = contentHeight
 
         self.shadow = BackgroundCard(
             ctx.anchors.center,
@@ -24,15 +32,19 @@ class Modal(Focusable):
 
         self.background = BackgroundCard(
             ctx.anchors.center,
-            width=width,
-            height=height,
+            width=contentWidth + 2 * UIConstants.modalPadding,
+            height=contentHeight + 2 * UIConstants.modalPadding,
             color=UIColors.BACKGROUND,
             layer=UILayer.MODAL_BACKGROUND,
         )
 
-        self.root = ctx.anchors.center.attachNewNode("modal-root")
-        self.root.setX(-width / 2 + UIConstants.modalPadding)
-        self.root.setZ(height / 2 - UIConstants.modalPadding)
+        self.topLeft = ctx.anchors.center.attachNewNode("modal-top-left")
+        self.topLeft.setX(-contentWidth / 2)
+        self.topLeft.setZ(contentHeight / 2)
+
+        self.bottomLeft = ctx.anchors.center.attachNewNode("modal-bottom-left")
+        self.bottomLeft.setX(-contentWidth / 2)
+        self.bottomLeft.setZ(-contentHeight / 2)
 
     def focus(self) -> None:
         pass
@@ -41,8 +53,11 @@ class Modal(Focusable):
         pass
 
     def destroy(self) -> None:
+        self.closed = True
+
         super().destroy()
 
         self.shadow.destroy()
         self.background.destroy()
-        self.root.removeNode()
+        self.topLeft.removeNode()
+        self.bottomLeft.removeNode()

@@ -2,6 +2,7 @@ from lib.app.events import AppEvents
 from lib.map.constants import RADAR_RANGE
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
+from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
@@ -16,7 +17,7 @@ from .radar_button import RadarButton
 
 class StationSearchModal(Modal):
     def __init__(self, ctx: UIContext, events: AppEvents):
-        super().__init__(ctx, events, 0.8, 0.5)
+        super().__init__(ctx, events, 0.7, 0.4)
 
         self.listener = Listener()
         self.appEvents = events
@@ -25,14 +26,14 @@ class StationSearchModal(Modal):
 
         self.title = ModalTitle(
             ctx,
-            self.root,
+            self.topLeft,
             "Find Radar Station",
             modalContentWidth=self.contentWidth,
         )
 
         self.detailText = ModalText(
             ctx,
-            self.root,
+            self.topLeft,
             self.title.height(),
             "Search for an address or location to locate\nnearby radar stations.",
         )
@@ -40,7 +41,7 @@ class StationSearchModal(Modal):
         self.searchbar = TextInput(
             ctx,
             events,
-            self.root,
+            self.topLeft,
             font=ctx.fonts.regular,
             size=UIConstants.fontSizeRegular,
             width=self.contentWidth,
@@ -55,6 +56,22 @@ class StationSearchModal(Modal):
         )
 
         self.searchbar.onCommit.listen(self.search)
+
+        self.cancelButton = Button(
+            root=self.bottomLeft,
+            ctx=ctx,
+            width=0.2,
+            height=0.05,
+            x=self.contentWidth / 2,
+            hAlign=HAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
+            layer=UILayer.MODAL_CONTENT_INTERACTION,
+            textSize=UIConstants.fontSizeRegular,
+            skin=ButtonSkin.ACCENT,
+            text="Cancel",
+        )
+
+        self.listener.listen(self.cancelButton.onClick, lambda _: self.destroy())
 
     def search(self, address: str) -> None:
         print("Searching", address)
@@ -76,7 +93,7 @@ class StationSearchModal(Modal):
         stationsInRange.sort(key=lambda s: distances[s.stationID])
 
         scroll = ScrollablePanel(
-            root=self.root,
+            root=self.topLeft,
             ctx=self.ctx,
             events=self.appEvents,
             y=-0.3,
@@ -105,3 +122,4 @@ class StationSearchModal(Modal):
 
         self.title.destroy()
         self.searchbar.destroy()
+        self.cancelButton.destroy()
