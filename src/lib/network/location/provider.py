@@ -14,11 +14,11 @@ class LocationProvider:
                 self.HOST + "/search",
                 params={
                     "q": address,
-                    "format": "jsonv2",
+                    "format": "geocodejson",
                     "addressdetails": 1,
                     "countrycodes": "us",
                     "limit": limit,
-                },
+                },  # type: ignore
                 timeout=10,
             )
             response.raise_for_status()
@@ -34,12 +34,35 @@ class LocationProvider:
         responseJson = response.json()
 
         locations = []
-        for location in responseJson:
+        for location in responseJson["features"]:
+            details = location["properties"]["geocoding"]
+
+            addressParts = []
+            areaParts = []
+
+            if "name" in details:
+                addressParts.append(details["name"])
+            if "housenumber" in details and "street" in details:
+                addressParts.append(f"{details['housenumber']} {details['street']}")
+            elif "street" in details:
+                addressParts.append(details["street"])
+            if "city" in details:
+                areaParts.append(details["city"])
+            if "state" in details:
+                areaParts.append(details["state"])
+
+            addr = ", ".join(addressParts)
+            area = ", ".join(areaParts)
+
+            if "postcode" in details:
+                area = " ".join([area, details["postcode"]])
+
             locations.append(
                 Location(
-                    location["display_name"],
-                    float(location["lat"]),
-                    float(location["lon"]),
+                    addr,
+                    area,
+                    float(location["geometry"]["coordinates"][1]),
+                    float(location["geometry"]["coordinates"][0]),
                 )
             )
 
