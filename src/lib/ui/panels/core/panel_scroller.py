@@ -31,6 +31,7 @@ class PanelScroller:
             width=UIConstants.panelWidth,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
+            scrollbarPadding=UIConstants.panelScrollbarPadding,
         )
 
         self.updateFrame()

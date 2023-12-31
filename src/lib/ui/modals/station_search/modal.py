@@ -2,6 +2,7 @@ from lib.app.events import AppEvents
 from lib.map.constants import RADAR_RANGE
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
+from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
@@ -18,6 +19,7 @@ class StationSearchModal(Modal):
         super().__init__(ctx, events, 0.8, 0.5)
 
         self.listener = Listener()
+        self.appEvents = events
 
         self.ctx = ctx
 
@@ -73,11 +75,25 @@ class StationSearchModal(Modal):
 
         stationsInRange.sort(key=lambda s: distances[s.stationID])
 
+        scroll = ScrollablePanel(
+            root=self.root,
+            ctx=self.ctx,
+            events=self.appEvents,
+            y=-0.3,
+            width=self.contentWidth + UIConstants.modalPadding,
+            height=0.2,
+            canvasHeight=(0.05 * len(stationsInRange)),
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.TOP,
+            layer=UILayer.MODAL_CONTENT_INTERACTION,
+            scrollbarPadding=UIConstants.modalScrollbarPadding,
+        )
+
         for i, radarStation in enumerate(stationsInRange):
             RadarButton(
                 self.ctx,
-                self.root,
-                0.2 + 0.05 * i,
+                scroll.getCanvas(),
+                0.05 * i,
                 self.contentWidth,
                 radarStation,
                 distances[radarStation.stationID],

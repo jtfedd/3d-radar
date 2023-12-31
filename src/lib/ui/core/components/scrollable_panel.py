@@ -31,11 +31,13 @@ class ScrollablePanel:
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.CONTENT_INTERACTION,
+        scrollbarPadding: float = 0,
     ) -> None:
         self.ctx = ctx
         self.events = events
 
         self.width = width
+        self.scrollbarPadding = scrollbarPadding
 
         xPos = self.correctXForAlignment(x, width, hAlign)
         yPos = self.correctYForAlignment(y, height, vAlign)
@@ -140,10 +142,10 @@ class ScrollablePanel:
 
         self.frame.verticalScroll.show()
         self.frame.verticalScroll.setPos(
-            self.width - UIConstants.scrollbarPadding, 0, -frameHeight / 2
+            self.width - self.scrollbarPadding, 0, -frameHeight / 2
         )
         self.frame.verticalScroll.setScale(
-            1, 1, (frameHeight / 2) - UIConstants.scrollbarPadding
+            1, 1, (frameHeight / 2) - self.scrollbarPadding
         )
 
         scrollSteps = (canvasHeight - frameHeight) * UIConstants.scrollSensitivity

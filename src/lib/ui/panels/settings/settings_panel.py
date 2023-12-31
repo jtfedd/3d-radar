@@ -79,7 +79,8 @@ class SettingsPanel(PanelContent):
 
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
-        hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
+        for i in range(100):
+            hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
         playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
         prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
         nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
