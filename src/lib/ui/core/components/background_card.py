@@ -25,8 +25,14 @@ class BackgroundCard(Component):
         vAlign: VAlign = VAlign.CENTER,
         layer: UILayer = UILayer.BACKGROUND,
     ) -> None:
-        x = correctXForAlignment(x, width, hAlign)
-        y = correctYForAlignment(y, height, vAlign)
+        self.x = x
+        self.y = y
+
+        self.hAlign = hAlign
+        self.vAlign = vAlign
+
+        xPos = correctXForAlignment(x, width, hAlign)
+        yPos = correctYForAlignment(y, height, vAlign)
 
         self.card = DirectFrame(
             parent=root,
@@ -37,7 +43,7 @@ class BackgroundCard(Component):
                 height / 2,
             ),
             frameColor=color,
-            pos=(x, 1, y),
+            pos=(xPos, 1, yPos),
         )
 
         self.card.setTransparency(TransparencyAttrib.MAlpha)
@@ -46,6 +52,18 @@ class BackgroundCard(Component):
 
     def updateColor(self, color: Vec4) -> None:
         self.card["frameColor"] = color
+
+    def updateSize(self, width: float, height: float) -> None:
+        xPos = correctXForAlignment(self.x, width, self.hAlign)
+        yPos = correctYForAlignment(self.y, height, self.vAlign)
+        self.card.setPos(xPos, 1, yPos)
+
+        self.card["frameSize"] = (
+            -width / 2,
+            width / 2,
+            -height / 2,
+            height / 2,
+        )
 
     def hide(self) -> None:
         self.card.hide()

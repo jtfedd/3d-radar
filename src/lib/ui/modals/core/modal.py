@@ -46,6 +46,21 @@ class Modal(Focusable):
         self.bottomLeft.setX(-contentWidth / 2)
         self.bottomLeft.setZ(-contentHeight / 2)
 
+    def updateSize(self, contentWidth: float, contentHeight: float) -> None:
+        self.contentWidth = contentWidth
+        self.contentHeight = contentHeight
+
+        self.topLeft.setX(-contentWidth / 2)
+        self.topLeft.setZ(contentHeight / 2)
+
+        self.bottomLeft.setX(-contentWidth / 2)
+        self.bottomLeft.setZ(-contentHeight / 2)
+
+        self.background.updateSize(
+            width=contentWidth + 2 * UIConstants.modalPadding,
+            height=contentHeight + 2 * UIConstants.modalPadding,
+        )
+
     def focus(self) -> None:
         pass
 

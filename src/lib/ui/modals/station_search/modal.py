@@ -116,6 +116,8 @@ class StationSearchModal(Modal):
                 distances[radarStation.stationID],
             )
 
+        self.updateSize(self.contentWidth, 0.7)
+
     def destroy(self) -> None:
         super().destroy()
         self.listener.destroy()
