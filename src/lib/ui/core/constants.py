@@ -57,6 +57,12 @@ class UIConstants:
     modalTitleHeight = 0.08
     modalScrollbarPadding = modalPadding / 2
 
+    modalFooterButtonWidth = 0.2
+    modalFooterButtonHeight = 0.05
+
+    addressModalWidth = 0.7
+    addressModalSearchbarHeight = 0.05
+
     # Higher number means slower scrolling
     scrollSensitivity = 10
 

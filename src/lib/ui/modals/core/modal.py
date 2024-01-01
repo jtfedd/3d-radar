@@ -19,9 +19,6 @@ class Modal(Focusable):
         self.onFocus(True)
         self.closed = False
 
-        self.contentWidth = contentWidth
-        self.contentHeight = contentHeight
-
         self.shadow = BackgroundCard(
             ctx.anchors.center,
             width=UIConstants.infinity,
@@ -47,9 +44,6 @@ class Modal(Focusable):
         self.bottomLeft.setZ(-contentHeight / 2)
 
     def updateSize(self, contentWidth: float, contentHeight: float) -> None:
-        self.contentWidth = contentWidth
-        self.contentHeight = contentHeight
-
         self.topLeft.setX(-contentWidth / 2)
         self.topLeft.setZ(contentHeight / 2)
 
