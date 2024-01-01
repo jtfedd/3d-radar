@@ -25,6 +25,8 @@ class StationSearchModal(AddressSearchModal):
 
         self.appEvents = events
 
+        self.listener.listen(events.ui.modals.stationSelected, lambda _: self.destroy())
+
     def resultsLimit(self) -> int:
         return 1
 

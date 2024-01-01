@@ -37,6 +37,10 @@ class RadarDataPanel(PanelContent):
             )
         )
 
+        self.listener.listen(
+            events.ui.modals.stationSelected, self.radarInput.input.setText
+        )
+
         self.radarName = self.addComponent(
             PanelText(
                 root=self.root,

@@ -11,12 +11,13 @@ from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
+from lib.util.events.listener import Listener
 
 from ..address_search.results_component import AddressResultsComponent
 from .radar_button import RadarButton
 
 
-class RadarStationsResult(AddressResultsComponent):
+class RadarStationsResult(AddressResultsComponent, Listener):
     def __init__(
         self,
         ctx: UIContext,
@@ -26,6 +27,8 @@ class RadarStationsResult(AddressResultsComponent):
         radarStations: List[RadarStation],
         distances: Dict[str, float],
     ):
+        super().__init__()
+
         self.scroll = ScrollablePanel(
             root=root,
             ctx=ctx,
@@ -54,10 +57,15 @@ class RadarStationsResult(AddressResultsComponent):
                 )
             )
 
+        for button in self.buttons:
+            self.listen(button.onClick, events.ui.modals.stationSelected.send)
+
     def height(self) -> float:
         return 0.2 + UIConstants.modalPadding
 
     def destroy(self) -> None:
+        super().destroy()
+
         for button in self.buttons:
             button.destroy()
 

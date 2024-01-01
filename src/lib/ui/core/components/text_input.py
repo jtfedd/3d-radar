@@ -131,6 +131,7 @@ class TextInput(Focusable, Component):
 
     def setText(self, value: str) -> None:
         self.entry.enterText(value)
+        self.onChange.send(value)
 
     def destroy(self) -> None:
         super().destroy()

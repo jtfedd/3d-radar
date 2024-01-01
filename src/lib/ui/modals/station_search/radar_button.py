@@ -9,9 +9,11 @@ from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
+from lib.util.events.event_dispatcher import EventDispatcher
+from lib.util.events.listener import Listener
 
 
-class RadarButton:
+class RadarButton(Listener):
     def __init__(
         self,
         ctx: UIContext,
@@ -21,6 +23,8 @@ class RadarButton:
         radarStation: RadarStation,
         distance: float,
     ) -> None:
+        super().__init__()
+
         self.button = Button(
             root=root,
             ctx=ctx,
@@ -57,8 +61,17 @@ class RadarButton:
             layer=UILayer.MODAL_CONTENT,
         )
 
+        self.onClick = EventDispatcher[str]()
+        self.listen(
+            self.button.onClick, lambda _: self.onClick.send(radarStation.stationID)
+        )
+
     def destroy(self) -> None:
+        super().destroy()
+
         self.button.destroy()
 
         self.nameText.destroy()
         self.distText.destroy()
+
+        self.onClick.close()
