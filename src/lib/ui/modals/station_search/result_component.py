@@ -43,19 +43,22 @@ class RadarStationsResult(AddressResultsComponent):
         self.buttons: List[RadarButton] = []
 
         for i, radarStation in enumerate(radarStations):
-            RadarButton(
-                ctx,
-                self.scroll.getCanvas(),
-                0.05 * i,
-                UIConstants.addressModalWidth,
-                radarStation,
-                distances[radarStation.stationID],
+            self.buttons.append(
+                RadarButton(
+                    ctx,
+                    self.scroll.getCanvas(),
+                    0.05 * i,
+                    UIConstants.addressModalWidth,
+                    radarStation,
+                    distances[radarStation.stationID],
+                )
             )
 
     def height(self) -> float:
         return 0.2 + UIConstants.modalPadding
 
     def destroy(self) -> None:
-        self.scroll.destroy()
         for button in self.buttons:
             button.destroy()
+
+        self.scroll.destroy()
