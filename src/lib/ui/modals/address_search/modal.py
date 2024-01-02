@@ -93,8 +93,6 @@ class AddressSearchModal(Modal, ABC):
             self.resultsComponent.destroy()
             self.resultsComponent = None
 
-        print("Searching", address)
-
         results = self.ctx.appContext.services.locations.search(
             address=address,
             limit=self.resultsLimit(),

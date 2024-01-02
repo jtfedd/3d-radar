@@ -9,6 +9,8 @@ class LocationProvider:
     HOST = "https://nominatim.openstreetmap.org"
 
     def search(self, address: str, limit: int = 1) -> List[Location] | None:
+        print("Searching", address)
+
         response = makeRequest(
             self.HOST + "/search",
             params={

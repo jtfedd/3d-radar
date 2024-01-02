@@ -48,7 +48,7 @@ class RadarStationsResult(AddressResultsComponent, Listener):
         )
 
         self.scroll: ScrollablePanel | None = None
-        buttonTopOffset = self.contentHeight
+        buttonTopOffset = top + self.contentHeight
         buttonRoot: NodePath[PandaNode]
 
         if buttonListHeight > UIConstants.stationModalResultButtonsMaxHeight:
