@@ -265,11 +265,13 @@ class RadarDataPanel(PanelContent):
             return
 
         self.state.station.setValue(radar)
-        self.state.year.setValue(year)
-        self.state.month.setValue(month)
-        self.state.day.setValue(day)
-        self.state.time.setValue(time)
         self.state.frames.setValue(frames)
+
+        if not self.state.latest.value:
+            self.state.year.setValue(year)
+            self.state.month.setValue(month)
+            self.state.day.setValue(day)
+            self.state.time.setValue(time)
 
         self.events.requestData.send(None)
 

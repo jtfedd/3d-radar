@@ -43,26 +43,11 @@ class App:
 
     def loadData(self) -> None:
         radar = self.state.station.value
-        year = self.state.year.value
-        month = self.state.month.value
-        day = self.state.day.value
-        time = self.state.time.value
-
-        hour = int(time.split(":")[0])
-        minute = int(time.split(":")[1])
 
         records = self.ctx.services.radar.search(
             Record(
                 radar,
-                datetime.datetime(
-                    year=year,
-                    month=month,
-                    day=day,
-                    hour=hour,
-                    minute=minute,
-                    second=59,
-                    tzinfo=datetime.timezone.utc,
-                ),
+                self.getQueryTime(),
             ),
             self.state.frames.value,
         )
@@ -83,6 +68,28 @@ class App:
 
         self.ctx.radarCache.setData(scans)
         self.animationManager.setRecords(records)
+
+    def getQueryTime(self) -> datetime.datetime:
+        if self.state.latest.value:
+            return datetime.datetime.now(tz=datetime.UTC)
+
+        year = self.state.year.value
+        month = self.state.month.value
+        day = self.state.day.value
+        time = self.state.time.value
+
+        hour = int(time.split(":")[0])
+        minute = int(time.split(":")[1])
+
+        return datetime.datetime(
+            year=year,
+            month=month,
+            day=day,
+            hour=hour,
+            minute=minute,
+            second=59,
+            tzinfo=datetime.timezone.utc,
+        )
 
     def loadConfig(self) -> None:
         configPath = self.ctx.fileManager.getConfigFile()
