@@ -25,3 +25,5 @@ class AppContext:
     def destroy(self) -> None:
         self.inputManager.destroy()
         self.windowManager.destroy()
+
+        self.services.destroy()

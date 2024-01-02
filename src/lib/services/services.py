@@ -10,4 +10,7 @@ class Services:
     def __init__(self, fileManager: FileManager, network: Network):
         self.nws = NWSService(fileManager, network)
         self.radar = RadarService(fileManager, network)
-        self.locations = LocationService(network)
+        self.locations = LocationService(fileManager, network)
+
+    def destroy(self) -> None:
+        self.locations.destroy()
