@@ -19,6 +19,7 @@ class UIConstants:
     panelTitleHeight = 0.08
     panelTextHeight = 0.04
     panelScrollbarPadding = panelPadding / 2
+    panelButtonGroupHeight = 0.04
 
     inputPaddingVertical = 0.3
     inputPaddingHorizontal = 0.1

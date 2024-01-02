@@ -1,10 +1,13 @@
 import datetime
+from typing import List
 
 from lib.app.events import AppEvents
+from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
+from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
@@ -64,6 +67,20 @@ class RadarDataPanel(PanelContent):
         self.addComponent(SpacerComponent(self.root))
 
         self.addComponent(TitleComponent(self.root, ctx, "Date and Time"))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.latest,
+                [
+                    ("Latest", True),
+                    ("Historical", False),
+                ],
+            )
+        )
+
+        self.yearSpacer = self.addComponent(SpacerComponent(self.root))
 
         self.yearInput = self.addComponent(
             PanelTextInput(
@@ -139,16 +156,28 @@ class RadarDataPanel(PanelContent):
 
         self.listener.listen(loadDataButton.button.onClick, lambda _: self.search())
 
-        self.setupFocusLoop(
-            [
-                self.radarInput.input,
-                self.yearInput.input,
-                self.monthInput.input,
-                self.dayInput.input,
-                self.timeInput.input,
-                self.framesInput.input,
-            ]
-        )
+        self.updateInputsForLatest()
+        self.listener.listen(state.latest, lambda _: self.updateInputsForLatest())
+
+    def updateInputsForLatest(self) -> None:
+        self.yearSpacer.setHidden(self.state.latest.value)
+        self.yearInput.setHidden(self.state.latest.value)
+        self.monthInput.setHidden(self.state.latest.value)
+        self.dayInput.setHidden(self.state.latest.value)
+        self.timeInput.setHidden(self.state.latest.value)
+
+        focusableItems: List[Focusable] = []
+        focusableItems.append(self.radarInput.input)
+
+        if not self.state.latest.value:
+            focusableItems.append(self.yearInput.input)
+            focusableItems.append(self.monthInput.input)
+            focusableItems.append(self.dayInput.input)
+            focusableItems.append(self.timeInput.input)
+
+        focusableItems.append(self.framesInput.input)
+
+        self.setupFocusLoop(focusableItems)
 
     def updateRadarName(self, radar: str) -> None:
         radarStation = self.ctx.appContext.services.nws.getStation(radar)
@@ -213,6 +242,11 @@ class RadarDataPanel(PanelContent):
             except ValueError:
                 valid = False
                 self.dayInput.setValid(False)
+
+        # The above updates validation on the datetime controls, but override
+        # that if we are latest
+        if self.state.latest.value:
+            valid = True
 
         radar = self.radarInput.input.entry.get()
         if radar not in self.ctx.appContext.services.nws.radarStations:

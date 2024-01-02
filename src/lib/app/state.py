@@ -59,6 +59,7 @@ class AppState:
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
 
         self.station = self.createField("station", "KDMX")
+        self.latest = self.createField("latest", True)
         self.year = self.createField("year", 2023)
         self.month = self.createField("month", 11)
         self.day = self.createField("day", 27)
