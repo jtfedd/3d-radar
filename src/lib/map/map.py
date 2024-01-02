@@ -10,8 +10,7 @@ from lib.ui.core.colors import UIColors
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
-EARTH_RADIUS = 6378.1
-RADAR_RANGE = 460
+from .constants import EARTH_RADIUS, RADAR_RANGE
 
 
 class Map(Listener):
@@ -82,8 +81,8 @@ class Map(Listener):
         if not radarStation:
             return
 
-        self.latRoot.setP(-radarStation.lat)
-        self.longRoot.setH(-radarStation.long)
+        self.latRoot.setP(-radarStation.geoPoint.lat)
+        self.longRoot.setH(-radarStation.geoPoint.lon)
 
     def drawCircle(self) -> GeomNode:
         lineSegs = LineSegs()

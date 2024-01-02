@@ -37,6 +37,10 @@ class RadarDataPanel(PanelContent):
             )
         )
 
+        self.listener.listen(
+            events.ui.modals.stationSelected, self.radarInput.input.setText
+        )
+
         self.radarName = self.addComponent(
             PanelText(
                 root=self.root,
@@ -46,6 +50,18 @@ class RadarDataPanel(PanelContent):
         )
         self.updateRadarName(state.station.value)
         self.listener.listen(self.radarInput.input.onChange, self.updateRadarName)
+
+        self.addComponent(SpacerComponent(self.root))
+
+        stationSearchButton = self.addComponent(
+            PanelButton(self.root, ctx, "Find Radar Station")
+        )
+
+        self.listener.listen(
+            stationSearchButton.button.onClick, events.ui.modals.stationSearch.send
+        )
+
+        self.addComponent(SpacerComponent(self.root))
 
         self.addComponent(TitleComponent(self.root, ctx, "Date and Time"))
 
@@ -121,7 +137,7 @@ class RadarDataPanel(PanelContent):
             )
         )
 
-        loadDataButton.button.onClick.listen(lambda _: self.search())
+        self.listener.listen(loadDataButton.button.onClick, lambda _: self.search())
 
         self.setupFocusLoop(
             [

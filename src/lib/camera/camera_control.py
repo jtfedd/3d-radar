@@ -3,7 +3,7 @@ from panda3d.core import Vec3
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.map.map import RADAR_RANGE
+from lib.map.constants import RADAR_RANGE
 from lib.util.events.listener import Listener
 
 

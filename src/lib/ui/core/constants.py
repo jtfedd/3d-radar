@@ -18,6 +18,7 @@ class UIConstants:
     panelValidationHeight = 0.04
     panelTitleHeight = 0.08
     panelTextHeight = 0.04
+    panelScrollbarPadding = panelPadding / 2
 
     inputPaddingVertical = 0.3
     inputPaddingHorizontal = 0.1
@@ -32,7 +33,6 @@ class UIConstants:
     checkboxPadding = 0.015
 
     scrollbarWidth = 0.01
-    scrollbarPadding = panelPadding / 2
 
     animationSliderWidth = 0.6
     animationSliderPadding = headerFooterHeight / 2
@@ -52,6 +52,20 @@ class UIConstants:
     legendScaleBarWidth = 0.03
     legendTitleHeight = 0.06
     legendScaleBarHeight = legendScaleHeight - 4 * legendPadding - legendTitleHeight
+
+    modalPadding = 0.05
+    modalTitleHeight = 0.08
+    modalScrollbarPadding = modalPadding / 2
+
+    modalFooterButtonWidth = 0.2
+    modalFooterButtonHeight = 0.05
+
+    addressModalWidth = 0.7
+    addressModalSearchbarHeight = 0.05
+
+    stationModalResultButtonHeight = 0.05
+    stationModalResultButtonPadding = 0.01
+    stationModalResultButtonsMaxHeight = 0.3
 
     # Higher number means slower scrolling
     scrollSensitivity = 10

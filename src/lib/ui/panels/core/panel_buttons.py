@@ -5,7 +5,7 @@ from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.button import Button
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
-from lib.ui.panels.panel_events import PanelEvents
+from lib.ui.panels.events import PanelEvents
 from lib.ui.panels.panel_type import PanelType
 from lib.util.events.listener import Listener
 
