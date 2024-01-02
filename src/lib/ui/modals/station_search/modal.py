@@ -56,6 +56,7 @@ class StationSearchModal(AddressSearchModal):
             self.topLeft,
             self.appEvents,
             self.headerHeight,
+            location,
             stationsInRange,
             distances,
         )

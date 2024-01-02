@@ -8,7 +8,14 @@ class Location:
         self.geoPoint = GeoPoint(lat, lon)
 
     def getLabel(self) -> str:
-        return ", ".join([self.address, self.area])
+        return self.makeLabel(", ")
 
     def getLabel2(self) -> str:
-        return "\n".join([self.address, self.area])
+        return self.makeLabel("\n")
+
+    def makeLabel(self, sep: str) -> str:
+        if len(self.address) == 0:
+            return self.area
+        if len(self.area) == 0:
+            return self.address
+        return sep.join([self.address, self.area])

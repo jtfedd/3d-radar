@@ -63,6 +63,10 @@ class UIConstants:
     addressModalWidth = 0.7
     addressModalSearchbarHeight = 0.05
 
+    stationModalResultButtonHeight = 0.05
+    stationModalResultButtonPadding = 0.01
+    stationModalResultButtonsMaxHeight = 0.3
+
     # Higher number means slower scrolling
     scrollSensitivity = 10
 
