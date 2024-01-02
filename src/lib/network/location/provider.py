@@ -1,34 +1,26 @@
 from typing import List
 
-import requests
-
 from lib.model.location import Location
+
+from ..util import makeRequest
 
 
 class LocationProvider:
     HOST = "https://nominatim.openstreetmap.org"
 
     def search(self, address: str, limit: int = 1) -> List[Location] | None:
-        try:
-            response = requests.get(
-                self.HOST + "/search",
-                params={
-                    "q": address,
-                    "format": "geocodejson",
-                    "addressdetails": 1,
-                    "countrycodes": "us",
-                    "limit": limit,
-                },  # type: ignore
-                timeout=10,
-            )
-            response.raise_for_status()
-        except requests.exceptions.HTTPError:
-            return None
-        except requests.exceptions.ConnectionError:
-            return None
-        except requests.exceptions.Timeout:
-            return None
-        except requests.exceptions.RequestException:
+        response = makeRequest(
+            self.HOST + "/search",
+            params={
+                "q": address,
+                "format": "geocodejson",
+                "addressdetails": 1,
+                "countrycodes": "us",
+                "limit": limit,
+            },
+            timeout=10,
+        )
+        if not response:
             return None
 
         responseJson = response.json()

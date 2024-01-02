@@ -1,28 +1,20 @@
 from typing import Dict
 
-import requests
-
 from lib.model.radar_station import RadarStation
+
+from ..util import makeRequest
 
 
 class NWSProvider:
     HOST = "https://api.weather.gov"
 
     def getRadarStations(self) -> Dict[str, RadarStation] | None:
-        try:
-            response = requests.get(
-                self.HOST + "/radar/stations",
-                params={"stationType": "WSR-88D"},
-                timeout=10,
-            )
-            response.raise_for_status()
-        except requests.exceptions.HTTPError:
-            return None
-        except requests.exceptions.ConnectionError:
-            return None
-        except requests.exceptions.Timeout:
-            return None
-        except requests.exceptions.RequestException:
+        response = makeRequest(
+            self.HOST + "/radar/stations",
+            params={"stationType": "WSR-88D"},
+            timeout=10,
+        )
+        if not response:
             return None
 
         responseJson = response.json()
