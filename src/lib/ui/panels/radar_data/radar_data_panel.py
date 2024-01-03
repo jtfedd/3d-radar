@@ -80,6 +80,16 @@ class RadarDataPanel(PanelContent):
             )
         )
 
+        self.timeSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.timeDescription = self.addComponent(
+            PanelText(
+                self.root,
+                ctx,
+                "Date and time format can be changed\nin Settings.",
+            )
+        )
+
         self.yearSpacer = self.addComponent(SpacerComponent(self.root))
 
         self.yearInput = self.addComponent(
@@ -160,6 +170,8 @@ class RadarDataPanel(PanelContent):
         self.listener.listen(state.latest, lambda _: self.updateInputsForLatest())
 
     def updateInputsForLatest(self) -> None:
+        self.timeSpacer.setHidden(self.state.latest.value)
+        self.timeDescription.setHidden(self.state.latest.value)
         self.yearSpacer.setHidden(self.state.latest.value)
         self.yearInput.setHidden(self.state.latest.value)
         self.monthInput.setHidden(self.state.latest.value)
@@ -189,7 +201,7 @@ class RadarDataPanel(PanelContent):
 
         self.radarName.setHidden(False)
         self.radarInput.setValid(True)
-        self.radarName.text.updateText(radarStation.name)
+        self.radarName.updateText(radarStation.name)
 
     def resetValidation(self) -> None:
         self.radarInput.setValid(True)

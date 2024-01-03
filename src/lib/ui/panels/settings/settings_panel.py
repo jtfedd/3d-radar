@@ -1,8 +1,11 @@
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.time_mode import TimeMode
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.spacer import SpacerComponent
+from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
@@ -77,6 +80,32 @@ class SettingsPanel(PanelContent):
 
         self.listener.listen(self.loopDelayInput.onChange, self.updateLoopDelay)
 
+        self.addComponent(TitleComponent(self.root, ctx, "Date And Time"))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.timeMode,
+                [
+                    ("UTC", TimeMode.UTC),
+                    ("Radar", TimeMode.RADAR),
+                    ("Custom", TimeMode.CUSTOM),
+                ],
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
+        self.timeModeDescription = self.addComponent(
+            PanelText(self.root, ctx, self.timeModeText())
+        )
+
+        self.listener.listen(
+            state.timeMode,
+            lambda _: self.timeModeDescription.updateText(self.timeModeText()),
+        )
+
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
         hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
@@ -139,6 +168,19 @@ class SettingsPanel(PanelContent):
         self.listener.listen(observable, textInput.input.setText)
 
         return textInput
+
+    def timeModeText(self) -> str:
+        if self.state.timeMode.value == TimeMode.UTC:
+            return "All times entered and shown in UTC."
+        if self.state.timeMode.value == TimeMode.RADAR:
+            return (
+                "All times entered and shown in the timezone\n"
+                + "for the currently selected radar station."
+            )
+        if self.state.timeMode.value == TimeMode.CUSTOM:
+            return "Enter a timezone or search by location."
+
+        return "Unknown time mode"
 
     def headerText(self) -> str:
         return "Settings"

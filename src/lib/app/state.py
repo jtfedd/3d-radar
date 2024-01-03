@@ -2,6 +2,7 @@ import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
 from lib.model.data_type import DataType
+from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
 
 T = TypeVar("T")
@@ -47,6 +48,28 @@ def deserializeDataType(dataType: int) -> DataType:
     raise ValueError("Unrecognized data type", dataType)
 
 
+def serializeTimeMode(timeMode: TimeMode) -> int:
+    if timeMode == TimeMode.UTC:
+        return 0
+    if timeMode == TimeMode.RADAR:
+        return 1
+    if timeMode == TimeMode.CUSTOM:
+        return 2
+
+    raise ValueError("Unrecognized time mode", timeMode)
+
+
+def deserializeTimeMode(timeMode: int) -> TimeMode:
+    if timeMode == 0:
+        return TimeMode.UTC
+    if timeMode == 1:
+        return TimeMode.RADAR
+    if timeMode == 2:
+        return TimeMode.CUSTOM
+
+    raise ValueError("Unrecognized time mode", timeMode)
+
+
 class AppState:
     def __init__(self) -> None:
         # Persisted fields
@@ -57,6 +80,13 @@ class AppState:
         self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
+
+        self.timeMode = self.createFieldCustomSerialization(
+            "timeMode",
+            TimeMode.RADAR,
+            serializeTimeMode,
+            deserializeTimeMode,
+        )
 
         self.station = self.createField("station", "KDMX")
         self.latest = self.createField("latest", True)
