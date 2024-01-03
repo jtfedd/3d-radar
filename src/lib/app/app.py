@@ -1,6 +1,5 @@
 import atexit
 import concurrent.futures
-import datetime
 
 from direct.showbase.ShowBase import ShowBase
 
