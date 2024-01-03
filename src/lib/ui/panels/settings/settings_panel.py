@@ -1,4 +1,5 @@
 from typing import List
+from zoneinfo import available_timezones
 
 from lib.app.events import AppEvents
 from lib.app.focus.focusable import Focusable
@@ -120,7 +121,13 @@ class SettingsPanel(PanelContent):
                 label="Time Zone:",
                 initialValue=state.timeZone.value,
                 inputWidth=UIConstants.panelContentWidth / 2,
+                validationText="Invalid Time Zone",
             )
+        )
+
+        self.listener.listen(self.timeZone.input.onChange, self.validateTimeZone)
+        self.listener.listen(
+            events.ui.modals.timeZoneSelected, self.timeZone.input.setText
         )
 
         self.timeZoneSpacer = self.addComponent(SpacerComponent(self.root))
@@ -131,6 +138,10 @@ class SettingsPanel(PanelContent):
                 ctx=ctx,
                 text="Search By Location",
             )
+        )
+
+        self.listener.listen(
+            self.searchButton.button.onClick, events.ui.modals.timeZoneSearch.send
         )
 
         self.searchButtonSpacer = self.addComponent(SpacerComponent(self.root))
@@ -185,6 +196,12 @@ class SettingsPanel(PanelContent):
         focusableItems.append(self.nextKey.input)
 
         self.setupFocusLoop(focusableItems)
+
+    def validateTimeZone(self, tzStr: str) -> None:
+        valid = tzStr in available_timezones()
+        self.timeZone.setValid(valid)
+        if valid:
+            self.state.timeZone.setValue(tzStr)
 
     def updateAnimationSpeed(self, valueStr: str) -> None:
         try:
