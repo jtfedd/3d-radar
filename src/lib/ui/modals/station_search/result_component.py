@@ -33,13 +33,7 @@ class RadarStationsResult(AddressResultsComponent, Listener):
         super().__init__()
 
         self.contentHeight = 0.0
-
-        text = location.getLabel()
-        if len(text) > 30:
-            text = location.getLabel2()
-
-        self.locationText = ModalText(ctx, root, top, text)
-
+        self.locationText = ModalText(ctx, root, top, location.getLabel())
         self.contentHeight = self.locationText.height() + UIConstants.modalPadding
 
         buttonListHeight = (

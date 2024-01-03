@@ -10,15 +10,12 @@ from .result_component import TimezoneResult
 
 
 class TimezoneSearchModal(AddressSearchModal):
-    TITLE = "Timezone Lookup"
-    DESC = "Search for an address or location to\ndetermine its timezone."
-
     def __init__(self, ctx: UIContext, events: AppEvents):
         super().__init__(
             ctx,
             events,
-            title=self.TITLE,
-            description=self.DESC,
+            title="Timezone Lookup",
+            description="Search for an address or location to\ndetermine its timezone.",
         )
 
         self.appEvents = events
@@ -36,10 +33,5 @@ class TimezoneSearchModal(AddressSearchModal):
         tz = self.ctx.appContext.timeUtil.findTimezone(location.geoPoint)
 
         return TimezoneResult(
-            self.ctx,
-            self.topLeft,
-            self.appEvents,
-            self.headerHeight,
-            location,
-            tz,
+            self.ctx, self.topLeft, self.appEvents, self.headerHeight, location, tz
         )

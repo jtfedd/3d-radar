@@ -68,6 +68,8 @@ class UIConstants:
     stationModalResultButtonPadding = 0.01
     stationModalResultButtonsMaxHeight = 0.3
 
+    timezoneModalResultButtonHeight = 0.05
+
     # Higher number means slower scrolling
     scrollSensitivity = 10
 

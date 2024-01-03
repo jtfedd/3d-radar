@@ -29,12 +29,7 @@ class TimezoneResult(AddressResultsComponent, Listener):
         super().__init__()
 
         self.contentHeight = 0.0
-
-        text = location.getLabel()
-        if len(text) > 30:
-            text = location.getLabel2()
-
-        self.locationText = ModalText(ctx, root, top, text)
+        self.locationText = ModalText(ctx, root, top, location.getLabel())
         self.contentHeight = self.locationText.height() + UIConstants.modalPadding
 
         self.result: Button | ModalText
@@ -44,7 +39,7 @@ class TimezoneResult(AddressResultsComponent, Listener):
                 root=root,
                 ctx=ctx,
                 width=UIConstants.addressModalWidth,
-                height=0.05,
+                height=UIConstants.timezoneModalResultButtonHeight,
                 y=-(top + self.contentHeight),
                 hAlign=HAlign.LEFT,
                 vAlign=VAlign.TOP,
@@ -54,7 +49,7 @@ class TimezoneResult(AddressResultsComponent, Listener):
                 skin=ButtonSkin.ACCENT,
             )
 
-            self.contentHeight += 0.05
+            self.contentHeight += UIConstants.timezoneModalResultButtonHeight
 
             self.listen(
                 self.result.onClick,
