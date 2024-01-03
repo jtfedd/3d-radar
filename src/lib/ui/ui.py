@@ -17,7 +17,7 @@ class UI:
         self.header = Header(self.ctx)
         self.footer = Footer(self.ctx, state, events)
         self.panels = PanelModule(self.ctx, state, events)
-        self.modals = ModalManager(self.ctx, state, events)
+        self.modals = ModalManager(self.ctx, events)
 
         self.label = Label(self.ctx, state)
         self.scale = Scale(self.ctx, state)

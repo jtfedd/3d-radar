@@ -1,11 +1,15 @@
 import datetime
 
+from timezonefinder import TimezoneFinder
+
 from lib.app.state import AppState
+from lib.model.geo_point import GeoPoint
 
 
 class TimeUtil:
     def __init__(self, state: AppState):
         self.state = state
+        self.tf = TimezoneFinder()
 
     def getQueryTime(self) -> datetime.datetime:
         if self.state.latest.value:
@@ -33,6 +37,9 @@ class TimeUtil:
         if capitalizeMonth:
             return "%d %B %Y"
         return "%d %b %Y"
+
+    def findTimezone(self, location: GeoPoint) -> str | None:
+        return self.tf.timezone_at(lng=location.lon, lat=location.lat)
 
     def getTimeFormatStr(self) -> str:
         return "%I:%M %p"

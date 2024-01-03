@@ -64,6 +64,7 @@ class UIConstants:
     addressModalSearchbarHeight = 0.05
 
     stationModalResultButtonHeight = 0.05
+    stationModalResultButtonTextPadding = 0.015
     stationModalResultButtonPadding = 0.01
     stationModalResultButtonsMaxHeight = 0.3
 
