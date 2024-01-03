@@ -9,6 +9,7 @@ from .files.manager import FileManager
 from .focus.manager import FocusManager
 from .input.manager import InputManager
 from .state import AppState
+from .time.util import TimeUtil
 from .window.manager import WindowManager
 
 
@@ -21,6 +22,7 @@ class AppContext:
         self.windowManager = WindowManager(events.window)
         self.services = Services(self.fileManager, Network())
         self.radarCache = RadarCache()
+        self.timeUtil = TimeUtil(state)
 
     def destroy(self) -> None:
         self.inputManager.destroy()

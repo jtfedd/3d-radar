@@ -13,6 +13,8 @@ from lib.ui.core.layers import UILayer
 
 class Clock:
     def __init__(self, ctx: UIContext):
+        self.ctx = ctx
+
         self.text = Text(
             ctx.anchors.topRight,
             ctx.fonts.medium,
@@ -43,10 +45,10 @@ class Clock:
         return task.again
 
     def getClockStr(self) -> str:
-        dateStr = "%d %b %Y"
-        timeStr = "%I:%M %p"
-
-        return datetime.datetime.now().strftime(dateStr + "\n" + timeStr)
+        return self.ctx.appContext.timeUtil.formatTime(
+            datetime.datetime.now(),
+            sep="\n",
+        )
 
     def destroy(self) -> None:
         self.updateTask.cancel()

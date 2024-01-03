@@ -112,10 +112,10 @@ class Label(Listener):
         if not scan:
             return None
 
-        dateStr = "%d %B %Y"
-        timeStr = "%I:%M %p"
-
-        return scan.record.time.strftime(dateStr + " " + timeStr)
+        return self.ctx.appContext.timeUtil.formatTime(
+            scan.record.time,
+            capitalizeMonth=True,
+        )
 
     def destroy(self) -> None:
         super().destroy()
