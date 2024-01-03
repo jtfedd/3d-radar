@@ -88,6 +88,9 @@ class AppState:
             deserializeTimeMode,
         )
 
+        self.timeFormat = self.createField("timeFormat", True)
+        self.timeZone = self.createField("timeZone", "America/Chicago")
+
         self.station = self.createField("station", "KDMX")
         self.latest = self.createField("latest", True)
         self.year = self.createField("year", 2023)

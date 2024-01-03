@@ -1,8 +1,12 @@
+from typing import List
+
 from lib.app.events import AppEvents
+from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.model.time_mode import TimeMode
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
@@ -31,7 +35,7 @@ class SettingsPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        scaleInput = self.addComponent(
+        self.scaleInput = self.addComponent(
             UIScaleInput(
                 self.root,
                 ctx,
@@ -106,24 +110,81 @@ class SettingsPanel(PanelContent):
             lambda _: self.timeModeDescription.updateText(self.timeModeText()),
         )
 
+        self.timeSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.timeZone = self.addComponent(
+            PanelTextInput(
+                root=self.root,
+                ctx=ctx,
+                events=events,
+                label="Time Zone:",
+                initialValue=state.timeZone.value,
+                inputWidth=UIConstants.panelContentWidth / 2,
+            )
+        )
+
+        self.timeZoneSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.searchButton = self.addComponent(
+            PanelButton(
+                root=self.root,
+                ctx=ctx,
+                text="Search By Location",
+            )
+        )
+
+        self.searchButtonSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.timeFormat = self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.timeFormat,
+                [
+                    ("12H", True),
+                    ("24H", False),
+                ],
+                label="Time Format:",
+                left=3 * UIConstants.panelContentWidth / 4,
+                height=UIConstants.panelInputHeight,
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
-        hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
-        playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
-        prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
-        nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
+        self.hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
+        self.playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
+        self.prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
+        self.nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
 
-        self.setupFocusLoop(
-            [
-                scaleInput.input.input,
-                self.animationSpeedInput.input,
-                self.loopDelayInput.input,
-                hideKey.input,
-                playKey.input,
-                prevKey.input,
-                nextKey.input,
-            ]
-        )
+        self.updateInputsForTimeMode()
+        self.listener.listen(state.timeMode, lambda _: self.updateInputsForTimeMode())
+
+    def updateInputsForTimeMode(self) -> None:
+        timeMode = self.state.timeMode.value
+        self.timeSpacer.setHidden(timeMode == TimeMode.UTC)
+        self.timeFormat.setHidden(timeMode == TimeMode.UTC)
+        self.timeZone.setHidden(timeMode != TimeMode.CUSTOM)
+        self.timeZoneSpacer.setHidden(timeMode != TimeMode.CUSTOM)
+        self.searchButton.setHidden(timeMode != TimeMode.CUSTOM)
+        self.searchButtonSpacer.setHidden(timeMode != TimeMode.CUSTOM)
+
+        focusableItems: List[Focusable] = []
+        focusableItems.append(self.scaleInput.input.input)
+        focusableItems.append(self.animationSpeedInput.input)
+        focusableItems.append(self.loopDelayInput.input)
+
+        if timeMode == TimeMode.CUSTOM:
+            focusableItems.append(self.timeZone.input)
+
+        focusableItems.append(self.hideKey.input)
+        focusableItems.append(self.playKey.input)
+        focusableItems.append(self.prevKey.input)
+        focusableItems.append(self.nextKey.input)
+
+        self.setupFocusLoop(focusableItems)
 
     def updateAnimationSpeed(self, valueStr: str) -> None:
         try:

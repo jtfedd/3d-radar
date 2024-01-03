@@ -8,6 +8,7 @@ from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.label import ComponentLabel
 from lib.util.events.listener import Listener
 from lib.util.events.observable import Observable
 
@@ -23,6 +24,9 @@ class PanelButtonGroup(PanelComponent, Generic[T]):
         ctx: UIContext,
         observable: Observable[T],
         buttonDefs: List[Tuple[str, T]],
+        label: str | None = None,
+        left: float = 0.0,
+        height: float = UIConstants.panelButtonGroupHeight,
     ):
         super().__init__(root)
         self.listener = Listener()
@@ -31,14 +35,18 @@ class PanelButtonGroup(PanelComponent, Generic[T]):
         self.buttons: List[Button] = []
         self.buttonDefs = buttonDefs
 
-        buttonWidth = UIConstants.panelContentWidth / len(buttonDefs)
+        self.label: ComponentLabel | None = None
+        if label:
+            self.label = ComponentLabel(self.root, ctx, label)
+
+        buttonWidth = (UIConstants.panelContentWidth - left) / len(buttonDefs)
         for i, buttonDef in enumerate(buttonDefs):
             button = Button(
                 self.root,
                 ctx,
                 width=buttonWidth,
-                height=UIConstants.panelButtonGroupHeight,
-                x=UIConstants.panelPadding + i * buttonWidth,
+                height=height,
+                x=UIConstants.panelPadding + left + i * buttonWidth,
                 y=0,
                 hAlign=HAlign.LEFT,
                 vAlign=VAlign.TOP,
@@ -67,6 +75,9 @@ class PanelButtonGroup(PanelComponent, Generic[T]):
         super().destroy()
 
         self.listener.destroy()
+
+        if self.label:
+            self.label.destroy()
 
         for button in self.buttons:
             button.destroy()
