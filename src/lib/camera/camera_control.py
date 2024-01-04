@@ -13,7 +13,7 @@ class CameraControl(Listener):
 
     DEFAULT_PITCH = 30
     DEFAULT_HEADING = 0
-    DEFAULT_ZOOM = 300
+    DEFAULT_ZOOM = 500
 
     MIN_ZOOM = 10
     MAX_ZOOM = 2250
@@ -77,7 +77,7 @@ class CameraControl(Listener):
         self,
         pitch: float = 30,
         heading: float = 0,
-        zoom: float = 300,
+        zoom: float = 500,
     ) -> None:
         if pitch is not None:
             self.pitch = pitch
