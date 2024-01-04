@@ -14,12 +14,12 @@ class UI:
     def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         self.ctx = UIContext(ctx, state, events)
 
-        self.header = Header(self.ctx)
+        self.header = Header(self.ctx, events)
         self.footer = Footer(self.ctx, state, events)
         self.panels = PanelModule(self.ctx, state, events)
         self.modals = ModalManager(self.ctx, events)
 
-        self.label = Label(self.ctx, state)
+        self.label = Label(self.ctx, state, events)
         self.scale = Scale(self.ctx, state)
 
     def destroy(self) -> None:

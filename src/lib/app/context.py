@@ -22,7 +22,7 @@ class AppContext:
         self.windowManager = WindowManager(events.window)
         self.services = Services(self.fileManager, Network())
         self.radarCache = RadarCache()
-        self.timeUtil = TimeUtil(state)
+        self.timeUtil = TimeUtil(state, events, self.services)
 
     def destroy(self) -> None:
         self.inputManager.destroy()
