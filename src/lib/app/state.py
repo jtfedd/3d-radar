@@ -96,7 +96,7 @@ class AppState:
         self.year = self.createField("year", 2023)
         self.month = self.createField("month", 11)
         self.day = self.createField("day", 27)
-        self.time = self.createField("time", "11:24")
+        self.time = self.createField("time", "11:24 AM")
         self.frames = self.createField("frames", 5)
 
         self.mapStates = self.createField("mapStates", True)
