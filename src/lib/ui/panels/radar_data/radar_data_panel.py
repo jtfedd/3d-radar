@@ -288,7 +288,18 @@ class RadarDataPanel(PanelContent):
         self.events.requestData.send(None)
 
     def validateTime(self, time: str) -> None:
-        parts = time.split(":")
+        parts = time.split(" ")
+        if self.state.use24HourTime():
+            if len(parts) != 1:
+                raise ValueError("Time should not have AM or PM")
+        else:
+            if len(parts) != 2:
+                raise ValueError("Time should include AM or PM")
+            ampm = parts[1]
+            if ampm.lower() not in ("am", "pm"):
+                raise ValueError("Time should include AM or PM")
+
+        parts = parts[0].split(":")
         if len(parts) != 2:
             raise ValueError("Time should be in the format HH:MM")
 
@@ -304,9 +315,12 @@ class RadarDataPanel(PanelContent):
         if minuteInt < 0 or minuteInt > 59:
             raise ValueError("Minute invalid")
 
-        # This should take into account 12/24 hour time eventually
-        if hourInt < 1 or hourInt > 24:
-            raise ValueError("Hour invalid")
+        if self.state.use24HourTime():
+            if hourInt < 1 or hourInt > 24:
+                raise ValueError("Hour invalid")
+        else:
+            if hourInt < 1 or hourInt > 12:
+                raise ValueError("Hour invalid")
 
     def validateYear(self, year: str) -> bool:
         try:

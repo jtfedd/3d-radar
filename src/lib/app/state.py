@@ -124,6 +124,9 @@ class AppState:
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)
 
+    def use24HourTime(self) -> bool:
+        return self.timeMode.value == TimeMode.UTC or not self.timeFormat.value
+
     def toJson(self) -> str:
         raw: Dict[str, Any] = {}  # type:ignore
 

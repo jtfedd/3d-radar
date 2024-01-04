@@ -20,8 +20,17 @@ class TimeUtil:
         day = self.state.day.value
         time = self.state.time.value
 
+        if not self.state.use24HourTime():
+            parts = time.split(" ")
+            time = parts[0]
+            ampm = parts[1].lower()
+
         hour = int(time.split(":")[0])
         minute = int(time.split(":")[1])
+
+        if not self.state.use24HourTime():
+            if ampm == "pm":
+                hour += 12
 
         return datetime.datetime(
             year=year,
