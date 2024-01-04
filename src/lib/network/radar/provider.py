@@ -1,4 +1,4 @@
-from datetime import timedelta
+import datetime
 from typing import List
 
 import boto3
@@ -39,15 +39,17 @@ class RadarProvider:
         return scan
 
     def search(self, record: Record, count: int) -> List[Record]:
+        searchTime = record.time.astimezone(datetime.timezone.utc)
+
         records = self.getScans(
             record.station,
-            record.time.year,
-            record.time.month,
-            record.time.day,
+            searchTime.year,
+            searchTime.month,
+            searchTime.day,
         )
 
         if len(records) < count:
-            previousDay = record.time - timedelta(days=1)
+            previousDay = searchTime - datetime.timedelta(days=1)
 
             records.extend(
                 self.getScans(
@@ -58,7 +60,7 @@ class RadarProvider:
                 )
             )
 
-        records = list(filter(lambda r: r.time <= record.time, records))
+        records = list(filter(lambda r: r.time <= searchTime, records))
         records.sort(key=lambda r: r.time)
 
         if len(records) <= count:

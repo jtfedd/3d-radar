@@ -1,10 +1,13 @@
 import datetime
+from typing import List
 
 from lib.app.events import AppEvents
+from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
+from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
@@ -64,6 +67,30 @@ class RadarDataPanel(PanelContent):
         self.addComponent(SpacerComponent(self.root))
 
         self.addComponent(TitleComponent(self.root, ctx, "Date and Time"))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.latest,
+                [
+                    ("Latest", True),
+                    ("Historical", False),
+                ],
+            )
+        )
+
+        self.timeSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.timeDescription = self.addComponent(
+            PanelText(
+                self.root,
+                ctx,
+                "Date and time format can be changed\nin Settings.",
+            )
+        )
+
+        self.yearSpacer = self.addComponent(SpacerComponent(self.root))
 
         self.yearInput = self.addComponent(
             PanelTextInput(
@@ -139,16 +166,30 @@ class RadarDataPanel(PanelContent):
 
         self.listener.listen(loadDataButton.button.onClick, lambda _: self.search())
 
-        self.setupFocusLoop(
-            [
-                self.radarInput.input,
-                self.yearInput.input,
-                self.monthInput.input,
-                self.dayInput.input,
-                self.timeInput.input,
-                self.framesInput.input,
-            ]
-        )
+        self.updateInputsForLatest()
+        self.listener.listen(state.latest, lambda _: self.updateInputsForLatest())
+
+    def updateInputsForLatest(self) -> None:
+        self.timeSpacer.setHidden(self.state.latest.value)
+        self.timeDescription.setHidden(self.state.latest.value)
+        self.yearSpacer.setHidden(self.state.latest.value)
+        self.yearInput.setHidden(self.state.latest.value)
+        self.monthInput.setHidden(self.state.latest.value)
+        self.dayInput.setHidden(self.state.latest.value)
+        self.timeInput.setHidden(self.state.latest.value)
+
+        focusableItems: List[Focusable] = []
+        focusableItems.append(self.radarInput.input)
+
+        if not self.state.latest.value:
+            focusableItems.append(self.yearInput.input)
+            focusableItems.append(self.monthInput.input)
+            focusableItems.append(self.dayInput.input)
+            focusableItems.append(self.timeInput.input)
+
+        focusableItems.append(self.framesInput.input)
+
+        self.setupFocusLoop(focusableItems)
 
     def updateRadarName(self, radar: str) -> None:
         radarStation = self.ctx.appContext.services.nws.getStation(radar)
@@ -160,7 +201,7 @@ class RadarDataPanel(PanelContent):
 
         self.radarName.setHidden(False)
         self.radarInput.setValid(True)
-        self.radarName.text.updateText(radarStation.name)
+        self.radarName.updateText(radarStation.name)
 
     def resetValidation(self) -> None:
         self.radarInput.setValid(True)
@@ -214,6 +255,11 @@ class RadarDataPanel(PanelContent):
                 valid = False
                 self.dayInput.setValid(False)
 
+        # The above updates validation on the datetime controls, but override
+        # that if we are latest
+        if self.state.latest.value:
+            valid = True
+
         radar = self.radarInput.input.entry.get()
         if radar not in self.ctx.appContext.services.nws.radarStations:
             valid = False
@@ -231,16 +277,29 @@ class RadarDataPanel(PanelContent):
             return
 
         self.state.station.setValue(radar)
-        self.state.year.setValue(year)
-        self.state.month.setValue(month)
-        self.state.day.setValue(day)
-        self.state.time.setValue(time)
         self.state.frames.setValue(frames)
+
+        if not self.state.latest.value:
+            self.state.year.setValue(year)
+            self.state.month.setValue(month)
+            self.state.day.setValue(day)
+            self.state.time.setValue(time)
 
         self.events.requestData.send(None)
 
     def validateTime(self, time: str) -> None:
-        parts = time.split(":")
+        parts = time.split(" ")
+        if self.state.use24HourTime():
+            if len(parts) != 1:
+                raise ValueError("Time should not have AM or PM")
+        else:
+            if len(parts) != 2:
+                raise ValueError("Time should include AM or PM")
+            ampm = parts[1]
+            if ampm.lower() not in ("am", "pm"):
+                raise ValueError("Time should include AM or PM")
+
+        parts = parts[0].split(":")
         if len(parts) != 2:
             raise ValueError("Time should be in the format HH:MM")
 
@@ -256,9 +315,12 @@ class RadarDataPanel(PanelContent):
         if minuteInt < 0 or minuteInt > 59:
             raise ValueError("Minute invalid")
 
-        # This should take into account 12/24 hour time eventually
-        if hourInt < 1 or hourInt > 24:
-            raise ValueError("Hour invalid")
+        if self.state.use24HourTime():
+            if hourInt < 1 or hourInt > 24:
+                raise ValueError("Hour invalid")
+        else:
+            if hourInt < 1 or hourInt > 12:
+                raise ValueError("Hour invalid")
 
     def validateYear(self, year: str) -> bool:
         try:

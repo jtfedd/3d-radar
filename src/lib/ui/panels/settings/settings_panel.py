@@ -1,8 +1,16 @@
+from typing import List
+from zoneinfo import available_timezones
+
 from lib.app.events import AppEvents
+from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
+from lib.model.time_mode import TimeMode
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.button import PanelButton
+from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.spacer import SpacerComponent
+from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
@@ -28,7 +36,7 @@ class SettingsPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        scaleInput = self.addComponent(
+        self.scaleInput = self.addComponent(
             UIScaleInput(
                 self.root,
                 ctx,
@@ -77,24 +85,123 @@ class SettingsPanel(PanelContent):
 
         self.listener.listen(self.loopDelayInput.onChange, self.updateLoopDelay)
 
+        self.addComponent(TitleComponent(self.root, ctx, "Date And Time"))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.timeMode,
+                [
+                    ("UTC", TimeMode.UTC),
+                    ("Radar", TimeMode.RADAR),
+                    ("Custom", TimeMode.CUSTOM),
+                ],
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
+        self.timeModeDescription = self.addComponent(
+            PanelText(self.root, ctx, self.timeModeText())
+        )
+
+        self.listener.listen(
+            state.timeMode,
+            lambda _: self.timeModeDescription.updateText(self.timeModeText()),
+        )
+
+        self.timeSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.timeZone = self.addComponent(
+            PanelTextInput(
+                root=self.root,
+                ctx=ctx,
+                events=events,
+                label="Time Zone:",
+                initialValue=state.timeZone.value,
+                inputWidth=UIConstants.panelContentWidth / 2,
+                validationText="Invalid Time Zone",
+            )
+        )
+
+        self.listener.listen(self.timeZone.input.onChange, self.validateTimeZone)
+        self.listener.listen(
+            events.ui.modals.timeZoneSelected, self.timeZone.input.setText
+        )
+
+        self.timeZoneSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.searchButton = self.addComponent(
+            PanelButton(
+                root=self.root,
+                ctx=ctx,
+                text="Search By Location",
+            )
+        )
+
+        self.listener.listen(
+            self.searchButton.button.onClick, events.ui.modals.timeZoneSearch.send
+        )
+
+        self.searchButtonSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.timeFormat = self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.timeFormat,
+                [
+                    ("12H", True),
+                    ("24H", False),
+                ],
+                label="Time Format:",
+                left=3 * UIConstants.panelContentWidth / 4,
+                height=UIConstants.panelInputHeight,
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
         self.addComponent(TitleComponent(self.root, ctx, "Keybindings"))
 
-        hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
-        playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
-        prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
-        nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
+        self.hideKey = self.addKeybindingInput("Hide UI:", state.hideKeybinding)
+        self.playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
+        self.prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
+        self.nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
 
-        self.setupFocusLoop(
-            [
-                scaleInput.input.input,
-                self.animationSpeedInput.input,
-                self.loopDelayInput.input,
-                hideKey.input,
-                playKey.input,
-                prevKey.input,
-                nextKey.input,
-            ]
-        )
+        self.updateInputsForTimeMode()
+        self.listener.listen(state.timeMode, lambda _: self.updateInputsForTimeMode())
+
+    def updateInputsForTimeMode(self) -> None:
+        timeMode = self.state.timeMode.value
+        self.timeSpacer.setHidden(timeMode == TimeMode.UTC)
+        self.timeFormat.setHidden(timeMode == TimeMode.UTC)
+        self.timeZone.setHidden(timeMode != TimeMode.CUSTOM)
+        self.timeZoneSpacer.setHidden(timeMode != TimeMode.CUSTOM)
+        self.searchButton.setHidden(timeMode != TimeMode.CUSTOM)
+        self.searchButtonSpacer.setHidden(timeMode != TimeMode.CUSTOM)
+
+        focusableItems: List[Focusable] = []
+        focusableItems.append(self.scaleInput.input.input)
+        focusableItems.append(self.animationSpeedInput.input)
+        focusableItems.append(self.loopDelayInput.input)
+
+        if timeMode == TimeMode.CUSTOM:
+            focusableItems.append(self.timeZone.input)
+
+        focusableItems.append(self.hideKey.input)
+        focusableItems.append(self.playKey.input)
+        focusableItems.append(self.prevKey.input)
+        focusableItems.append(self.nextKey.input)
+
+        self.setupFocusLoop(focusableItems)
+
+    def validateTimeZone(self, tzStr: str) -> None:
+        valid = tzStr in available_timezones()
+        self.timeZone.setValid(valid)
+        if valid:
+            self.state.timeZone.setValue(tzStr)
 
     def updateAnimationSpeed(self, valueStr: str) -> None:
         try:
@@ -139,6 +246,19 @@ class SettingsPanel(PanelContent):
         self.listener.listen(observable, textInput.input.setText)
 
         return textInput
+
+    def timeModeText(self) -> str:
+        if self.state.timeMode.value == TimeMode.UTC:
+            return "All times entered and shown in UTC."
+        if self.state.timeMode.value == TimeMode.RADAR:
+            return (
+                "All times entered and shown in the timezone\n"
+                + "for the currently selected radar station."
+            )
+        if self.state.timeMode.value == TimeMode.CUSTOM:
+            return "Enter a timezone or search by location."
+
+        return "Unknown time mode"
 
     def headerText(self) -> str:
         return "Settings"

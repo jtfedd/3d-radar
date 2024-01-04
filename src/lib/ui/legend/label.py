@@ -1,3 +1,4 @@
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_type import DataType
 from lib.ui.context import UIContext
@@ -11,7 +12,7 @@ from lib.util.events.listener import Listener
 
 
 class Label(Listener):
-    def __init__(self, ctx: UIContext, state: AppState):
+    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.ctx = ctx
@@ -68,6 +69,7 @@ class Label(Listener):
         self.updateLabel()
         self.listen(state.animationFrame, lambda _: self.updateLabel())
         self.listen(state.dataType, lambda _: self.updateLabel())
+        self.listen(events.timeFormatChanged, lambda _: self.updateLabel())
 
     def updateLabel(self) -> None:
         productText = self.getProductText()
@@ -112,10 +114,10 @@ class Label(Listener):
         if not scan:
             return None
 
-        dateStr = "%d %B %Y"
-        timeStr = "%I:%M %p"
-
-        return scan.record.time.strftime(dateStr + " " + timeStr)
+        return self.ctx.appContext.timeUtil.formatTime(
+            scan.record.time,
+            capitalizeMonth=True,
+        )
 
     def destroy(self) -> None:
         super().destroy()

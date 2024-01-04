@@ -18,18 +18,29 @@ class PanelText(PanelComponent):
     ):
         super().__init__(root)
 
-        self.text = Text(
+        self.font = ctx.fonts.regular
+        self.text = text
+
+        self.component = Text(
             root=self.root,
             font=ctx.fonts.regular,
             text=text,
             x=UIConstants.panelPadding,
-            y=-UIConstants.panelTextHeight / 2,
             hAlign=HAlign.LEFT,
-            vAlign=VAlign.CENTER,
+            vAlign=VAlign.TOP,
         )
 
+    def updateText(self, text: str) -> None:
+        self.text = text
+        self.component.updateText(text)
+        self.onHeightChange.send(None)
+
     def getHeight(self) -> float:
-        return UIConstants.panelTextHeight
+        return (
+            len(self.text.split("\n"))
+            * self.font.getLineHeight()
+            * UIConstants.fontSizeRegular
+        )
 
     def destroy(self) -> None:
-        self.text.destroy()
+        self.component.destroy()

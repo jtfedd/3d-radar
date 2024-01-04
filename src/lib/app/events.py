@@ -14,6 +14,7 @@ class AppEvents:
         self.animation = AnimationEvents()
 
         self.requestData = EventDispatcher[None]()
+        self.timeFormatChanged = EventDispatcher[None]()
 
     def destroy(self) -> None:
         self.ui.destroy()
@@ -22,3 +23,4 @@ class AppEvents:
         self.animation.destroy()
 
         self.requestData.close()
+        self.timeFormatChanged.close()

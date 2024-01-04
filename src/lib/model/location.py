@@ -28,11 +28,11 @@ class Location:
         self.area = area
         self.geoPoint = GeoPoint(lat, lon)
 
-    def getLabel(self) -> str:
-        return self.makeLabel(", ")
-
-    def getLabel2(self) -> str:
-        return self.makeLabel("\n")
+    def getLabel(self, breakLong: bool = True, alwaysBreak: bool = False) -> str:
+        label = self.makeLabel(", ")
+        if alwaysBreak or (breakLong and len(label) > 30):
+            return self.makeLabel("\n")
+        return label
 
     def makeLabel(self, sep: str) -> str:
         if len(self.address) == 0:

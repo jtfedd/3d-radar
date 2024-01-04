@@ -6,6 +6,12 @@ class ModalEvents:
         self.stationSearch = EventDispatcher[None]()
         self.stationSelected = EventDispatcher[str]()
 
+        self.timeZoneSearch = EventDispatcher[None]()
+        self.timeZoneSelected = EventDispatcher[str]()
+
     def destroy(self) -> None:
         self.stationSearch.close()
         self.stationSelected.close()
+
+        self.timeZoneSearch.close()
+        self.timeZoneSelected.close()

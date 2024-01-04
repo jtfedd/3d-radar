@@ -17,8 +17,8 @@ class UIConstants:
     panelInputHeight = 0.06
     panelValidationHeight = 0.04
     panelTitleHeight = 0.08
-    panelTextHeight = 0.04
     panelScrollbarPadding = panelPadding / 2
+    panelButtonGroupHeight = 0.04
 
     inputPaddingVertical = 0.3
     inputPaddingHorizontal = 0.1
@@ -64,8 +64,11 @@ class UIConstants:
     addressModalSearchbarHeight = 0.05
 
     stationModalResultButtonHeight = 0.05
+    stationModalResultButtonTextPadding = 0.015
     stationModalResultButtonPadding = 0.01
     stationModalResultButtonsMaxHeight = 0.3
+
+    timezoneModalResultButtonHeight = 0.05
 
     # Higher number means slower scrolling
     scrollSensitivity = 10

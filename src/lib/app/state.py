@@ -2,6 +2,7 @@ import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
 from lib.model.data_type import DataType
+from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
 
 T = TypeVar("T")
@@ -47,6 +48,28 @@ def deserializeDataType(dataType: int) -> DataType:
     raise ValueError("Unrecognized data type", dataType)
 
 
+def serializeTimeMode(timeMode: TimeMode) -> int:
+    if timeMode == TimeMode.UTC:
+        return 0
+    if timeMode == TimeMode.RADAR:
+        return 1
+    if timeMode == TimeMode.CUSTOM:
+        return 2
+
+    raise ValueError("Unrecognized time mode", timeMode)
+
+
+def deserializeTimeMode(timeMode: int) -> TimeMode:
+    if timeMode == 0:
+        return TimeMode.UTC
+    if timeMode == 1:
+        return TimeMode.RADAR
+    if timeMode == 2:
+        return TimeMode.CUSTOM
+
+    raise ValueError("Unrecognized time mode", timeMode)
+
+
 class AppState:
     def __init__(self) -> None:
         # Persisted fields
@@ -58,11 +81,22 @@ class AppState:
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
 
+        self.timeMode = self.createFieldCustomSerialization(
+            "timeMode",
+            TimeMode.RADAR,
+            serializeTimeMode,
+            deserializeTimeMode,
+        )
+
+        self.timeFormat = self.createField("timeFormat", True)
+        self.timeZone = self.createField("timeZone", "America/Chicago")
+
         self.station = self.createField("station", "KDMX")
+        self.latest = self.createField("latest", True)
         self.year = self.createField("year", 2023)
         self.month = self.createField("month", 11)
         self.day = self.createField("day", 27)
-        self.time = self.createField("time", "11:24")
+        self.time = self.createField("time", "11:24 AM")
         self.frames = self.createField("frames", 5)
 
         self.mapStates = self.createField("mapStates", True)
@@ -89,6 +123,9 @@ class AppState:
 
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)
+
+    def use24HourTime(self) -> bool:
+        return self.timeMode.value == TimeMode.UTC or not self.timeFormat.value
 
     def toJson(self) -> str:
         raw: Dict[str, Any] = {}  # type:ignore
