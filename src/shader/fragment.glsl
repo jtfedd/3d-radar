@@ -1,5 +1,7 @@
 #version 460
 
+#define MAX_SCANS 20
+
 // Outputs to Panda3D
 out vec4 p3d_FragColor;
 
@@ -17,28 +19,17 @@ uniform mat4 projection_matrix_inverse;
 uniform vec3 bounds_start;
 uniform vec3 bounds_end;
 
-uniform float el_min;
-uniform float el_max;
-uniform int el_length;
-uniform float el_values[20];
+uniform int scan_count[1];
+uniform float elevation[MAX_SCANS];
+uniform float az_step[MAX_SCANS];
+uniform float r_first[MAX_SCANS];
+uniform float r_step[MAX_SCANS];
+uniform int r_count[MAX_SCANS];
+uniform int offset[MAX_SCANS];
 
-uniform int az_length;
-uniform float az_step;
-
-uniform float r_min;
-uniform int r_length;
-uniform float r_step;
+uniform float density_params[5];
 
 uniform samplerBuffer volume_data;
-
-// Density parameters
-uniform float d_min;
-uniform float d_scale;
-uniform float d_exp;
-
-uniform float d_offset;
-uniform float d_factor;
-
 uniform sampler2D color_scale;
 
 // End inputs
@@ -103,14 +94,14 @@ float hash13(vec3 p3) {
     return fract((p3.x + p3.y) * p3.z);
 }
 
-int calc_el_index(float el) {
+int calc_sweep_index(float el) {
     int l = 0;
-    int r = el_length;
+    int r = scan_count[0];
 
     for (int i = 0; i < 20; i++) {
         int m = (l + r) / 2;
 
-        if (el < el_values[m]) {
+        if (el < elevation[m]) {
             r = m;
         } else {
             l = m;
@@ -124,35 +115,39 @@ int calc_el_index(float el) {
     return 0;
 }
 
-float data_value(vec3 point) {
-    float el = atan(point.z, length(point.xy));
-    if (el <= el_min || el >= el_max) {
+float data_value_for_sweep(vec3 point, int sweep_index) {
+    float r = length(point);
+    int r_index = int(floor((r - r_first[sweep_index]) / r_step[sweep_index]));
+    if (r_index < 0 || r_index >= r_count[sweep_index]) {
         return -1.0;
     }
 
     float az = mod(atan(point.x, point.y), PI*2);
-    int az_index = int(floor(az / az_step));
-    if (az_index < 0 || az_index >= az_length) {
+    int az_index = int(floor(az / az_step[sweep_index]));
+    if (az_index < 0) {
         return -1.0;
     }
 
-    float r = length(point);
-    int r_index = int(floor((r - r_min) / r_step));
-    if (r_index < 0 || r_index >= r_length) {
+    int buff_index = r_count[sweep_index] * az_index + r_index;
+    return texelFetch(volume_data, offset[sweep_index] + buff_index).x;
+}
+
+float data_value(vec3 point) {
+    float el = atan(point.z, length(point.xy));
+    if (el <= elevation[0] || el >= elevation[scan_count[0] - 1]) {
         return -1.0;
     }
 
-    int el_index = calc_el_index(el);
+    int sweep_index = calc_sweep_index(el);
 
-    int buff_index = az_length * r_length * el_index + r_length * az_index + r_index;
-    return texelFetch(volume_data, buff_index).x;
+    return data_value_for_sweep(point, sweep_index);
 }
 
 float density(float value) {
     if (value < 0) return 0;
 
-    value = abs((value + d_offset) * d_factor);
-    return d_min + d_scale * pow(value, d_exp);
+    value = abs((value + density_params[0]) * density_params[1]);
+    return density_params[2] + density_params[3] * pow(value, density_params[4]);
 }
 
 vec3 colorize(float value) {
