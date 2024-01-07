@@ -3,6 +3,7 @@ from typing import List
 
 import boto3
 import botocore
+import pynexrad
 from metpy.io import Level2File
 
 from lib.model.convert.scan_from_metpy import scanFromLevel2Data
@@ -69,18 +70,11 @@ class RadarProvider:
         return records[-count:]
 
     def getScans(self, radar: str, year: int, month: int, day: int) -> List[Record]:
-        prefix = Record.PREFIX_FMT.format(radar, year, month, day)
-
-        resp = self.bucket.meta.client.list_objects(
-            Bucket="noaa-nexrad-level2",
-            Prefix=prefix,
-            Delimiter="/",
-        )
+        resp = pynexrad.list_records(radar, year, month, day)
 
         records = []
 
-        for scan in resp.get("Contents", []):
-            key = scan.get("Key")
+        for key in resp:
             record = Record.parse(key)
             if record:
                 records.append(record)
