@@ -24,6 +24,8 @@ class RadarProvider:
 
     def load(self, record: Record) -> Scan:
         key = record.awsKey()
+
+        key = f"{key[4:8]}/{key[8:10]}/{key[10:12]}/{key[0:4]}/{key}"
         print("Fetching from s3:", key)
 
         obj = self.client.get_object(Bucket=self.RADAR_BUCKET, Key=key)

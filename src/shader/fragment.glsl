@@ -22,6 +22,7 @@ uniform vec3 bounds_end;
 uniform int scan_count[1];
 uniform float elevation[MAX_SCANS];
 uniform float az_step[MAX_SCANS];
+uniform float az_count[MAX_SCANS];
 uniform float r_first[MAX_SCANS];
 uniform float r_step[MAX_SCANS];
 uniform int r_count[MAX_SCANS];
@@ -116,9 +117,17 @@ int calc_sweep_index(float el) {
 }
 
 float data_value_for_sweep(vec3 point, int sweep_index) {
+    if (r_count[sweep_index] == 0) {
+        return -1.0;
+    }
+
     float r = length(point);
     int r_index = int(floor((r - r_first[sweep_index]) / r_step[sweep_index]));
     if (r_index < 0 || r_index >= r_count[sweep_index]) {
+        return -1.0;
+    }
+
+    if (az_count[sweep_index] == 0) {
         return -1.0;
     }
 

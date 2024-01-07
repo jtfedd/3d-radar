@@ -42,7 +42,7 @@ class VolumeRenderer(Listener):
         self.plane.setShaderInput("bounds_start", (-1000, -1000, 0))
         self.plane.setShaderInput("bounds_end", (1000, 1000, 20))
         self.plane.setShaderInput("camera", self.ctx.base.camera)
-        self.plane.setShaderInput("time_ms", 0)
+        self.plane.setShaderInput("time", 0)
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",

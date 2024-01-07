@@ -36,6 +36,7 @@ class VolumeDataProvider(Listener):
         self.scanCount = PTA_int.empty_array(1)
         self.elevations = PTA_float.emptyArray(self.MAX_SCANS)
         self.azSteps = PTA_float.emptyArray(self.MAX_SCANS)
+        self.azCounts = PTA_float.emptyArray(self.MAX_SCANS)
         self.rFirsts = PTA_float.emptyArray(self.MAX_SCANS)
         self.rSteps = PTA_float.emptyArray(self.MAX_SCANS)
         self.rCounts = PTA_int.emptyArray(self.MAX_SCANS)
@@ -71,6 +72,7 @@ class VolumeDataProvider(Listener):
             scan_count=self.scanCount,
             elevation=self.elevations,
             az_step=self.azSteps,
+            az_count=self.azCounts,
             r_first=self.rFirsts,
             r_step=self.rSteps,
             r_count=self.rCounts,
@@ -121,43 +123,34 @@ class VolumeDataProvider(Listener):
         self.densityParams[4] = densityExp
 
     def updateVolumeData(self, scan: Scan) -> None:
-        dataBytes = scan.reflectivityBytes
+        scanData = scan.reflectivityScan
         if self.state.dataType.value == DataType.VELOCITY:
-            dataBytes = scan.velocityBytes
+            scanData = scan.velocityScan
 
         # Create a new buffer if necessary
-        if self.bufferSize < len(dataBytes):
-            self.bufferSize = util.nextPowerOf2(len(dataBytes))
+        if self.bufferSize < len(scanData.data):
+            self.bufferSize = util.nextPowerOf2(len(scanData.data))
             self.setupBuffer()
 
         # I would love to create a single memory view when the buffer is created
         # and reuse that. It also seems to be faster. But for some reason the data
         # is not sent properly that way.
         dataView = memoryview(self.buffer.modifyRamImage())  # type: ignore
-        dataView[: len(dataBytes)] = dataBytes
+        dataView[: len(scanData.data)] = scanData.data
 
         # At some point I would like to optimize all of these meta inputs into a packed
         # struct or something but it doesn't seem to be a performance issue yet
 
-        self.scanCount.setElement(0, len(scan.elevations))
+        self.scanCount.setElement(0, len(scanData.metas))
 
-        for i, elevation in enumerate(scan.elevations):
-            self.elevations.setElement(i, math.radians(elevation))
-
-        for i in range(len(scan.elevations)):
-            self.azSteps.setElement(i, math.pi / 360)
-
-        for i in range(len(scan.elevations)):
-            self.rFirsts.setElement(i, scan.ranges[0])
-
-        for i in range(len(scan.elevations)):
-            self.rSteps.setElement(i, 0.25)
-
-        for i in range(len(scan.elevations)):
-            self.rCounts.setElement(i, scan.reflectivity.shape[2])
-
-        for i in range(len(scan.elevations)):
-            self.offsets.setElement(i, i * scan.reflectivity.shape[2] * 720)
+        for i, meta in enumerate(scanData.metas):
+            self.elevations.setElement(i, meta.elevation)
+            self.azSteps.setElement(i, meta.azStep)
+            self.azCounts.setElement(i, meta.azCount)
+            self.rFirsts.setElement(i, meta.rngFirst)
+            self.rSteps.setElement(i, meta.rngStep)
+            self.rCounts.setElement(i, meta.rngCount)
+            self.offsets.setElement(i, meta.offset)
 
     def updateFrame(self) -> None:
         if not self.state.animationFrame.value:

@@ -1,7 +1,11 @@
+import math
+
 import numpy as np
 import numpy.typing as npt
 
 from lib.model.record import Record
+from lib.model.scan_data import ScanData
+from lib.model.sweep_meta import SweepMeta
 
 
 class Scan:
@@ -26,6 +30,24 @@ class Scan:
         # velocity scale: -100 to 100
         self.reflectivityBytes = self.processData(reflectivity, -20, 80)
         self.velocityBytes = self.processData(velocity, -100, 100)
+
+        sweepMetas = []
+        for i, elevation in enumerate(elevations):
+            sweepMetas.append(
+                SweepMeta(
+                    math.radians(elevation),
+                    0,
+                    math.pi / 360,
+                    720,
+                    ranges[0],
+                    0.25,
+                    reflectivity.shape[2],
+                    i * reflectivity.shape[2] * 720,
+                )
+            )
+
+        self.reflectivityScan = ScanData(sweepMetas, self.reflectivityBytes)
+        self.velocityScan = ScanData(sweepMetas, self.velocityBytes)
 
     def processData(
         self,
