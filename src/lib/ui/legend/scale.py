@@ -62,7 +62,7 @@ class Scale(Listener):
             scale = "assets/reflectivity_scale.png"
             increments = [-20, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80]
         if dataType == DataType.VELOCITY:
-            title = "KT"
+            title = "m/s"
             scale = "assets/velocity_scale.png"
             increments = [-100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100]
 
