@@ -24,7 +24,7 @@ class RadarService:
         #     return scan
 
         scan = self.network.radar.load(record)
-        self.saveCached(record, scan)
+        # self.saveCached(record, scan)
 
         return scan
 

@@ -7,6 +7,7 @@ import pynexrad
 from metpy.io import Level2File
 
 from lib.model.convert.scan_from_metpy import scanFromLevel2Data
+from lib.model.convert.scan_from_pynexrad import scanFromLevel2File
 from lib.model.record import Record
 from lib.model.scan import Scan
 
@@ -25,18 +26,27 @@ class RadarProvider:
     def load(self, record: Record) -> Scan:
         key = record.awsKey()
 
-        key = f"{key[4:8]}/{key[8:10]}/{key[10:12]}/{key[0:4]}/{key}"
+        # key = f"{key[4:8]}/{key[8:10]}/{key[10:12]}/{key[0:4]}/{key}"
         print("Fetching from s3:", key)
 
-        obj = self.client.get_object(Bucket=self.RADAR_BUCKET, Key=key)
-        data = obj["Body"]
+        level2File = pynexrad.download_nexrad_file(
+            record.station,
+            record.time.year,
+            record.time.month,
+            record.time.day,
+            record.awsKey(),
+        )
 
-        print("Parsing", key)
-        level2File = Level2File(data)
-        print("Parsed", key)
+        # obj = self.client.get_object(Bucket=self.RADAR_BUCKET, Key=key)
+        # data = obj["Body"]
+
+        # print("Parsing", key)
+        # level2File = Level2File(data)
+        # print("Parsed", key)
 
         print("Post-processing", key)
-        scan = scanFromLevel2Data(record, level2File)
+        # scan = scanFromLevel2Data(record, level2File)
+        scan = scanFromLevel2File(record, level2File)
         print("Post-processing finished", key)
 
         return scan
