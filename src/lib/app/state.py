@@ -2,7 +2,6 @@ import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
 from lib.model.data_type import DataType
-from lib.model.serialization.constants import SERIALIZATION_VERSION
 from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
 
@@ -76,9 +75,7 @@ class AppState:
         # Persisted fields
         self.config: Dict[str, SerializableField[Any, Any]] = {}  # type: ignore
 
-        self.serializationVersion = self.createField(
-            "serializationVersion", SERIALIZATION_VERSION
-        )
+        self.serializationVersion = self.createField("serializationVersion", -1)
 
         self.uiScale = self.createField("uiScale", 1.0)
 
