@@ -123,9 +123,9 @@ class VolumeDataProvider(Listener):
         self.densityParams[4] = densityExp
 
     def updateVolumeData(self, scan: Scan) -> None:
-        scanData = scan.reflectivityScan
+        scanData = scan.reflectivity
         if self.state.dataType.value == DataType.VELOCITY:
-            scanData = scan.velocityScan
+            scanData = scan.velocity
 
         # Create a new buffer if necessary
         if self.bufferSize < len(scanData.data):

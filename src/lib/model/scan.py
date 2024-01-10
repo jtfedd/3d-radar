@@ -11,5 +11,5 @@ class Scan:
     ):
         self.record = record
 
-        self.reflectivityScan = reflectivity
-        self.velocityScan = velocity
+        self.reflectivity = reflectivity
+        self.velocity = velocity
