@@ -19,12 +19,12 @@ class RadarService:
         return self.network.radar.search(record, count)
 
     def load(self, record: Record) -> Scan:
-        # scan = self.loadCached(record)
-        # if scan:
-        #     return scan
+        scan = self.loadCached(record)
+        if scan:
+            return scan
 
         scan = self.network.radar.load(record)
-        # self.saveCached(record, scan)
+        self.saveCached(record, scan)
 
         return scan
 
