@@ -1,4 +1,4 @@
-#version 460
+#version 330
 
 #define MAX_SCANS 20
 
