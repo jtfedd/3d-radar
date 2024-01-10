@@ -11,7 +11,7 @@ RECORD_FORMAT = "<d4s"
 RECORD_FORMAT_SIZE = struct.calcsize(RECORD_FORMAT)
 SCANDATA_FORMAT = "<2I"
 SCANDATA_FORMAT_SIZE = struct.calcsize(SCANDATA_FORMAT)
-SWEEPMETA_FORMAT = "<5d3I"
+SWEEPMETA_FORMAT = "<5f3I"
 SWEEPMETA_FORMAT_SIZE = struct.calcsize(SWEEPMETA_FORMAT)
 
 
@@ -29,7 +29,7 @@ def serializeSweepMeta(meta: SweepMeta) -> bytes:
     )
 
 
-def deserializeSweepMeta(buffer: bytes, offset: int = 0) -> Tuple[SweepMeta, int]:
+def deserializeSweepMeta(buffer: bytes, bufOffset: int = 0) -> Tuple[SweepMeta, int]:
     (
         elevation,
         azFirst,
@@ -39,13 +39,13 @@ def deserializeSweepMeta(buffer: bytes, offset: int = 0) -> Tuple[SweepMeta, int
         azCount,
         rngCount,
         offset,
-    ) = struct.unpack_from(SWEEPMETA_FORMAT, buffer, offset=offset)
+    ) = struct.unpack_from(SWEEPMETA_FORMAT, buffer, offset=bufOffset)
 
     return (
         SweepMeta(
             elevation, azFirst, azStep, azCount, rngFirst, rngStep, rngCount, offset
         ),
-        offset + SWEEPMETA_FORMAT_SIZE,
+        bufOffset + SWEEPMETA_FORMAT_SIZE,
     )
 
 

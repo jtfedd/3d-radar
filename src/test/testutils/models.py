@@ -1,11 +1,13 @@
 import datetime
+import random
 import unittest
 
 import numpy as np
-import numpy.typing as npt
 
 from lib.model.record import Record
 from lib.model.scan import Scan
+from lib.model.scan_data import ScanData
+from lib.model.sweep_meta import SweepMeta
 
 
 def newTestRecord() -> Record:
@@ -22,18 +24,32 @@ def newTestRecord() -> Record:
     return Record("KDMX", time)
 
 
+def newTestSweepMeta() -> SweepMeta:
+    return SweepMeta(
+        random.random(),
+        random.random(),
+        random.random(),
+        random.randint(0, 1000),
+        random.random(),
+        random.random(),
+        random.randint(0, 1000),
+        random.randint(0, 1000),
+    )
+
+
+def newTestScanData() -> ScanData:
+    return ScanData(
+        [newTestSweepMeta() for _ in range(10)],
+        np.random.uniform(low=0, high=1, size=1000).astype(np.float32).tobytes(),
+    )
+
+
 def newTestScan() -> Scan:
     record = newTestRecord()
-    elevations = np.random.uniform(low=0, high=100, size=10).astype(np.float32)
-    azimuths = np.random.uniform(low=0, high=100, size=100).astype(np.float32)
-    ranges = np.random.uniform(low=0, high=100, size=1000).astype(np.float32)
-    reflectivity = np.random.uniform(low=-25, high=75, size=(10, 100, 1000)).astype(
-        np.float32
-    )
-    velocity = np.random.uniform(low=-100, high=100, size=(10, 100, 1000)).astype(
-        np.float32
-    )
-    return Scan(record, elevations, azimuths, ranges, reflectivity, velocity)
+    reflectivity = newTestScanData()
+    velocity = newTestScanData()
+
+    return Scan(record, reflectivity, velocity)
 
 
 def assertRecordsEqual(t: unittest.TestCase, first: Record, second: Record) -> None:
@@ -44,32 +60,39 @@ def assertRecordsEqual(t: unittest.TestCase, first: Record, second: Record) -> N
     t.assertEqual(first.time, second.time)
 
 
+def assertSweepMetasEqual(
+    t: unittest.TestCase, first: SweepMeta, second: SweepMeta
+) -> None:
+    t.assertIsInstance(first, SweepMeta)
+    t.assertIsInstance(second, SweepMeta)
+
+    t.assertAlmostEqual(first.elevation, second.elevation)
+    t.assertAlmostEqual(first.azFirst, second.azFirst)
+    t.assertEqual(first.azCount, second.azCount)
+    t.assertAlmostEqual(first.azStep, second.azStep)
+    t.assertAlmostEqual(first.rngFirst, second.rngFirst)
+    t.assertEqual(first.rngCount, second.rngCount)
+    t.assertAlmostEqual(first.rngStep, second.rngStep)
+    t.assertEqual(first.offset, second.offset)
+
+
+def assertScanDatasEqual(
+    t: unittest.TestCase, first: ScanData, second: ScanData
+) -> None:
+    t.assertIsInstance(first, ScanData)
+    t.assertIsInstance(second, ScanData)
+
+    t.assertEqual(len(first.metas), len(second.metas))
+    for i, meta in enumerate(first.metas):
+        assertSweepMetasEqual(t, meta, second.metas[i])
+
+    t.assertEqual(first.data, second.data)
+
+
 def assertScansEqual(t: unittest.TestCase, first: Scan, second: Scan) -> None:
     t.assertIsInstance(first, Scan)
     t.assertIsInstance(second, Scan)
 
     assertRecordsEqual(t, first.record, second.record)
-
-    assertArraysAlmostEqual(t, first.elevations, second.elevations)
-    assertArraysAlmostEqual(t, first.azimuths, second.azimuths)
-    assertArraysAlmostEqual(t, first.ranges, second.ranges)
-    assertArraysAlmostEqual(t, first.reflectivity, second.reflectivity)
-    assertArraysAlmostEqual(t, first.velocity, second.velocity)
-
-
-def assertArraysAlmostEqual(
-    t: unittest.TestCase,
-    first: npt.NDArray[np.float32],
-    second: npt.NDArray[np.float32],
-) -> None:
-    t.assertEqual(first.shape, second.shape)
-
-    elements = len(first)
-
-    if len(first.shape) > 1:
-        for i in range(elements):
-            assertArraysAlmostEqual(t, first[i], second[i])
-        return
-
-    for i in range(elements):
-        t.assertAlmostEqual(first[i], second[i])
+    assertScanDatasEqual(t, first.reflectivity, second.reflectivity)
+    assertScanDatasEqual(t, first.velocity, second.velocity)
