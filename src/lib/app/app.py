@@ -89,7 +89,7 @@ class App:
         if self.state.serializationVersion.value == SERIALIZATION_VERSION:
             return
 
-        print("Serialization out of date, clearing cached file")
+        print("Serialization out of date, clearing cached files")
 
         self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
         for file in self.ctx.fileManager.cachePath.iterdir():
