@@ -1,42 +1,62 @@
 import datetime
 from typing import List
 
-import boto3
-import botocore
-from metpy.io import Level2File
+import numpy as np
+import pynexrad
 
-from lib.model.convert.scan_from_metpy import scanFromLevel2Data
 from lib.model.record import Record
 from lib.model.scan import Scan
+from lib.model.scan_data import ScanData
+from lib.model.sweep_meta import SweepMeta
+
+
+def sweepMetaFromSweep(sweep: pynexrad.Sweep) -> SweepMeta:
+    return SweepMeta(
+        sweep.elevation,
+        sweep.az_first,
+        sweep.az_step,
+        sweep.az_count,
+        sweep.range_first,
+        sweep.range_step,
+        sweep.range_count,
+        sweep.offset,
+    )
+
+
+def scanDataFromScan(scan: pynexrad.Scan) -> ScanData:
+    data = np.array(scan.data, dtype=np.float32).tobytes()
+
+    metas = []
+    for meta in scan.meta:
+        metas.append(sweepMetaFromSweep(meta))
+
+    return ScanData(metas, data)
+
+
+def scanFromLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
+    return Scan(
+        record,
+        scanDataFromScan(file.reflectivity),
+        scanDataFromScan(file.velocity),
+    )
 
 
 class RadarProvider:
-    RADAR_BUCKET = "noaa-nexrad-level2"
-
-    def __init__(self) -> None:
-        config = botocore.client.Config(
-            signature_version=botocore.UNSIGNED, user_agent_extra="Resource"
-        )
-
-        self.bucket = boto3.resource("s3", config=config).Bucket(self.RADAR_BUCKET)
-        self.client = boto3.client("s3", config=config)
-
     def load(self, record: Record) -> Scan:
         key = record.awsKey()
+
         print("Fetching from s3:", key)
 
-        obj = self.client.get_object(Bucket=self.RADAR_BUCKET, Key=key)
-        data = obj["Body"]
-
-        print("Parsing", key)
-        level2File = Level2File(data)
-        print("Parsed", key)
+        level2File = pynexrad.download_nexrad_file(
+            record.station,
+            record.time.year,
+            record.time.month,
+            record.time.day,
+            key,
+        )
 
         print("Post-processing", key)
-        scan = scanFromLevel2Data(record, level2File)
-        print("Post-processing finished", key)
-
-        return scan
+        return scanFromLevel2File(record, level2File)
 
     def search(self, record: Record, count: int) -> List[Record]:
         searchTime = record.time.astimezone(datetime.timezone.utc)
@@ -69,18 +89,11 @@ class RadarProvider:
         return records[-count:]
 
     def getScans(self, radar: str, year: int, month: int, day: int) -> List[Record]:
-        prefix = Record.PREFIX_FMT.format(radar, year, month, day)
-
-        resp = self.bucket.meta.client.list_objects(
-            Bucket="noaa-nexrad-level2",
-            Prefix=prefix,
-            Delimiter="/",
-        )
+        resp = pynexrad.list_records(radar, year, month, day)
 
         records = []
 
-        for scan in resp.get("Contents", []):
-            key = scan.get("Key")
+        for key in resp:
             record = Record.parse(key)
             if record:
                 records.append(record)

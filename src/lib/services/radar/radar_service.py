@@ -4,9 +4,9 @@ from typing import List, Optional
 import blosc
 
 from lib.app.files.manager import FileManager
-from lib.model.convert.serialization import deserializeScan, serializeScan
 from lib.model.record import Record
 from lib.model.scan import Scan
+from lib.model.serialization.serialization import deserializeScan, serializeScan
 from lib.network.network import Network
 
 

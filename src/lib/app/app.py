@@ -6,6 +6,7 @@ from direct.showbase.ShowBase import ShowBase
 from lib.camera.camera_control import CameraControl
 from lib.map.map import Map
 from lib.model.record import Record
+from lib.model.serialization.constants import SERIALIZATION_VERSION
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight
@@ -26,6 +27,7 @@ class App:
         self.ctx = AppContext(base, self.events, self.state)
 
         self.loadConfig()
+        self.validateCache()
 
         self.ui = UI(self.ctx, self.state, self.events)
 
@@ -56,7 +58,7 @@ class App:
 
         scans = {}
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = {
                 executor.submit(self.ctx.services.radar.load, record)
                 for record in records
@@ -82,6 +84,17 @@ class App:
     def saveConfig(self) -> None:
         with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
             f.write(self.state.toJson())
+
+    def validateCache(self) -> None:
+        if self.state.serializationVersion.value == SERIALIZATION_VERSION:
+            return
+
+        print("Serialization out of date, clearing cached files")
+
+        self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
+        for file in self.ctx.fileManager.cachePath.iterdir():
+            if file.suffix == ".dat":
+                self.ctx.fileManager.removeCacheFile(file)
 
     def destroy(self) -> None:
         self.volumeRenderer.destroy()
