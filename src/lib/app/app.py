@@ -6,7 +6,6 @@ from direct.showbase.ShowBase import ShowBase
 from lib.camera.camera_control import CameraControl
 from lib.map.map import Map
 from lib.model.record import Record
-from lib.model.serialization.constants import SERIALIZATION_VERSION
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight
@@ -86,12 +85,8 @@ class App:
             f.write(self.state.toJson())
 
     def validateCache(self) -> None:
-        if self.state.serializationVersion.value == SERIALIZATION_VERSION:
-            return
+        print("Clearing cached files")
 
-        print("Serialization out of date, clearing cached files")
-
-        self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
         for file in self.ctx.fileManager.cachePath.iterdir():
             if file.suffix == ".dat":
                 self.ctx.fileManager.removeCacheFile(file)
