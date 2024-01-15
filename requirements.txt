@@ -1,4 +1,3 @@
-blosc>=1.11.1
 numpy>=1.26.3
 panda3d>=1.10.13
 platformdirs>=4.1.0
