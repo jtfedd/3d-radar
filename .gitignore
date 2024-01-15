@@ -24,3 +24,6 @@ build/*
 
 # Requirements lock file
 requirements-lock.txt
+
+# Map json files
+src/assets/maps/*.json

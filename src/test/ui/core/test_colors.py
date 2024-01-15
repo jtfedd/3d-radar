@@ -2,7 +2,7 @@ import unittest
 
 from panda3d.core import Vec4
 
-from lib.ui.core.colors import fromHex, fromHexWithAlpha
+from lib.ui.core.colors import fromHex, withAlpha
 from lib.util.errors import StateError
 
 
@@ -11,8 +11,8 @@ class TestColors(unittest.TestCase):
         self.assertEqual(fromHex("#000000"), Vec4(0, 0, 0, 1))
         self.assertEqual(fromHex("#FFFFFF"), Vec4(1, 1, 1, 1))
 
-        self.assertEqual(fromHexWithAlpha("#000000", 0.5), Vec4(0, 0, 0, 0.5))
-        self.assertEqual(fromHexWithAlpha("#FFFFFF", 0.75), Vec4(1, 1, 1, 0.75))
+        self.assertEqual(withAlpha(fromHex("#000000"), 0.5), Vec4(0, 0, 0, 0.5))
+        self.assertEqual(withAlpha(fromHex("#FFFFFF"), 0.75), Vec4(1, 1, 1, 0.75))
 
     def testParseHexColorInvalid(self) -> None:
         self.assertRaises(StateError, fromHex, "")

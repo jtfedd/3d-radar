@@ -15,19 +15,21 @@ class PanelComponentManager:
     def add(self, component: PanelComponent) -> None:
         component.setOffset(self.getHeight())
         self.components.append(component)
-        self.subscriptions.append(component.onChange.listen(lambda _: self.update()))
+        self.subscriptions.append(
+            component.onHeightChange.listen(lambda _: self.update())
+        )
 
     def update(self) -> None:
         height = 0.0
 
         for component in self.components:
             component.setOffset(height)
-            height += component.getHeight()
+            height += component.height()
 
         self.onUpdate.send(height)
 
     def getHeight(self) -> float:
-        return sum(c.getHeight() for c in self.components)
+        return sum(c.height() for c in self.components)
 
     def destroy(self) -> None:
         self.components.clear()

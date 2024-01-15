@@ -1,36 +1,102 @@
 import atexit
+import concurrent.futures
 
 from direct.showbase.ShowBase import ShowBase
 
-from lib.app.app_config import AppConfig
-from lib.app.file_manager import FileManager
+from lib.camera.camera_control import CameraControl
+from lib.map.map import Map
+from lib.model.record import Record
+from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
+from lib.util.util import defaultLight
+
+from .animation.manager import AnimationManager
+from .context import AppContext
+from .events import AppEvents
+from .state import AppState
 
 
 class App:
     def __init__(self, base: ShowBase) -> None:
-        self.base = base
-        self.base.setBackgroundColor(0, 0, 0, 1)
+        base.setBackgroundColor(0, 0, 0, 1)
+        defaultLight(base)
 
-        self.fileManager = FileManager()
+        self.state = AppState()
+        self.events = AppEvents()
+        self.ctx = AppContext(base, self.events, self.state)
 
-        self.config = AppConfig()
         self.loadConfig()
+        self.validateCache()
 
-        self.ui = UI(self.base, self.config)
-        self.ui.panels.events.scaleChanged.listen(self.config.setUiScale)
+        self.ui = UI(self.ctx, self.state, self.events)
 
-        atexit.register(self.saveConfig)
+        self.cameraControl = CameraControl(self.ctx, self.events)
+        self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
+        self.animationManager = AnimationManager(self.ctx, self.state, self.events)
+
+        self.map = Map(self.ctx, self.state)
+
+        self.loadData()
+        self.events.requestData.listen(lambda _: self.loadData())
+
+        atexit.register(self.destroy)
+
+    def loadData(self) -> None:
+        radar = self.state.station.value
+
+        records = self.ctx.services.radar.search(
+            Record(
+                radar,
+                self.ctx.timeUtil.getQueryTime(),
+            ),
+            self.state.frames.value,
+        )
+
+        if len(records) == 0:
+            raise ValueError("No Records Found")
+
+        scans = {}
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = {
+                executor.submit(self.ctx.services.radar.load, record)
+                for record in records
+            }
+            for future in concurrent.futures.as_completed(futures):
+                scan = future.result()
+                scans[scan.record.key()] = scan
+
+        self.ctx.radarCache.setData(scans)
+        self.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:
-        configPath = self.fileManager.getConfigFile()
+        configPath = self.ctx.fileManager.getConfigFile()
         if not configPath.exists():
             return
 
         with configPath.open("r", encoding="utf-8") as f:
             jsonStr = f.read()
-            self.config.fromJson(jsonStr)
+            if jsonStr == "":
+                return
+            self.state.fromJson(jsonStr)
 
     def saveConfig(self) -> None:
-        with self.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
-            f.write(self.config.toJson())
+        with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
+            f.write(self.state.toJson())
+
+    def validateCache(self) -> None:
+        print("Clearing cached files")
+
+        for file in self.ctx.fileManager.cachePath.iterdir():
+            if file.suffix == ".dat":
+                self.ctx.fileManager.removeCacheFile(file)
+
+    def destroy(self) -> None:
+        self.volumeRenderer.destroy()
+        self.cameraControl.destroy()
+        self.ui.destroy()
+        self.ctx.destroy()
+        self.events.destroy()
+
+        self.saveConfig()
+        self.state.destroy()

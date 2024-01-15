@@ -2,50 +2,45 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.events import AppEvents
+from lib.app.state import AppState
+from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
-from lib.ui.core.components.text_input import TextInput
-from lib.ui.core.config import UIConfig
 from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.text_input import PanelTextInput
 from lib.ui.panels.core.panel_component import PanelComponent
-from lib.util.events.event_dispatcher import EventDispatcher
 
 
 class UIScaleInput(PanelComponent):
-    MIN_SCALE = 25
-    MAX_SCALE = 300
+    MIN_SCALE = 50
+    MAX_SCALE = 150
 
-    def __init__(self, root: NodePath[PandaNode], config: UIConfig, label: str):
+    def __init__(
+        self,
+        root: NodePath[PandaNode],
+        ctx: UIContext,
+        state: AppState,
+        events: AppEvents,
+    ):
         super().__init__(root)
 
-        self.config = config
+        self.ctx = ctx
+        self.state = state
 
-        self.label = Text(
+        self.input = PanelTextInput(
             root=self.root,
-            font=config.fonts.bold,
-            text=label,
-            x=UIConstants.panelPadding,
-            y=-UIConstants.panelInputHeight / 2,
-            hAlign=HAlign.LEFT,
-            vAlign=VAlign.CENTER,
-        )
-
-        self.input = TextInput(
-            config=config,
-            root=self.root,
-            font=config.fonts.regular,
-            x=UIConstants.panelContentWidth + UIConstants.panelPadding - 0.04,
-            y=-UIConstants.panelInputHeight / 2,
-            hAlign=HAlign.RIGHT,
-            vAlign=VAlign.CENTER,
-            width=UIConstants.panelContentWidth / 4,
-            size=UIConstants.fontSizeRegular,
-            initialText=self.scaleStr(),
+            ctx=ctx,
+            events=events,
+            label="UI Scale:",
+            initialValue=self.scaleStr(),
+            inputWidth=UIConstants.panelContentWidth / 4,
+            rightMargin=0.04,
         )
 
         self.percent = Text(
             root=self.root,
-            font=config.fonts.regular,
+            font=ctx.fonts.regular,
             text="%",
             x=UIConstants.panelContentWidth + UIConstants.panelPadding,
             y=-UIConstants.panelInputHeight / 2,
@@ -53,14 +48,14 @@ class UIScaleInput(PanelComponent):
             vAlign=VAlign.CENTER,
         )
 
-        self.inputChangeSub = self.input.onChange.listen(self.handleScaleChange)
-        self.onScaleChange = EventDispatcher[float]()
+        self.inputChangeSub = self.input.input.onCommit.listen(self.handleScaleChange)
+        self.scaleChangeSub = self.state.uiScale.listen(lambda _: self.resetValue())
 
     def scaleStr(self) -> str:
-        return str(int(self.config.anchors.scale * 100))
+        return str(int(self.state.uiScale.value * 100))
 
     def resetValue(self) -> None:
-        self.input.setText(self.scaleStr())
+        self.input.input.setText(self.scaleStr())
 
     def handleScaleChange(self, value: str) -> None:
         try:
@@ -71,9 +66,8 @@ class UIScaleInput(PanelComponent):
 
         if newScale < self.MIN_SCALE or newScale > self.MAX_SCALE:
             newScale = min(self.MAX_SCALE, max(self.MIN_SCALE, newScale))
-            self.input.setText(str(newScale))
 
-        self.onScaleChange.send(newScale / 100.0)
+        self.state.uiScale.setValue(newScale / 100.0)
 
     def getHeight(self) -> float:
         return UIConstants.panelInputHeight
@@ -82,8 +76,6 @@ class UIScaleInput(PanelComponent):
         super().destroy()
 
         self.inputChangeSub.cancel()
-        self.onScaleChange.close()
 
-        self.label.destroy()
         self.input.destroy()
         self.percent.destroy()

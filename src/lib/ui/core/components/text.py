@@ -9,8 +9,10 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.ui.core.util import correctYForTextAlignment, horizontalAlignToTextNodeAlign
 
+from .component import Component
 
-class Text:
+
+class Text(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],
@@ -19,7 +21,7 @@ class Text:
         x: float = 0,
         y: float = 0,
         size: float = UIConstants.fontSizeRegular,
-        color: Vec4 = UIColors.WHITE,
+        color: Vec4 = UIColors.CONTENT,
         hAlign: HAlign = HAlign.LEFT,
         vAlign: VAlign = VAlign.BASELINE,
         layer: UILayer = UILayer.CONTENT,
@@ -40,8 +42,17 @@ class Text:
 
         self.text.setBin("fixed", layer.value)
 
+    def hide(self) -> None:
+        self.text.hide()
+
+    def show(self) -> None:
+        self.text.show()
+
     def updateText(self, text: str) -> None:
         self.text.setText(text)
+
+    def updateColor(self, color: Vec4) -> None:
+        self.text.setFg(color)
 
     def destroy(self) -> None:
         self.text.destroy()

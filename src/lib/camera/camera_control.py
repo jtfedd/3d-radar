@@ -1,19 +1,27 @@
-from direct.showbase.DirectObject import DirectObject
-from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.core import Vec3
 
+from lib.app.context import AppContext
+from lib.app.events import AppEvents
+from lib.map.constants import RADAR_RANGE
+from lib.util.events.listener import Listener
 
-class CameraControl(DirectObject):
+
+class CameraControl(Listener):
     DEFAULT_X = 0
     DEFAULT_Y = 0
 
     DEFAULT_PITCH = 30
     DEFAULT_HEADING = 0
-    DEFAULT_ZOOM = 300
+    DEFAULT_ZOOM = 500
 
-    def __init__(self, base: ShowBase, enable: bool = True):
-        self.base = base
+    MIN_ZOOM = 10
+    MAX_ZOOM = 2250
+
+    def __init__(self, ctx: AppContext, events: AppEvents):
+        super().__init__()
+
+        self.base = ctx.base
 
         # Disable the built-in mouse camera control
         self.base.disableMouse()
@@ -35,13 +43,13 @@ class CameraControl(DirectObject):
         self.lastMouseY: float = 0
 
         # Set up nodes
-        self.slider = base.render.attachNewNode("camera-slider")
-        self.pivot = base.render.attachNewNode("camera-pivot")
-        self.mount = base.render.attachNewNode("camera-mount")
+        self.slider = self.base.render.attachNewNode("camera-slider")
+        self.pivot = self.base.render.attachNewNode("camera-pivot")
+        self.mount = self.base.render.attachNewNode("camera-mount")
 
         self.pivot.reparentTo(self.slider)
         self.mount.reparentTo(self.pivot)
-        base.camera.reparentTo(self.mount)
+        self.base.camera.reparentTo(self.mount)
 
         self.updatePositions()
 
@@ -49,25 +57,11 @@ class CameraControl(DirectObject):
         self.dragging = False
         self.rotating = False
 
-        if enable:
-            self.enable()
+        self.listen(events.input.leftMouse, self.handleDrag)
+        self.listen(events.input.rightMouse, self.handleRotate)
+        self.listen(events.input.zoom, self.handleZoom)
 
-        base.task_mgr.add(self.update, "camera-update")
-
-    def enable(self) -> None:
-        self.accept("mouse1", self.handleDragStart)
-        self.accept("mouse1-up", self.handleDragStop)
-
-        self.accept("mouse3", self.handleRotateStart)
-        self.accept("mouse3-up", self.handleRotateStop)
-
-        self.accept("wheel_up", self.handleZoomIn)
-        self.accept("wheel_down", self.handleZoomOut)
-
-    def disable(self) -> None:
-        self.dragging = False
-        self.rotating = False
-        self.ignoreAll()
+        self.updateTask = ctx.base.taskMgr.add(self.update, "camera-update")
 
     def resetPosition(
         self,
@@ -83,7 +77,7 @@ class CameraControl(DirectObject):
         self,
         pitch: float = 30,
         heading: float = 0,
-        zoom: float = 300,
+        zoom: float = 500,
     ) -> None:
         if pitch is not None:
             self.pitch = pitch
@@ -95,6 +89,7 @@ class CameraControl(DirectObject):
     def update(self, task: Task.Task) -> int:
         self.handleMouseUpdate()
         self.updatePositions()
+        self.updateNearFar()
 
         return task.cont
 
@@ -130,6 +125,10 @@ class CameraControl(DirectObject):
             newPos = self.base.render.getRelativePoint(
                 self.slider, Vec3(moveDX, moveDY, 0)
             )
+
+            if newPos.length() > RADAR_RANGE:
+                newPos = newPos.normalized() * RADAR_RANGE
+
             self.x = newPos.x
             self.y = newPos.y
 
@@ -140,20 +139,42 @@ class CameraControl(DirectObject):
         self.lastMouseX = mouseX
         self.lastMouseY = mouseY
 
-    def handleDragStart(self) -> None:
-        self.dragging = True
+    def handleDrag(self, value: bool) -> None:
+        self.dragging = value
 
-    def handleDragStop(self) -> None:
-        self.dragging = False
+    def handleRotate(self, value: bool) -> None:
+        self.rotating = value
 
-    def handleRotateStart(self) -> None:
-        self.rotating = True
+    def handleZoom(self, direction: int) -> None:
+        self.zoom = self.zoom * pow(self.zoomFactor, direction)
+        self.zoom = min(self.MAX_ZOOM, max(self.MIN_ZOOM, self.zoom))
 
-    def handleRotateStop(self) -> None:
-        self.rotating = False
+    def updateNearFar(self) -> None:
+        # Clips the near and far planes of the camera to reduce z-fighting between
+        # the map and the volume
 
-    def handleZoomIn(self) -> None:
-        self.zoom = self.zoom / self.zoomFactor
+        # Get a unit vector in the direction the camera is pointing
+        cameraForward = self.base.render.getRelativeVector(
+            self.base.camera, Vec3(0, 1, 0)
+        )
 
-    def handleZoomOut(self) -> None:
-        self.zoom = self.zoom * self.zoomFactor
+        # Get the near and far points of the scene along the vector the camera is facing
+        # Transform back to be relative to the camera
+        sceneNear = self.base.camera.getRelativePoint(
+            self.base.render, -cameraForward * RADAR_RANGE
+        )
+        sceneFar = self.base.camera.getRelativePoint(
+            self.base.render, cameraForward * RADAR_RANGE
+        )
+
+        # To set the near and far plane to the correct distance we just need to extract
+        # the y-coordinate from the camera-relative points
+        near = sceneNear.y
+        far = sceneFar.y
+
+        # Ensure we don't end up with invalid values
+        near = max(1, near)
+        far = max(far, near + 1)
+
+        # Apply the values to the lens
+        self.base.cam.node().getLens().setNearFar(near, far)

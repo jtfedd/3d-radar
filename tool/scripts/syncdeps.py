@@ -29,6 +29,8 @@ def readDeps(file: pathlib.Path) -> List[Dependency]:
                 separator = "=="
             elif ">=" in line:
                 separator = ">="
+            elif "@" in line:
+                separator = "@"
             else:
                 raise ValueError("Could not find expected separator in " + line)
 
