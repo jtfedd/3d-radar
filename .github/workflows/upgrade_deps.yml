@@ -11,10 +11,10 @@ jobs:
       - name: Check out the branch
         uses: actions/checkout@v3
 
-      - name: Set Up Python 3.11
+      - name: Set Up Python 3.12
         uses: actions/setup-python@v3
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Upgrade Pip
         run: |

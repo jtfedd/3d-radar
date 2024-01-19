@@ -6,7 +6,7 @@ This is a project to build a 3d rendering program which can visualize full 3d ne
 
 ### Python
 
-This project is written in [Python](https://www.python.org/). It is currently developed with Python 3.11; your milage may vary with other versions.
+This project requires [Python 3.12](https://www.python.org/).
 
 ### Set up a virtual environment
 
@@ -31,17 +31,20 @@ deactivate
 
 Dependencies for the project are managed using `pip`.
 
-To install all dependencies:
+To install build dependencies:
 ```
 make install
+```
+
+To install build and development dependencies:
+```
+make install-dev
 ```
 
 To upgrade all dependencies:
 ```
 make upgrade
 ```
-
-Dependencies will also be automatically upgraded weekly by a [workflow](https://github.com/jtfedd/3d-radar/actions/workflows/upgrade_deps.yml).
 
 ### Testing
 
