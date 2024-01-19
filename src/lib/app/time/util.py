@@ -1,7 +1,7 @@
 import datetime
 from zoneinfo import ZoneInfo
 
-from timezonefinder import TimezoneFinder
+from tzfpy import get_tz
 
 from lib.app.events import AppEvents
 from lib.app.state import AppState
@@ -18,8 +18,6 @@ class TimeUtil(Listener):
         self.state = state
         self.services = services
         self.events = events
-
-        self.tf = TimezoneFinder()
 
         self.timezone = self.resolveTimezone()
 
@@ -93,7 +91,7 @@ class TimeUtil(Listener):
         return "%d %b %Y"
 
     def findTimezone(self, location: GeoPoint) -> str | None:
-        return self.tf.timezone_at(lng=location.lon, lat=location.lat)
+        return get_tz(lng=location.lon, lat=location.lat)
 
     def getTimeFormatStr(self) -> str:
         if self.state.timeMode.value == TimeMode.UTC:
