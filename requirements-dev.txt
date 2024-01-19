@@ -6,6 +6,6 @@ mypy>=1.8.0
 pylint>=3.0.3
 pyshp>=2.3.1
 shapely>=2.0.2
-types-panda3d>=0.3.3
+types-panda3d>=0.4.0
 types-requests>=2.31.0.20240106
 unittest-xml-reporting>=3.2.0
