@@ -31,7 +31,7 @@ class VolumeRenderer(Listener):
             "assets/velocity_scale.png"
         )
 
-        manager = FilterManager(self.ctx.base.win, self.ctx.base.cam)  # type: ignore
+        manager = FilterManager(self.ctx.base.win, self.ctx.base.cam)
         scene = Texture()
         depth = Texture()
         self.plane = unwrap(manager.renderSceneInto(colortex=scene, depthtex=depth))

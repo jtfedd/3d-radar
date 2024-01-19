@@ -19,10 +19,10 @@ jobs:
     - name: Setup LCOV
       uses: hrishikesh-kadam/setup-lcov@v1
 
-    - name: Set Up Python 3.11
+    - name: Set Up Python 3.12
       uses: actions/setup-python@v3
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: Display Python Version
       run: python -c "import sys; print(sys.version)"
