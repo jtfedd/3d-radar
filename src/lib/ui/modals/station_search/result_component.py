@@ -8,10 +8,7 @@ from lib.app.events import AppEvents
 from lib.model.location import Location
 from lib.model.radar_station import RadarStation
 from lib.ui.context import UIContext
-from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 
 from ..address_search.results_component import AddressResultsComponent
@@ -37,41 +34,20 @@ class RadarStationsResult(AddressResultsComponent, Listener):
         self.contentHeight = self.locationText.height() + UIConstants.modalPadding
 
         buttonListHeight = (
-            len(radarStations) * UIConstants.stationModalResultButtonHeight
-            + (len(radarStations) - 1) * UIConstants.stationModalResultButtonPadding
+            len(radarStations) * UIConstants.addressModalResultButtonHeight
+            + (len(radarStations) - 1) * UIConstants.addressModalResultButtonPadding
         )
 
-        self.scroll: ScrollablePanel | None = None
-        buttonTopOffset = top + self.contentHeight
-        buttonRoot: NodePath[PandaNode]
-
-        if buttonListHeight > UIConstants.stationModalResultButtonsMaxHeight:
-            self.scroll = ScrollablePanel(
-                root=root,
-                ctx=ctx,
-                events=events,
-                y=-(top + self.contentHeight),
-                width=UIConstants.addressModalWidth + UIConstants.modalPadding,
-                height=UIConstants.stationModalResultButtonsMaxHeight,
-                canvasHeight=buttonListHeight,
-                hAlign=HAlign.LEFT,
-                vAlign=VAlign.TOP,
-                layer=UILayer.MODAL_CONTENT_INTERACTION,
-                scrollbarPadding=UIConstants.modalScrollbarPadding,
-            )
-            self.contentHeight += UIConstants.stationModalResultButtonsMaxHeight
-            buttonTopOffset = 0
-            buttonRoot = self.scroll.getCanvas()
-        else:
-            self.contentHeight += buttonListHeight
-            buttonRoot = root
+        (self.scroll, buttonRoot, self.contentHeight, buttonTop) = self.setupButtonRoot(
+            ctx, events, top, self.contentHeight, buttonListHeight, root
+        )
 
         self.buttons: List[RadarButton] = []
 
         for i, radarStation in enumerate(radarStations):
-            buttonTop = buttonTopOffset + i * (
-                UIConstants.stationModalResultButtonHeight
-                + UIConstants.stationModalResultButtonPadding
+            buttonTop = buttonTop + i * (
+                UIConstants.addressModalResultButtonHeight
+                + UIConstants.addressModalResultButtonPadding
             )
 
             self.buttons.append(

@@ -39,7 +39,7 @@ class TimezoneResult(AddressResultsComponent, Listener):
                 root=root,
                 ctx=ctx,
                 width=UIConstants.addressModalWidth,
-                height=UIConstants.timezoneModalResultButtonHeight,
+                height=UIConstants.addressModalResultButtonHeight,
                 y=-(top + self.contentHeight),
                 hAlign=HAlign.LEFT,
                 vAlign=VAlign.TOP,
@@ -49,7 +49,7 @@ class TimezoneResult(AddressResultsComponent, Listener):
                 skin=ButtonSkin.ACCENT,
             )
 
-            self.contentHeight += UIConstants.timezoneModalResultButtonHeight
+            self.contentHeight += UIConstants.addressModalResultButtonHeight
 
             self.listen(
                 self.result.onClick,

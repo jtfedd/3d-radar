@@ -16,7 +16,7 @@ class MarkersComponent(PanelComponent):
         state: AppState,
         events: AppEvents,
     ):
-        pass
+        super().__init__(root)
 
     def getHeight(self) -> float:
         return 5

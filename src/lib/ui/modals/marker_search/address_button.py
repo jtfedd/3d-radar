@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
-from lib.model.radar_station import RadarStation
+from lib.model.location import Location
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.button import Button, ButtonSkin
@@ -13,65 +13,54 @@ from lib.util.events.event_dispatcher import EventDispatcher
 from lib.util.events.listener import Listener
 
 
-class RadarButton(Listener):
+class AddressButton(Listener):
     def __init__(
         self,
         ctx: UIContext,
         root: NodePath[PandaNode],
         top: float,
         contentWidth: float,
-        radarStation: RadarStation,
-        distance: float,
+        location: Location,
     ) -> None:
         super().__init__()
+
+        label = location.getLabel()
+        if "\n" in label:
+            buttonHeight = UIConstants.addressModalResultButtonHeightDouble
+        else:
+            buttonHeight = UIConstants.addressModalResultButtonHeight
 
         self.button = Button(
             root=root,
             ctx=ctx,
             width=contentWidth,
-            height=UIConstants.addressModalResultButtonHeight,
+            height=buttonHeight,
             y=-top,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
-            layer=UILayer.MODAL_CONTENT_INTERACTION,
             textSize=UIConstants.fontSizeRegular,
             skin=ButtonSkin.ACCENT,
+            layer=UILayer.MODAL_CONTENT_INTERACTION,
         )
 
-        self.nameText = Text(
+        self.labelText = Text(
             root=root,
             font=ctx.fonts.regular,
-            text=radarStation.stationID + ": " + radarStation.name,
+            text=label,
             x=UIConstants.addressModalResultButtonTextPadding,
-            y=-(top + UIConstants.addressModalResultButtonHeight / 2),
+            y=-(top + (UIConstants.addressModalResultButtonTextPadding / 2)),
             size=UIConstants.fontSizeRegular,
-            vAlign=VAlign.CENTER,
+            vAlign=VAlign.TOP,
             layer=UILayer.MODAL_CONTENT,
         )
 
-        self.distText = Text(
-            root=root,
-            font=ctx.fonts.regular,
-            text=f"{distance:.1f} km",
-            x=contentWidth - UIConstants.addressModalResultButtonTextPadding,
-            y=-(top + UIConstants.addressModalResultButtonHeight / 2),
-            size=UIConstants.fontSizeRegular,
-            vAlign=VAlign.CENTER,
-            hAlign=HAlign.RIGHT,
-            layer=UILayer.MODAL_CONTENT,
-        )
-
-        self.onClick = EventDispatcher[str]()
-        self.listen(
-            self.button.onClick, lambda _: self.onClick.send(radarStation.stationID)
-        )
+        self.onClick = EventDispatcher[Location]()
+        self.listen(self.button.onClick, lambda _: self.onClick.send(location))
 
     def destroy(self) -> None:
         super().destroy()
 
         self.button.destroy()
-
-        self.nameText.destroy()
-        self.distText.destroy()
+        self.labelText.destroy()
 
         self.onClick.close()
