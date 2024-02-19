@@ -1,1 +1,34 @@
-<a target="_blank" href="https://icons8.com/icons/collections/pyx2sphy3nenxzy1rnyc">Stormfront</a> icons by <a target="_blank" href="https://icons8.com">Icons8</a>
+Weather Data
+
+Radar Data:
+NEXRAD on AWS
+https://registry.opendata.aws/noaa-nexrad
+
+Stations and Alerts:
+National Weather Service API
+https://www.weather.gov/documentation/services-web-api
+
+
+Map Data
+
+Cartographic Boundary Files:
+United States Census Bureau
+https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
+
+Location Search:
+OpenStreetMap
+https://www.openstreetmap.org/copyright
+
+
+UI Resources
+
+Fonts:
+Inter
+https://fonts.google.com/specimen/Inter
+
+Roboto Mono
+https://fonts.google.com/specimen/Roboto+Mono
+
+Icons:
+Icons8
+https://icons8.com/icons/collections/pyx2sphy3nenxzy1rnyc

@@ -3,7 +3,7 @@ from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
-from lib.ui.panels.credits.credits_panel import CreditsPanel
+from lib.ui.panels.info.into_panel import InfoPanel
 from lib.ui.panels.map.map_panel import MapPanel
 from lib.ui.panels.panel_type import PanelType
 from lib.ui.panels.radar_data.radar_data_panel import RadarDataPanel
@@ -23,7 +23,7 @@ class PanelModule:
         self.radarDataPanel = RadarDataPanel(ctx, state, events)
         self.radarVizPanel = RadarViewerPanel(ctx, state, events)
         self.mapPanel = MapPanel(ctx, state, events)
-        self.creditsPanel = CreditsPanel(ctx, state, events)
+        self.infoPanel = InfoPanel(ctx, state, events)
 
         self.currentPanel: PanelContent = self.settingsPanel
 
@@ -56,8 +56,8 @@ class PanelModule:
             self.currentPanel = self.radarVizPanel
         elif panel is PanelType.MAP:
             self.currentPanel = self.mapPanel
-        elif panel is PanelType.CREDITS:
-            self.currentPanel = self.creditsPanel
+        elif panel is PanelType.ABOUT:
+            self.currentPanel = self.infoPanel
         else:
             raise InvalidArgumentException("Unsupported panel type: " + str(panel))
 

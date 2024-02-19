@@ -70,6 +70,8 @@ class UIConstants:
 
     timezoneModalResultButtonHeight = 0.05
 
+    labelPadding = 0.01
+
     # Higher number means slower scrolling
     scrollSensitivity = 10
 
