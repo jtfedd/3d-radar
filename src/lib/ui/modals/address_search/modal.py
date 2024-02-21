@@ -5,12 +5,12 @@ from lib.app.events import AppEvents
 from lib.model.location import Location
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 
+from ..core.footer_button import FooterButton
 from ..core.modal import Modal
 from ..core.text import ModalText
 from ..core.title import ModalTitle
@@ -61,18 +61,11 @@ class AddressSearchModal(Modal, ABC):
 
         self.searchbar.onCommit.listen(self.search)
 
-        self.cancelButton = Button(
-            root=self.bottomLeft,
-            ctx=ctx,
-            width=UIConstants.modalFooterButtonWidth,
-            height=UIConstants.modalFooterButtonHeight,
-            x=UIConstants.addressModalWidth / 2,
-            hAlign=HAlign.CENTER,
-            vAlign=VAlign.BOTTOM,
-            layer=UILayer.MODAL_CONTENT_INTERACTION,
-            textSize=UIConstants.fontSizeRegular,
-            skin=ButtonSkin.ACCENT,
-            text="Cancel",
+        self.cancelButton = FooterButton(
+            ctx,
+            self.bottomLeft,
+            UIConstants.addressModalWidth,
+            "Cancel",
         )
 
         self.headerHeight = top
@@ -86,7 +79,7 @@ class AddressSearchModal(Modal, ABC):
             UIConstants.addressModalWidth, self.headerHeight + self.footerHeight
         )
 
-        self.listener.listen(self.cancelButton.onClick, lambda _: self.destroy())
+        self.listener.listen(self.cancelButton.button.onClick, lambda _: self.destroy())
 
     def search(self, address: str) -> None:
         if self.resultsComponent:

@@ -1,10 +1,8 @@
 from lib.app.events import AppEvents
 from lib.ui.context import UIContext
-from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.constants import UIConstants
-from lib.ui.core.layers import UILayer
 
+from ..core.footer_button import FooterButton
 from ..core.modal import Modal
 from ..core.text import ModalText
 from .license import LICENSE_TEXT
@@ -27,21 +25,14 @@ class LicenseModal(Modal):
             fontSize=UIConstants.fontSizeDetail,
         )
 
-        self.button = Button(
-            root=self.bottomLeft,
-            ctx=ctx,
-            width=UIConstants.modalFooterButtonWidth,
-            height=UIConstants.modalFooterButtonHeight,
-            x=UIConstants.licenseModalWidth / 2,
-            hAlign=HAlign.CENTER,
-            vAlign=VAlign.BOTTOM,
-            layer=UILayer.MODAL_CONTENT_INTERACTION,
-            textSize=UIConstants.fontSizeRegular,
-            skin=ButtonSkin.ACCENT,
-            text="OK",
+        self.button = FooterButton(
+            ctx,
+            self.bottomLeft,
+            UIConstants.licenseModalWidth,
+            "OK",
         )
 
-        self.closeSub = self.button.onClick.listen(lambda _: self.destroy())
+        self.closeSub = self.button.button.onClick.listen(lambda _: self.destroy())
 
     def destroy(self) -> None:
         super().destroy()
