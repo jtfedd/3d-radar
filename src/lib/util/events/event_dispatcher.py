@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Generic, TypeVar
+from typing import Any, Callable, Dict, Generic, TypeVar
 
 from lib.util.errors import StateError
 from lib.util.events.event_subscription import EventSubscription
@@ -25,7 +25,10 @@ class EventDispatcher(Generic[T]):
         for key in list(self.subscriptions.keys()):
             self.remove(key)
 
-    def listen(self, callback: Callable[[T], None]) -> EventSubscription[T]:
+    def listen(  # type: ignore
+        self,
+        callback: Callable[[T], Any],
+    ) -> EventSubscription[T]:
         if self.closed:
             raise StateError("EventDispatcher cannot accept listeners when closed")
 

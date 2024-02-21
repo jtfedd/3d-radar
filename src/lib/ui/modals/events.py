@@ -9,6 +9,8 @@ class ModalEvents:
         self.timeZoneSearch = EventDispatcher[None]()
         self.timeZoneSelected = EventDispatcher[str]()
 
+        self.license = EventDispatcher[None]()
+
     def destroy(self) -> None:
         self.stationSearch.close()
         self.stationSelected.close()

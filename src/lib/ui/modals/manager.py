@@ -3,6 +3,7 @@ from lib.ui.context import UIContext
 from lib.util.events.listener import Listener
 
 from .core.modal import Modal
+from .license.modal import LicenseModal
 from .station_search.modal import StationSearchModal
 from .timezone_search.modal import TimezoneSearchModal
 
@@ -21,6 +22,11 @@ class ModalManager(Listener):
         self.listen(
             events.ui.modals.timeZoneSearch,
             lambda _: self.openModal(TimezoneSearchModal(ctx, events)),
+        )
+
+        self.listen(
+            events.ui.modals.license,
+            lambda _: self.openModal(LicenseModal(ctx, events)),
         )
 
     def openModal(self, modal: Modal) -> None:
