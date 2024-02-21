@@ -74,6 +74,11 @@ class InfoPanel(PanelContent):
         self.iconsButton = self.addComponent(PanelButton(self.root, ctx, "Icons8"))
         self.addComponent(SpacerComponent(self.root))
 
+        self.listener.listen(
+            self.licenseButton.button.onClick,
+            events.ui.modals.license.send,
+        )
+
         self.bind(
             self.awsButton,
             "https://registry.opendata.aws/noaa-nexrad",

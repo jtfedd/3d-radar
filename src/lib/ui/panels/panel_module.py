@@ -3,7 +3,7 @@ from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
-from lib.ui.panels.info.into_panel import InfoPanel
+from lib.ui.panels.info.info_panel import InfoPanel
 from lib.ui.panels.map.map_panel import MapPanel
 from lib.ui.panels.panel_type import PanelType
 from lib.ui.panels.radar_data.radar_data_panel import RadarDataPanel

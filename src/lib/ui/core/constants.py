@@ -63,6 +63,9 @@ class UIConstants:
     addressModalWidth = 0.7
     addressModalSearchbarHeight = 0.05
 
+    licenseModalWidth = 1.2
+    licenseModalHeight = 0.8
+
     stationModalResultButtonHeight = 0.05
     stationModalResultButtonTextPadding = 0.015
     stationModalResultButtonPadding = 0.01
