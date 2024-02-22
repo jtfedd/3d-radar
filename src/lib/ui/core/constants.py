@@ -68,6 +68,18 @@ class UIConstants:
     addressModalResultButtonHeight = 0.05
     addressModalResultButtonHeightDouble = 0.09
 
+    licenseModalWidth = 1.2
+    licenseModalHeight = 0.8
+
+    stationModalResultButtonHeight = 0.05
+    stationModalResultButtonTextPadding = 0.015
+    stationModalResultButtonPadding = 0.01
+    stationModalResultButtonsMaxHeight = 0.3
+
+    timezoneModalResultButtonHeight = 0.05
+
+    labelPadding = 0.01
+
     # Higher number means slower scrolling
     scrollSensitivity = 10
 

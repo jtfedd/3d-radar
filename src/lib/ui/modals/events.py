@@ -13,6 +13,8 @@ class ModalEvents:
         self.markerAdd = EventDispatcher[None]()
         self.markerSelected = EventDispatcher[Location]()
 
+        self.license = EventDispatcher[None]()
+
     def destroy(self) -> None:
         self.stationSearch.close()
         self.stationSelected.close()

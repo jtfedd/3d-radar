@@ -16,6 +16,7 @@ class PanelButtons(Listener):
         (PanelType.RADAR_DATA, Icons.RADAR),
         (PanelType.RADAR_VIEWER, Icons.RADAR_DISPLAY),
         (PanelType.MAP, Icons.MAP),
+        (PanelType.ABOUT, Icons.INFO),
     ]
 
     def __init__(self, ctx: UIContext, events: PanelEvents) -> None:

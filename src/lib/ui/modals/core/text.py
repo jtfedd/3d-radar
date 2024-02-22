@@ -16,9 +16,12 @@ class ModalText:
         root: NodePath[PandaNode],
         top: float,
         text: str,
+        fontSize: float = UIConstants.fontSizeRegular,
     ):
         self.ctx = ctx
         self.numLines = len(text.split("\n"))
+
+        self.fontSize = fontSize
 
         self.text = Text(
             root=root,
@@ -26,17 +29,13 @@ class ModalText:
             text=text,
             vAlign=VAlign.TOP,
             y=-top,
-            size=UIConstants.fontSizeRegular,
+            size=fontSize,
             layer=UILayer.MODAL_CONTENT,
             hAlign=HAlign.LEFT,
         )
 
     def height(self) -> float:
-        return (
-            self.ctx.fonts.regular.getLineHeight()
-            * UIConstants.fontSizeRegular
-            * self.numLines
-        )
+        return self.ctx.fonts.regular.getLineHeight() * self.fontSize * self.numLines
 
     def destroy(self) -> None:
         self.text.destroy()

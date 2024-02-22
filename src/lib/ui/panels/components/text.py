@@ -15,15 +15,18 @@ class PanelText(PanelComponent):
         root: NodePath[PandaNode],
         ctx: UIContext,
         text: str,
+        bold: bool = False,
     ):
         super().__init__(root)
 
         self.font = ctx.fonts.regular
+        if bold:
+            self.font = ctx.fonts.bold
         self.text = text
 
         self.component = Text(
             root=self.root,
-            font=ctx.fonts.regular,
+            font=self.font,
             text=text,
             x=UIConstants.panelPadding,
             hAlign=HAlign.LEFT,

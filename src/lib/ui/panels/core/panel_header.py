@@ -53,7 +53,7 @@ class PanelHeader(Listener):
             y=-UIConstants.panelBorderWidth,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.TOP,
-            icon=Icons.X,
+            icon=Icons.CLOSE,
             iconWidth=closeButtonSize,
             iconHeight=closeButtonSize,
         )

@@ -1,14 +1,15 @@
 class Icons:
-    GEAR = "assets/gear.png"
-    RADAR = "assets/radar.png"
-    RADAR_DISPLAY = "assets/radar_display.png"
-    MAP = "assets/map.png"
+    GEAR = "assets/icons/gear.png"
+    RADAR = "assets/icons/radar.png"
+    RADAR_DISPLAY = "assets/icons/radar_display.png"
+    MAP = "assets/icons/map.png"
+    INFO = "assets/icons/info.png"
 
-    X = "assets/x.png"
+    CLOSE = "assets/icons/close.png"
 
-    PLAY = "assets/play.png"
-    PAUSE = "assets/pause.png"
-    ARROWS = "assets/arrows.png"
+    PLAY = "assets/icons/play.png"
+    PAUSE = "assets/icons/pause.png"
+    ARROWS = "assets/icons/arrows.png"
 
-    CHECKBOX = "assets/checkbox.png"
-    CHECKMARK = "assets/checkmark.png"
+    CHECKBOX = "assets/icons/checkbox.png"
+    CHECKMARK = "assets/icons/checkmark.png"

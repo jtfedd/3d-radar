@@ -26,7 +26,6 @@ class App:
         self.ctx = AppContext(base, self.events, self.state)
 
         self.loadConfig()
-        self.validateCache()
 
         self.ui = UI(self.ctx, self.state, self.events)
 
@@ -83,13 +82,6 @@ class App:
     def saveConfig(self) -> None:
         with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
             f.write(self.state.toJson())
-
-    def validateCache(self) -> None:
-        print("Clearing cached files")
-
-        for file in self.ctx.fileManager.cachePath.iterdir():
-            if file.suffix == ".dat":
-                self.ctx.fileManager.removeCacheFile(file)
 
     def destroy(self) -> None:
         self.volumeRenderer.destroy()
