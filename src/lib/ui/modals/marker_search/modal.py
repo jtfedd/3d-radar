@@ -20,9 +20,7 @@ class MarkerSearchModal(AddressSearchModal):
 
         self.appEvents = events
 
-        self.listener.listen(
-            events.ui.modals.timeZoneSelected, lambda _: self.destroy()
-        )
+        self.listener.listen(events.ui.modals.markerSelected, lambda _: self.destroy())
 
     def resultsLimit(self) -> int:
         return 10
