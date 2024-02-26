@@ -5,20 +5,24 @@ import math
 from panda3d.core import GeomNode, LineSegs, NodePath, PandaNode, Plane, PlaneNode, Vec4
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.core.colors import UIColors
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 from .constants import EARTH_RADIUS, RADAR_RANGE
+from .markers_manager import MarkersManager
 
 
 class Map(Listener):
-    def __init__(self, ctx: AppContext, state: AppState):
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.ctx = ctx
         self.state = state
+
+        self.markersManager = MarkersManager(ctx, state, events)
 
         self.root = ctx.base.render.attachNewNode("map-root")
         self.root.setZ(-EARTH_RADIUS)
@@ -103,6 +107,8 @@ class Map(Listener):
 
     def destroy(self) -> None:
         super().destroy()
+
+        self.markersManager.destroy()
 
         self.root.removeNode()
         self.clipPlane.removeNode()

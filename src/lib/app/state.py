@@ -2,7 +2,7 @@ import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
 from lib.model.data_type import DataType
-from lib.model.location import Location
+from lib.model.location_marker import LocationMarker
 from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
 
@@ -104,13 +104,13 @@ class AppState:
         self.mapCounties = self.createField("mapCounties", True)
         self.mapRoads = self.createField("mapRoads", True)
 
-        self.mapMarkers: Observable[
-            List[Location]
-        ] = self.createFieldCustomSerialization(
-            "mapMarkers",
-            [],
-            lambda rawL: list(map(lambda loc: loc.toJson(), rawL)),
-            lambda jsonL: list(map(Location.fromJson, jsonL)),
+        self.mapMarkers: Observable[List[LocationMarker]] = (
+            self.createFieldCustomSerialization(
+                "mapMarkers",
+                [],
+                lambda rawL: list(map(lambda loc: loc.toJson(), rawL)),
+                lambda jsonL: list(map(LocationMarker.fromJson, jsonL)),
+            )
         )
 
         self.animationSpeed = self.createField("animationSpeed", 4)
