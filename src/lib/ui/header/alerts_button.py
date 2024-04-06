@@ -7,7 +7,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
 
 
-class Alerts:
+class AlertsButton:
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         self.ctx = ctx
         self.state = state
