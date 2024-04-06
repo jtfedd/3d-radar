@@ -9,6 +9,8 @@ class UIConstants:
     clockWidth = 0.22
     clockPadding = 0.01
 
+    headerButtonWidth = headerFooterHeight * 1.6
+
     panelWidth = 0.7
     panelPadding = 0.03
     panelBorderWidth = 0.005
