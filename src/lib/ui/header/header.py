@@ -6,7 +6,7 @@ from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.constants import UIConstants
 
-from .alerts import Alerts
+from .alerts_button import AlertsButton
 from .clock import Clock
 
 
@@ -21,7 +21,7 @@ class Header:
         )
 
         self.clock = Clock(ctx, events)
-        self.alerts = Alerts(ctx, state, events)
+        self.alerts = AlertsButton(ctx, state, events)
 
     def destroy(self) -> None:
         self.background.destroy()

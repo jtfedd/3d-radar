@@ -119,8 +119,10 @@ class Button(Component):
         iconHeight: float = 0.0,
         skin: ButtonSkin = ButtonSkin.DARK,
         toggleSkin: ButtonSkin = ButtonSkin.LIGHT,
+        disabled: bool = False,
     ) -> None:
         self.toggleState = toggleState
+        self.disabled = disabled
 
         xPos = correctXForAlignment(x, width, hAlign)
         yPos = correctYForAlignment(y, height, vAlign)
@@ -182,6 +184,7 @@ class Button(Component):
             frameColor=UIColors.TRANSPARENT,
             rolloverSound=None,
             clickSound=None,
+            state=self.getState(),
         )
 
         self.button.setBin("fixed", layer.value)
@@ -195,6 +198,11 @@ class Button(Component):
         self.updateTask = ctx.appContext.base.addTask(
             lambda _: self.update(), "button-update"
         )
+
+    def getState(self) -> str:
+        if self.disabled:
+            return DGG.DISABLED
+        return DGG.NORMAL
 
     def update(self) -> int:
         buttonState = self.button.guiItem.getState()  # type: ignore
@@ -230,6 +238,10 @@ class Button(Component):
 
     def setToggleState(self, toggleState: bool) -> None:
         self.toggleState = toggleState
+
+    def setDisabled(self, disabled: bool) -> None:
+        self.disabled = disabled
+        self.button["state"] = self.getState()
 
     def destroy(self) -> None:
         self.updateTask.cancel()

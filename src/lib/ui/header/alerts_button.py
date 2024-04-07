@@ -5,10 +5,13 @@ from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.button import Button
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
+from lib.util.events.listener import Listener
 
 
-class AlertsButton:
+class AlertsButton(Listener):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+        super().__init__()
+
         self.ctx = ctx
         self.state = state
         self.events = events
@@ -24,7 +27,12 @@ class AlertsButton:
             icon=Icons.WARNING,
             iconWidth=UIConstants.headerFooterHeight,
             iconHeight=UIConstants.headerFooterHeight,
+            disabled=not state.latest,
         )
 
+        self.listen(state.latest, lambda latest: self.button.setDisabled(not latest))
+
     def destroy(self) -> None:
+        super().destroy()
+
         self.button.destroy()
