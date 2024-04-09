@@ -1,6 +1,8 @@
 import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
+from lib.model.alert_payload import AlertPayload
+from lib.model.alert_status import AlertStatus
 from lib.model.data_type import DataType
 from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
@@ -123,6 +125,9 @@ class AppState:
 
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)
+        self.alerts = Observable[AlertPayload](
+            AlertPayload(status=AlertStatus.READY, alerts={})
+        )
 
     def use24HourTime(self) -> bool:
         return self.timeMode.value == TimeMode.UTC or not self.timeFormat.value

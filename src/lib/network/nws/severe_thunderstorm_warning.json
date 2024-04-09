@@ -1,0 +1,1454 @@
+{
+    "@context": [
+        "https://geojson.org/geojson-ld/geojson-context.jsonld",
+        {
+            "@version": "1.1",
+            "wx": "https://api.weather.gov/ontology#",
+            "@vocab": "https://api.weather.gov/ontology#"
+        }
+    ],
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.43b8169ef0ac6784970f03df36f5dd493cae3103.002.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -84.42,
+                            37.4799999
+                        ],
+                        [
+                            -84.45,
+                            37.4799999
+                        ],
+                        [
+                            -84.48,
+                            37.470000000000006
+                        ],
+                        [
+                            -84.83,
+                            37.4099999
+                        ],
+                        [
+                            -84.85,
+                            37.43
+                        ],
+                        [
+                            -84.86,
+                            37.47
+                        ],
+                        [
+                            -84.85,
+                            37.5
+                        ],
+                        [
+                            -84.52,
+                            37.6599999
+                        ],
+                        [
+                            -84.42,
+                            37.4799999
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.43b8169ef0ac6784970f03df36f5dd493cae3103.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.43b8169ef0ac6784970f03df36f5dd493cae3103.002.1",
+                "areaDesc": "Garrard, KY; Lincoln, KY",
+                "geocode": {
+                    "SAME": [
+                        "021079",
+                        "021137"
+                    ],
+                    "UGC": [
+                        "KYC079",
+                        "KYC137"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/KYC079",
+                    "https://api.weather.gov/zones/county/KYC137"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a295f9a3099f4e14fb1afa97a72ae18ad421a462.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.a295f9a3099f4e14fb1afa97a72ae18ad421a462.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T20:14:00-04:00"
+                    }
+                ],
+                "sent": "2024-04-02T20:34:00-04:00",
+                "effective": "2024-04-02T20:34:00-04:00",
+                "onset": "2024-04-02T20:34:00-04:00",
+                "expires": "2024-04-02T20:45:00-04:00",
+                "ends": "2024-04-02T20:45:00-04:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Louisville KY",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:34PM EDT until April 2 at 8:45PM EDT by NWS Louisville KY",
+                "description": "At 834 PM EDT, a severe thunderstorm was located near Stanford,\nmoving northeast at 55 mph.\n\nHAZARD...60 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Hail damage to vehicles is expected. Expect wind damage to\nroofs, siding, and trees.\n\nLocations impacted include...\nStanford, Lancaster, Crab Orchard, Hustonville, Boneyville, Jumbo,\nMount Salem, Gilbert, Geneva, and Preachersville.",
+                "instruction": "A Tornado Watch remains in effect until 1000 PM EDT for central\nKentucky.\n\nRemain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVSLMK"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS53 KLMK 030034"
+                    ],
+                    "NWSheadline": [
+                        "A SEVERE THUNDERSTORM WARNING REMAINS IN EFFECT UNTIL 845 PM EDT FOR CENTRAL LINCOLN AND SOUTH CENTRAL GARRARD COUNTIES"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:34:00-00:00...storm...246DEG...49KT...37.45,-84.71"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KLMK.SV.W.0055.000000T0000Z-240403T0045Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T00:45:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.eb00e319bc58568100f19a13a01385cb1f0c2dfb.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -81.52,
+                            40.3
+                        ],
+                        [
+                            -81.35,
+                            40.11
+                        ],
+                        [
+                            -81.41,
+                            39.87
+                        ],
+                        [
+                            -81.45,
+                            39.89
+                        ],
+                        [
+                            -81.84,
+                            39.89
+                        ],
+                        [
+                            -81.91,
+                            40.21
+                        ],
+                        [
+                            -81.52,
+                            40.3
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.eb00e319bc58568100f19a13a01385cb1f0c2dfb.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.eb00e319bc58568100f19a13a01385cb1f0c2dfb.001.1",
+                "areaDesc": "Coshocton, OH; Guernsey, OH; Muskingum, OH; Noble, OH; Tuscarawas, OH",
+                "geocode": {
+                    "SAME": [
+                        "039031",
+                        "039059",
+                        "039119",
+                        "039121",
+                        "039157"
+                    ],
+                    "UGC": [
+                        "OHC031",
+                        "OHC059",
+                        "OHC119",
+                        "OHC121",
+                        "OHC157"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/OHC031",
+                    "https://api.weather.gov/zones/county/OHC059",
+                    "https://api.weather.gov/zones/county/OHC119",
+                    "https://api.weather.gov/zones/county/OHC121",
+                    "https://api.weather.gov/zones/county/OHC157"
+                ],
+                "references": [],
+                "sent": "2024-04-02T20:34:00-04:00",
+                "effective": "2024-04-02T20:34:00-04:00",
+                "onset": "2024-04-02T20:34:00-04:00",
+                "expires": "2024-04-02T21:15:00-04:00",
+                "ends": "2024-04-02T21:15:00-04:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Pittsburgh PA",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:34PM EDT until April 2 at 9:15PM EDT by NWS Pittsburgh PA",
+                "description": "SVRPBZ\n\nThe National Weather Service in Pittsburgh has issued a\n\n* Severe Thunderstorm Warning for...\nGuernsey County in east central Ohio...\nSoutheastern Coshocton County in east central Ohio...\nNortheastern Muskingum County in east central Ohio...\nSouth central Tuscarawas County in east central Ohio...\nNorth central Noble County in east central Ohio...\n\n* Until 915 PM EDT.\n\n* At 834 PM EDT, severe thunderstorms were located along a line\nextending from Dresden to North Zanesville to South Zanesville,\nmoving east at 40 mph.\n\nHAZARD...70 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Hail damage to vehicles. Trees snapped and uprooted.\nPower outages.\n\n* Locations impacted include...\nCambridge, Newcomerstown, New Concord, Byesville, Antrim,\nSenecaville, Pleasant City, Conesville, Lore City, Old Washington,\nPlainfield, Norwich, Chandlersville, Otsego, Birmingham, Boden,\nSeneca Lake Park, Salt Fork State Park, and Kimbolton.",
+                "instruction": "Remain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nA Tornado Watch remains in effect until 200 AM EDT for east central\nOhio.\n\nPlease report severe weather by calling 412-262-1988, posting to\nthe NWS Pittsburgh Facebook page, or using Twitter @NWSPITTSBURGH.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVRPBZ"
+                    ],
+                    "WMOidentifier": [
+                        "WUUS51 KPBZ 030034"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:34:00-00:00...storm...259DEG...36KT...40.11,-81.99 39.99,-81.97 39.9,-82.05"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "70 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "thunderstormDamageThreat": [
+                        "CONSIDERABLE"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KPBZ.SV.W.0022.240403T0034Z-240403T0115Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T01:15:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.19ccc8052e14134db0e816d954cac334672175ce.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -82.89,
+                            38.76
+                        ],
+                        [
+                            -82.76,
+                            38.86
+                        ],
+                        [
+                            -82.75,
+                            38.94
+                        ],
+                        [
+                            -82.81,
+                            38.949999999999996
+                        ],
+                        [
+                            -82.79,
+                            39.15
+                        ],
+                        [
+                            -82.77000000000001,
+                            39.17
+                        ],
+                        [
+                            -82.75000000000001,
+                            39.29
+                        ],
+                        [
+                            -82.36000000000001,
+                            39.39
+                        ],
+                        [
+                            -82.29000000000002,
+                            39.38
+                        ],
+                        [
+                            -82.27000000000002,
+                            39.4099999
+                        ],
+                        [
+                            -82.19000000000003,
+                            38.9099999
+                        ],
+                        [
+                            -82.66000000000003,
+                            38.79
+                        ],
+                        [
+                            -82.65000000000002,
+                            38.85
+                        ],
+                        [
+                            -82.77000000000002,
+                            38.85
+                        ],
+                        [
+                            -82.88000000000002,
+                            38.76
+                        ],
+                        [
+                            -82.88000000000002,
+                            38.739999999999995
+                        ],
+                        [
+                            -82.99000000000002,
+                            38.709999999999994
+                        ],
+                        [
+                            -82.99000000000002,
+                            38.729999899999996
+                        ],
+                        [
+                            -82.89,
+                            38.76
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.19ccc8052e14134db0e816d954cac334672175ce.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.19ccc8052e14134db0e816d954cac334672175ce.001.1",
+                "areaDesc": "Greenup, KY; Athens, OH; Gallia, OH; Jackson, OH; Lawrence, OH; Meigs, OH; Vinton, OH",
+                "geocode": {
+                    "SAME": [
+                        "021089",
+                        "039009",
+                        "039053",
+                        "039079",
+                        "039087",
+                        "039105",
+                        "039163"
+                    ],
+                    "UGC": [
+                        "KYC089",
+                        "OHC009",
+                        "OHC053",
+                        "OHC079",
+                        "OHC087",
+                        "OHC105",
+                        "OHC163"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/KYC089",
+                    "https://api.weather.gov/zones/county/OHC009",
+                    "https://api.weather.gov/zones/county/OHC053",
+                    "https://api.weather.gov/zones/county/OHC079",
+                    "https://api.weather.gov/zones/county/OHC087",
+                    "https://api.weather.gov/zones/county/OHC105",
+                    "https://api.weather.gov/zones/county/OHC163"
+                ],
+                "references": [],
+                "sent": "2024-04-02T20:32:00-04:00",
+                "effective": "2024-04-02T20:32:00-04:00",
+                "onset": "2024-04-02T20:32:00-04:00",
+                "expires": "2024-04-02T21:15:00-04:00",
+                "ends": "2024-04-02T21:15:00-04:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Charleston WV",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:32PM EDT until April 2 at 9:15PM EDT by NWS Charleston WV",
+                "description": "SVRRLX\n\nThe National Weather Service in Charleston West Virginia has issued a\n\n* Severe Thunderstorm Warning for...\nNorth central Greenup County in northeastern Kentucky...\nNorthwestern Meigs County in southeastern Ohio...\nNorthern Gallia County in southeastern Ohio...\nJackson County in southeastern Ohio...\nVinton County in southeastern Ohio...\nSouthwestern Athens County in southeastern Ohio...\nNorthwestern Lawrence County in southeastern Ohio...\n\n* Until 915 PM EDT.\n\n* At 831 PM EDT, a severe thunderstorm was located near Lucasville,\nor 10 miles south of Waverly, moving northeast at 45 mph.\n\nHAZARD...60 mph wind gusts and nickel size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Expect damage to roofs, siding, and trees.\n\n* Locations impacted include...\nJackson, Wellston, Mcarthur, Oak Hill, Rio Grande, Lake Hope State\nPark, Gallia, South Shore, Hamden, Coalton, Zaleski, Vinton,\nWilkesville, Mabee, Creola, Radcliffe, Dyesville, Petersburg,\nAllensville, and Salem Center.",
+                "instruction": "Remain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nTorrential rainfall is occurring with this storm, and may lead to\nflash flooding. Do not drive your vehicle through flooded roadways.\n\nA Tornado Watch remains in effect until 200 AM EDT for northeastern\nKentucky...and southeastern Ohio.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVRRLX"
+                    ],
+                    "WMOidentifier": [
+                        "WUUS51 KRLX 030032"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:31:00-00:00...storm...245DEG...46KT...38.97,-83.02"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "0.88"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KRLX.SV.W.0036.240403T0032Z-240403T0115Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T01:15:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1cb43b122251a98d85b988309edf0e32aa53b709.002.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -83.24,
+                            38.6599999
+                        ],
+                        [
+                            -83.41,
+                            38.7
+                        ],
+                        [
+                            -83.36,
+                            38.790000000000006
+                        ],
+                        [
+                            -83.31,
+                            38.92000000000001
+                        ],
+                        [
+                            -83.2,
+                            39.02000000000001
+                        ],
+                        [
+                            -82.8,
+                            39.03000000000001
+                        ],
+                        [
+                            -83.05,
+                            38.74000000000001
+                        ],
+                        [
+                            -83.24,
+                            38.6599999
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1cb43b122251a98d85b988309edf0e32aa53b709.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.1cb43b122251a98d85b988309edf0e32aa53b709.002.1",
+                "areaDesc": "Adams, OH; Pike, OH; Scioto, OH",
+                "geocode": {
+                    "SAME": [
+                        "039001",
+                        "039131",
+                        "039145"
+                    ],
+                    "UGC": [
+                        "OHC001",
+                        "OHC131",
+                        "OHC145"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/OHC001",
+                    "https://api.weather.gov/zones/county/OHC131",
+                    "https://api.weather.gov/zones/county/OHC145"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b489df10c8a5e03795de1558d04b3e1c79b3316a.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.b489df10c8a5e03795de1558d04b3e1c79b3316a.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T19:36:00-04:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0702012c807a377aed28dbcf39d699e937cf6ec2.002.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.0702012c807a377aed28dbcf39d699e937cf6ec2.002.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T20:02:00-04:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.98d4c0e526c2f0d0b191efbac59527ad448325e6.002.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.98d4c0e526c2f0d0b191efbac59527ad448325e6.002.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T20:12:00-04:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.00734e0e529e7dac21e7ba854f1abb2ad926d332.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.00734e0e529e7dac21e7ba854f1abb2ad926d332.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T20:23:00-04:00"
+                    }
+                ],
+                "sent": "2024-04-02T20:31:00-04:00",
+                "effective": "2024-04-02T20:31:00-04:00",
+                "onset": "2024-04-02T20:31:00-04:00",
+                "expires": "2024-04-02T20:45:00-04:00",
+                "ends": "2024-04-02T20:45:00-04:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Wilmington OH",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:31PM EDT until April 2 at 8:45PM EDT by NWS Wilmington OH",
+                "description": "At 831 PM EDT, severe thunderstorms were located along a line\nextending from near Piketon to near Rome, moving east at 45 mph.\n\nHAZARD...60 mph wind gusts and nickel size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Expect damage to trees and power lines.\n\nLocations impacted include...\nLucasville, Blue Creek, Beaver, Rarden, Otway, Lombardsville,\nWakefield, West Portsmouth, Wamsley, Turkey Creek Lake, Ladd,\nMcdermott, Mount Joy, Bear Creek, Germany, and Stockdale.",
+                "instruction": "A Tornado Watch remains in effect until 1000 PM EDT for south central\nOhio.\n\nRemain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nTo report severe weather, go to our website at weather.gov/iln and\nsubmit your report via social media, when you can do so safely.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVSILN"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS51 KILN 030031"
+                    ],
+                    "NWSheadline": [
+                        "A SEVERE THUNDERSTORM WARNING REMAINS IN EFFECT UNTIL 845 PM EDT FOR SOUTHEASTERN ADAMS...SOUTHEASTERN PIKE AND NORTHWESTERN SCIOTO COUNTIES"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:31:00-00:00...storm...262DEG...41KT...39.03,-82.92 38.64,-83.33"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "0.88"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KILN.SV.W.0047.000000T0000Z-240403T0045Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T00:45:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b06210705d0eedbc5ce15edea72175023b310159.002.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -81.23,
+                            40.17
+                        ],
+                        [
+                            -81.38000000000001,
+                            40.31
+                        ],
+                        [
+                            -81.08000000000001,
+                            40.54
+                        ],
+                        [
+                            -80.81999990000001,
+                            40.55
+                        ],
+                        [
+                            -80.70000000000002,
+                            40.449999999999996
+                        ],
+                        [
+                            -80.88000000000002,
+                            40.29
+                        ],
+                        [
+                            -81.23,
+                            40.17
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b06210705d0eedbc5ce15edea72175023b310159.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.b06210705d0eedbc5ce15edea72175023b310159.002.1",
+                "areaDesc": "Carroll, OH; Harrison, OH; Jefferson, OH; Tuscarawas, OH",
+                "geocode": {
+                    "SAME": [
+                        "039019",
+                        "039067",
+                        "039081",
+                        "039157"
+                    ],
+                    "UGC": [
+                        "OHC019",
+                        "OHC067",
+                        "OHC081",
+                        "OHC157"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/OHC019",
+                    "https://api.weather.gov/zones/county/OHC067",
+                    "https://api.weather.gov/zones/county/OHC081",
+                    "https://api.weather.gov/zones/county/OHC157"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f857498f7decfe64424d0403f50b57d3aa2b9d90.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.f857498f7decfe64424d0403f50b57d3aa2b9d90.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T20:16:00-04:00"
+                    }
+                ],
+                "sent": "2024-04-02T20:31:00-04:00",
+                "effective": "2024-04-02T20:31:00-04:00",
+                "onset": "2024-04-02T20:31:00-04:00",
+                "expires": "2024-04-02T21:00:00-04:00",
+                "ends": "2024-04-02T21:00:00-04:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Pittsburgh PA",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:31PM EDT until April 2 at 9:00PM EDT by NWS Pittsburgh PA",
+                "description": "At 830 PM EDT, a severe thunderstorm was located 8 miles northeast of\nFreeport, moving northeast at 60 mph.\n\nHAZARD...60 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Minor hail damage to vehicles is possible. Expect wind\ndamage to trees and power lines, resulting in some power\noutages.\n\nLocations impacted include...\nCadiz, Freeport, Hopedale, Scio, Jewett, Bergholz, Amsterdam,\nRichmond, Bowerston, Bloomingdale, Unionport, Tippecanoe, Piedmont,\nStillwater, Deersville, Clendening Lake, Kilgore, Harlem Springs,\nTappan Lake, and Leesville Lake Park.",
+                "instruction": "A Tornado Watch remains in effect until 200 AM EDT for east central\nOhio.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nPlease report severe weather by calling 412-262-1988, posting to\nthe NWS Pittsburgh Facebook page, or using Twitter @NWSPITTSBURGH.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVSPBZ"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS51 KPBZ 030031"
+                    ],
+                    "NWSheadline": [
+                        "A SEVERE THUNDERSTORM WARNING REMAINS IN EFFECT UNTIL 900 PM EDT FOR HARRISON...NORTHWESTERN JEFFERSON...SOUTHEASTERN CARROLL AND SOUTHEASTERN TUSCARAWAS COUNTIES"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:30:00-00:00...storm...237DEG...50KT...40.3,-81.17"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KPBZ.SV.W.0021.000000T0000Z-240403T0100Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T01:00:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.9648fa4a1ace5609814f459e7676c5ea9798ec72.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -82.8,
+                            39.01
+                        ],
+                        [
+                            -83.09,
+                            39.01
+                        ],
+                        [
+                            -83.09,
+                            39.12
+                        ],
+                        [
+                            -82.98,
+                            39.18
+                        ],
+                        [
+                            -82.79,
+                            39.17
+                        ],
+                        [
+                            -82.8,
+                            39.01
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.9648fa4a1ace5609814f459e7676c5ea9798ec72.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.9648fa4a1ace5609814f459e7676c5ea9798ec72.001.1",
+                "areaDesc": "Pike, OH",
+                "geocode": {
+                    "SAME": [
+                        "039131"
+                    ],
+                    "UGC": [
+                        "OHC131"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/OHC131"
+                ],
+                "references": [],
+                "sent": "2024-04-02T20:26:00-04:00",
+                "effective": "2024-04-02T20:26:00-04:00",
+                "onset": "2024-04-02T20:26:00-04:00",
+                "expires": "2024-04-02T21:00:00-04:00",
+                "ends": "2024-04-02T21:00:00-04:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Wilmington OH",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:26PM EDT until April 2 at 9:00PM EDT by NWS Wilmington OH",
+                "description": "SVRILN\n\nThe National Weather Service in Wilmington has issued a\n\n* Severe Thunderstorm Warning for...\nNortheastern Pike County in south central Ohio...\n\n* Until 900 PM EDT.\n\n* At 826 PM EDT, a severe thunderstorm was located over Piketon,\nmoving east at 55 mph.\n\nHAZARD...60 mph wind gusts and penny size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Expect damage to trees and power lines.\n\n* Locations impacted include...\nWaverly, Piketon, Beaver, Givens, Pike County Airport, Linn, Lake\nWhite, and Omega.",
+                "instruction": "For your protection move to an interior room on the lowest floor of a\nbuilding.\n\nTo report severe weather, go to our website at weather.gov/iln and\nsubmit your report via social media, when you can do so safely.\n\nA Tornado Watch remains in effect until 1000 PM EDT for south central\nOhio.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVRILN"
+                    ],
+                    "WMOidentifier": [
+                        "WUUS51 KILN 030026"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:26:00-00:00...storm...258DEG...48KT...39.05,-83.01"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "0.75"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KILN.SV.W.0050.240403T0026Z-240403T0100Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T01:00:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.643d199bb74cd73ef9f176ddf17ef149d5ca6b2f.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -81.93,
+                            39.84
+                        ],
+                        [
+                            -82.12,
+                            39.82
+                        ],
+                        [
+                            -82.17,
+                            39.82
+                        ],
+                        [
+                            -82.16,
+                            39.9099999
+                        ],
+                        [
+                            -82.22999999999999,
+                            39.9099999
+                        ],
+                        [
+                            -82.20999989999999,
+                            39.92
+                        ],
+                        [
+                            -82.20999989999999,
+                            39.95
+                        ],
+                        [
+                            -82.19999999999999,
+                            39.95
+                        ],
+                        [
+                            -82.18999999999998,
+                            40.1599999
+                        ],
+                        [
+                            -81.93999999999998,
+                            40.220000000000006
+                        ],
+                        [
+                            -81.73999999999998,
+                            40.1599999
+                        ],
+                        [
+                            -81.72999999999998,
+                            39.940000000000005
+                        ],
+                        [
+                            -81.93,
+                            39.84
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.643d199bb74cd73ef9f176ddf17ef149d5ca6b2f.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.643d199bb74cd73ef9f176ddf17ef149d5ca6b2f.001.1",
+                "areaDesc": "Coshocton, OH; Muskingum, OH",
+                "geocode": {
+                    "SAME": [
+                        "039031",
+                        "039119"
+                    ],
+                    "UGC": [
+                        "OHC031",
+                        "OHC119"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/OHC031",
+                    "https://api.weather.gov/zones/county/OHC119"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a242ae75f1fd4ebce6880d306a569493113636f3.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.a242ae75f1fd4ebce6880d306a569493113636f3.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2024-04-02T20:02:00-04:00"
+                    }
+                ],
+                "sent": "2024-04-02T20:25:00-04:00",
+                "effective": "2024-04-02T20:25:00-04:00",
+                "onset": "2024-04-02T20:25:00-04:00",
+                "expires": "2024-04-02T21:00:00-04:00",
+                "ends": "2024-04-02T21:00:00-04:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Pittsburgh PA",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:25PM EDT until April 2 at 9:00PM EDT by NWS Pittsburgh PA",
+                "description": "At 824 PM EDT, severe thunderstorms were located along a line\nextending from near Frazeysburg to near Zanesville to near Somerset,\nmoving east at 45 mph.\n\nHAZARD...60 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Minor hail damage to vehicles is possible. Expect wind\ndamage to trees and power lines, resulting in some power\noutages.\n\nLocations impacted include...\nZanesville, New Concord, South Zanesville, North Zanesville, Dresden,\nFrazeysburg, Philo, Pleasant Grove, Conesville, Fultonham, Norwich,\nChandlersville, Bridgeville, Duncan Falls, East Fultonham, Otsego,\nDrake, and Dillon State Park.",
+                "instruction": "A Tornado Watch remains in effect until 200 AM EDT for east central\nOhio.\n\nRemain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nPlease report severe weather by calling 412-262-1988, posting to\nthe NWS Pittsburgh Facebook page, or using Twitter @NWSPITTSBURGH.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVSPBZ"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS51 KPBZ 030025"
+                    ],
+                    "NWSheadline": [
+                        "A SEVERE THUNDERSTORM WARNING REMAINS IN EFFECT UNTIL 900 PM EDT FOR SOUTH CENTRAL COSHOCTON AND MUSKINGUM COUNTIES"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:24:00-00:00...storm...252DEG...38KT...40.04,-82.11 39.95,-82.12 39.84,-82.31"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KPBZ.SV.W.0020.000000T0000Z-240403T0100Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T01:00:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.65d26b5a9f77d4efcffdca3721ef1deac1073c53.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -83.3199999,
+                            38.33
+                        ],
+                        [
+                            -83.28,
+                            38.32
+                        ],
+                        [
+                            -83.24,
+                            38.33
+                        ],
+                        [
+                            -83.24,
+                            38.39
+                        ],
+                        [
+                            -82.85,
+                            38.59
+                        ],
+                        [
+                            -82.64,
+                            38.290000000000006
+                        ],
+                        [
+                            -83.08,
+                            38.220000000000006
+                        ],
+                        [
+                            -83.17,
+                            38.27
+                        ],
+                        [
+                            -83.22,
+                            38.24
+                        ],
+                        [
+                            -83.23,
+                            38.190000000000005
+                        ],
+                        [
+                            -83.26,
+                            38.190000000000005
+                        ],
+                        [
+                            -83.29,
+                            38.21000000000001
+                        ],
+                        [
+                            -83.30000000000001,
+                            38.21000000000001
+                        ],
+                        [
+                            -83.34000000000002,
+                            38.32000000000001
+                        ],
+                        [
+                            -83.3199999,
+                            38.33
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.65d26b5a9f77d4efcffdca3721ef1deac1073c53.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.65d26b5a9f77d4efcffdca3721ef1deac1073c53.001.1",
+                "areaDesc": "Boyd, KY; Carter, KY; Greenup, KY",
+                "geocode": {
+                    "SAME": [
+                        "021019",
+                        "021043",
+                        "021089"
+                    ],
+                    "UGC": [
+                        "KYC019",
+                        "KYC043",
+                        "KYC089"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/KYC019",
+                    "https://api.weather.gov/zones/county/KYC043",
+                    "https://api.weather.gov/zones/county/KYC089"
+                ],
+                "references": [],
+                "sent": "2024-04-02T20:24:00-04:00",
+                "effective": "2024-04-02T20:24:00-04:00",
+                "onset": "2024-04-02T20:24:00-04:00",
+                "expires": "2024-04-02T21:00:00-04:00",
+                "ends": "2024-04-02T21:00:00-04:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Charleston WV",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:24PM EDT until April 2 at 9:00PM EDT by NWS Charleston WV",
+                "description": "SVRRLX\n\nThe National Weather Service in Charleston West Virginia has issued a\n\n* Severe Thunderstorm Warning for...\nSouthwestern Boyd County in northeastern Kentucky...\nSouthern Greenup County in northeastern Kentucky...\nCarter County in northeastern Kentucky...\n\n* Until 900 PM EDT.\n\n* At 823 PM EDT, a severe thunderstorm was located over Haldeman, or\n7 miles west of Olive Hill, moving northeast at 45 mph.\n\nHAZARD...60 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Hail damage to vehicles is expected. Expect wind damage\nto roofs, siding, and trees.\n\n* Locations impacted include...\nGrayson, Olive Hill, Carter Caves State Park, Princess, Coalton,\nDenton, Gesling, Greenbo Lake, Oldtown, Naples, Rush, Carter,\nGrahn, Hopewell, Hitchins, Warnock, Soldier, Globe, and Mavity.\n\nThis includes Interstate 64 in Kentucky between mile markers 149 and\n185.",
+                "instruction": "Remain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nTorrential rainfall is occurring with this storm, and may lead to\nflash flooding. Do not drive your vehicle through flooded roadways.\n\nA Tornado Watch remains in effect until 200 AM EDT for northeastern\nKentucky.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVRRLX"
+                    ],
+                    "WMOidentifier": [
+                        "WUUS51 KRLX 030024"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:23:00-00:00...storm...245DEG...46KT...38.27,-83.3"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KRLX.SV.W.0035.240403T0024Z-240403T0100Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T01:00:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.9fbbf47b6baad66bdc100fde70cb96547f7010f9.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -85.84,
+                            36.62
+                        ],
+                        [
+                            -85.93,
+                            36.629999999999995
+                        ],
+                        [
+                            -85.98,
+                            36.72
+                        ],
+                        [
+                            -85.69,
+                            36.839999999999996
+                        ],
+                        [
+                            -85.58,
+                            36.81999999999999
+                        ],
+                        [
+                            -85.58,
+                            36.839999999999996
+                        ],
+                        [
+                            -85.6,
+                            36.87
+                        ],
+                        [
+                            -85.55999999999999,
+                            36.849999999999994
+                        ],
+                        [
+                            -85.50999999999999,
+                            36.87
+                        ],
+                        [
+                            -85.46999999999998,
+                            36.89
+                        ],
+                        [
+                            -85.44999999999999,
+                            36.94
+                        ],
+                        [
+                            -85.32999999999998,
+                            36.989999999999995
+                        ],
+                        [
+                            -85.18999999999998,
+                            36.69
+                        ],
+                        [
+                            -85.58999999999999,
+                            36.62
+                        ],
+                        [
+                            -85.84,
+                            36.62
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.9fbbf47b6baad66bdc100fde70cb96547f7010f9.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.9fbbf47b6baad66bdc100fde70cb96547f7010f9.001.1",
+                "areaDesc": "Adair, KY; Clinton, KY; Cumberland, KY; Monroe, KY",
+                "geocode": {
+                    "SAME": [
+                        "021001",
+                        "021053",
+                        "021057",
+                        "021171"
+                    ],
+                    "UGC": [
+                        "KYC001",
+                        "KYC053",
+                        "KYC057",
+                        "KYC171"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/KYC001",
+                    "https://api.weather.gov/zones/county/KYC053",
+                    "https://api.weather.gov/zones/county/KYC057",
+                    "https://api.weather.gov/zones/county/KYC171"
+                ],
+                "references": [],
+                "sent": "2024-04-02T19:18:00-05:00",
+                "effective": "2024-04-02T19:18:00-05:00",
+                "onset": "2024-04-02T19:18:00-05:00",
+                "expires": "2024-04-02T19:45:00-05:00",
+                "ends": "2024-04-02T19:45:00-05:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Louisville KY",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 7:18PM CDT until April 2 at 7:45PM CDT by NWS Louisville KY",
+                "description": "SVRLMK\n\nThe National Weather Service in Louisville has issued a\n\n* Severe Thunderstorm Warning for...\nWest central Clinton County in south central Kentucky...\nMonroe County in south central Kentucky...\nCumberland County in south central Kentucky...\nSouth central Adair County in south central Kentucky...\n\n* Until 745 PM CDT.\n\n* At 718 PM CDT, a severe thunderstorm was located 8 miles west of\nTompkinsville, moving northeast at 55 mph.\n\nHAZARD...60 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Hail damage to vehicles is expected. Expect wind damage\nto roofs, siding, and trees.\n\n* Locations impacted include...\nTompkinsville, Burkesville, Leslie, Gamaliel, Fountain Run,\nLittrell, Meshack, Modoc, Gum Tree, and Blythe.",
+                "instruction": "Remain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nA Tornado Watch remains in effect until 900 PM CDT for south central\nKentucky.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVRLMK"
+                    ],
+                    "WMOidentifier": [
+                        "WUUS53 KLMK 030018"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-03T00:18:00-00:00...storm...247DEG...50KT...36.68,-85.85"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KLMK.SV.W.0056.240403T0018Z-240403T0045Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T00:45:00+00:00"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d7f35dfb0a462b8e11b9a69e2652f7b52f881e89.001.1",
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -82.42,
+                            39.93
+                        ],
+                        [
+                            -82.42,
+                            39.92
+                        ],
+                        [
+                            -82.17,
+                            39.9099999
+                        ],
+                        [
+                            -82.17,
+                            39.82
+                        ],
+                        [
+                            -82.0699999,
+                            39.81
+                        ],
+                        [
+                            -82.08,
+                            39.74
+                        ],
+                        [
+                            -82.38,
+                            39.61
+                        ],
+                        [
+                            -82.36,
+                            39.74
+                        ],
+                        [
+                            -82.4,
+                            39.75
+                        ],
+                        [
+                            -82.39,
+                            39.83
+                        ],
+                        [
+                            -82.47,
+                            39.839999999999996
+                        ],
+                        [
+                            -82.4599999,
+                            39.93
+                        ],
+                        [
+                            -82.42,
+                            39.93
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d7f35dfb0a462b8e11b9a69e2652f7b52f881e89.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.d7f35dfb0a462b8e11b9a69e2652f7b52f881e89.001.1",
+                "areaDesc": "Perry, OH",
+                "geocode": {
+                    "SAME": [
+                        "039127"
+                    ],
+                    "UGC": [
+                        "OHC127"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/county/OHC127"
+                ],
+                "references": [],
+                "sent": "2024-04-02T20:00:00-04:00",
+                "effective": "2024-04-02T20:00:00-04:00",
+                "onset": "2024-04-02T20:00:00-04:00",
+                "expires": "2024-04-02T20:45:00-04:00",
+                "ends": "2024-04-02T20:45:00-04:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Severe",
+                "certainty": "Observed",
+                "urgency": "Immediate",
+                "event": "Severe Thunderstorm Warning",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Charleston WV",
+                "headline": "Severe Thunderstorm Warning issued April 2 at 8:00PM EDT until April 2 at 8:45PM EDT by NWS Charleston WV",
+                "description": "SVRRLX\n\nThe National Weather Service in Charleston West Virginia has issued a\n\n* Severe Thunderstorm Warning for...\nPerry County in southeastern Ohio...\n\n* Until 845 PM EDT.\n\n* At 759 PM EDT, a severe thunderstorm was located 7 miles southeast\nof Canal Winchester, or 8 miles west of Lancaster, moving northeast\nat 45 mph.\n\nHAZARD...60 mph wind gusts and quarter size hail.\n\nSOURCE...Radar indicated.\n\nIMPACT...Hail damage to vehicles is expected. Expect wind damage\nto roofs, siding, and trees.\n\n* Locations impacted include...\nNew Lexington, Somerset, Perry State Forest, Crooksville,\nThornville, Junction City, and Glenford.",
+                "instruction": "Remain alert for a possible tornado! Tornadoes can develop quickly\nfrom severe thunderstorms. If you spot a tornado go at once into the\nbasement or small central room in a sturdy structure.\n\nFor your protection move to an interior room on the lowest floor of a\nbuilding.\n\nTorrential rainfall is occurring with this storm, and may lead to\nflash flooding. Do not drive your vehicle through flooded roadways.\n\nA Tornado Watch remains in effect until 200 AM EDT for southeastern\nOhio.",
+                "response": "Shelter",
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "SVRRLX"
+                    ],
+                    "WMOidentifier": [
+                        "WUUS51 KRLX 030000"
+                    ],
+                    "eventMotionDescription": [
+                        "2024-04-02T23:59:00-00:00...storm...245DEG...47KT...39.75,-82.76"
+                    ],
+                    "windThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxWindGust": [
+                        "60 MPH"
+                    ],
+                    "hailThreat": [
+                        "RADAR INDICATED"
+                    ],
+                    "maxHailSize": [
+                        "1.00"
+                    ],
+                    "tornadoDetection": [
+                        "POSSIBLE"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "EAS-ORG": [
+                        "WXR"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KRLX.SV.W.0034.240403T0000Z-240403T0045Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2024-04-03T00:45:00+00:00"
+                    ]
+                }
+            }
+        }
+    ],
+    "title": "Current watches, warnings, and advisories",
+    "updated": "2024-04-03T00:35:22+00:00"
+}
