@@ -4,6 +4,7 @@ from typing import Dict, List, Tuple
 
 from lib.model.alert import Alert
 from lib.model.alert_type import AlertType
+from lib.model.geo_point import GeoPoint
 from lib.model.radar_station import RadarStation
 
 from ..util import makeRequest
@@ -86,6 +87,47 @@ class NWSProvider:
         alerts = []
 
         for feature in features:
-            alerts.append(Alert(alertType, feature["properties"]["event"]))
+            geometry = feature["geometry"]
+            if geometry is None:
+                continue
+
+            boundary = []
+
+            if geometry["type"] == "Polygon":
+                boundary = self.parsePolygon(geometry["coordinates"])
+            elif geometry["type"] == "MultiPolygon":
+                boundary = self.parseMultiPolygon(geometry["coordinates"])
+            else:
+                continue
+
+            alerts.append(Alert(alertType, feature["properties"]["event"], boundary))
 
         return (alertType, alerts)
+
+    def parseMultiPolygon(
+        self, multiPoly: List[List[List[List[float]]]]
+    ) -> List[List[GeoPoint]]:
+        ret = []
+
+        for poly in multiPoly:
+            rings = self.parsePolygon(poly)
+            for ring in rings:
+                ret.append(ring)
+
+        return ret
+
+    def parsePolygon(
+        self,
+        poly: List[List[List[float]]],
+    ) -> List[List[GeoPoint]]:
+        ret = []
+
+        for ring in poly:
+            coords = []
+
+            for point in ring:
+                coords.append(GeoPoint(lon=point[0], lat=point[1]))
+
+            ret.append(coords)
+
+        return ret
