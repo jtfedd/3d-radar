@@ -5,7 +5,6 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
-from lib.model.alert_type import AlertType
 from lib.util.events.listener import Listener
 
 
@@ -43,10 +42,7 @@ class AlertManager(Listener):
         return task.cont
 
     def loadAlerts(self) -> None:
-        print("load alerts")
-
         if not self.monitoring:
-            print("not monitoring")
             self.state.alerts.setValue(
                 AlertPayload(status=AlertStatus.READY, alerts={})
             )
@@ -54,21 +50,11 @@ class AlertManager(Listener):
 
         alerts = self.ctx.services.nws.getAlerts()
         if alerts is not None:
-            print("loaded")
-            print(
-                "> ", AlertType.TORNADO_WARNING, len(alerts[AlertType.TORNADO_WARNING])
-            )
-            print(
-                "> ",
-                AlertType.SEVERE_THUNDERSTORM_WARNING,
-                len(alerts[AlertType.SEVERE_THUNDERSTORM_WARNING]),
-            )
             self.state.alerts.setValue(
                 AlertPayload(status=AlertStatus.LOADED, alerts=alerts)
             )
             return
 
-        print("error")
         self.state.alerts.setValue(AlertPayload(status=AlertStatus.ERROR, alerts={}))
 
     def handleMonitoringChange(self, shouldMonitor: bool) -> None:

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import math
-from typing import List
+from typing import Dict, List
 
 from panda3d.core import LineSegs, NodePath, PandaNode, Vec3, Vec4
 
 from lib.app.state import AppState
 from lib.model.alert import Alert
+from lib.model.alert_status import AlertStatus
 from lib.model.alert_type import AlertType
 from lib.model.geo_point import GeoPoint
 from lib.ui.core.colors import UIColors
@@ -26,22 +27,32 @@ class AlertRenderer(Listener):
         self.state = state
         self.alertType = alertType
 
-        self.alerts: List[NodePath[PandaNode]] = []
+        self.alerts: Dict[int, NodePath[PandaNode]] = {}
 
         self.renderAlerts()
         self.listen(state.alerts, lambda _: self.renderAlerts())
 
     def renderAlerts(self) -> None:
-        for a in self.alerts:
-            a.removeNode()
-
         payload = self.state.alerts.value
+        if payload.status != AlertStatus.LOADED or self.alertType not in payload.alerts:
+            self.clearAlerts()
+            return
+
         alerts = payload.alerts[self.alertType]
 
-        for alert in alerts:
-            print(self.hashBoundary(alert.boundary))
+        toKeep = {}
 
-            self.alerts.append(self.drawAlert(alert))
+        for alert in alerts:
+            alertHash = self.hashBoundary(alert.boundary)
+            toKeep[alertHash] = True
+            if alertHash not in self.alerts:
+                self.alerts[alertHash] = self.drawAlert(alert)
+
+        toDelete = [key for key in self.alerts if key not in toKeep]
+
+        for key in toDelete:
+            alertToRemove = self.alerts.pop(key)
+            alertToRemove.removeNode()
 
     def hashBoundary(self, boundary: List[List[GeoPoint]]) -> int:
         loopHashes = []
@@ -89,8 +100,14 @@ class AlertRenderer(Listener):
 
         return UIColors.WHITE
 
+    def clearAlerts(self) -> None:
+        toDelete = list(self.alerts)
+
+        for key in toDelete:
+            alert = self.alerts.pop(key)
+            alert.removeNode()
+
     def destroy(self) -> None:
         super().destroy()
 
-        for alert in self.alerts:
-            alert.removeNode()
+        self.clearAlerts()
