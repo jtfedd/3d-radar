@@ -2,7 +2,16 @@ from __future__ import annotations
 
 import math
 
-from panda3d.core import GeomNode, LineSegs, NodePath, PandaNode, Plane, PlaneNode, Vec4
+from panda3d.core import (
+    GeomNode,
+    LineSegs,
+    NodePath,
+    PandaNode,
+    Plane,
+    PlaneNode,
+    TransparencyAttrib,
+    Vec4,
+)
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
@@ -50,12 +59,14 @@ class Map(Listener):
         self.counties = self.loadMapLayer("counties", UIColors.MAP_BOUNDARIES)
         self.roads = self.loadMapLayer("roads", UIColors.MAP_DETAILS)
 
-        self.towRoot = self.mapRoot.attachNewNode("towRoot")
-        self.svwRoot = self.mapRoot.attachNewNode("svwRoot")
-        self.towRoot.setH(90)
-        self.svwRoot.setH(90)
-        self.towRoot.setLightOff()
-        self.svwRoot.setLightOff()
+        self.warningsRoot = self.mapRoot.attachNewNode("warningsRoot")
+        self.warningsRoot.setH(90)
+        self.warningsRoot.setLightOff()
+        self.warningsRoot.setAlphaScale(state.warningsOpacity.value)
+        self.warningsRoot.setTransparency(TransparencyAttrib.MAlpha)
+
+        self.towRoot = self.warningsRoot.attachNewNode("towRoot")
+        self.svwRoot = self.warningsRoot.attachNewNode("svwRoot")
 
         self.towRenderer = AlertRenderer(self.towRoot, state, AlertType.TORNADO_WARNING)
         self.svwRenderer = AlertRenderer(
@@ -71,6 +82,8 @@ class Map(Listener):
         self.listen(state.mapRoads, lambda _: self.updateLayers())
         self.listen(state.showTornadoWarnings, lambda _: self.updateLayers())
         self.listen(state.showSevereThunderstormWarnings, lambda _: self.updateLayers())
+
+        self.listen(state.warningsOpacity, self.warningsRoot.setAlphaScale)
 
     def updateLayers(self) -> None:
         self.states.hide()

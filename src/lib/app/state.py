@@ -105,6 +105,7 @@ class AppState:
         self.mapCounties = self.createField("mapCounties", True)
         self.mapRoads = self.createField("mapRoads", True)
 
+        self.warningsOpacity = self.createField("warningsOpacity", 1.0)
         self.showTornadoWarnings = self.createField("showTornadoWarnings", True)
         self.showSevereThunderstormWarnings = self.createField(
             "showSevereThunderstormWarnings", True
