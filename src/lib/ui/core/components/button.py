@@ -109,7 +109,9 @@ class Button(Component):
         y: float = 0,
         hAlign: HAlign = HAlign.CENTER,
         vAlign: VAlign = VAlign.CENTER,
-        layer: UILayer = UILayer.CONTENT_INTERACTION,
+        bgLayer: UILayer = UILayer.CONTENT_BACKGROUND,
+        contentLayer: UILayer = UILayer.CONTENT,
+        interactionLayer: UILayer = UILayer.CONTENT_INTERACTION,
         toggleState: bool = False,
         text: str | None = None,
         textSize: float = UIConstants.fontSizeRegular,
@@ -138,7 +140,7 @@ class Button(Component):
             y=y,
             hAlign=hAlign,
             vAlign=vAlign,
-            layer=UILayer(layer.value - 2),
+            layer=bgLayer,
         )
 
         self.imageContentFactory: Callable[[str], Image] = lambda i: Image(
@@ -150,7 +152,7 @@ class Button(Component):
             y=yPos,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.CENTER,
-            layer=UILayer(layer.value - 1),
+            layer=contentLayer,
         )
 
         self.textContentFactory: Callable[[str], Text] = lambda t: Text(
@@ -162,7 +164,7 @@ class Button(Component):
             hAlign=HAlign.CENTER,
             vAlign=VAlign.CENTER,
             size=textSize,
-            layer=UILayer(layer.value - 1),
+            layer=contentLayer,
         )
 
         self.content: Text | Image | None = None
@@ -187,7 +189,7 @@ class Button(Component):
             state=self.getState(),
         )
 
-        self.button.setBin("fixed", layer.value)
+        self.button.setBin("fixed", interactionLayer.value)
         self.button.setTransparency(TransparencyAttrib.MAlpha)
         self.button.setAlphaScale(0)
 
