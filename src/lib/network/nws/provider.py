@@ -1,6 +1,5 @@
 import concurrent.futures
 import json
-import random
 from typing import Dict, List, Tuple
 
 from lib.model.alert import Alert
