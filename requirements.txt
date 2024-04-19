@@ -1,8 +1,7 @@
-blosc>=1.11.1
 numpy>=1.26.3
-panda3d>=1.10.13
+panda3d==1.10.14
 platformdirs>=4.1.0
-pynexrad@git+https://github.com/jtfedd/pynexrad.git
+pynexrad==0.0.13
 requests>=2.31.0
-timezonefinder>=6.2.0
 tzdata>=2023.4
+tzfpy>=0.15.3
