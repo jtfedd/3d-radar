@@ -11,6 +11,8 @@ class UIConstants:
 
     headerButtonWidth = headerFooterHeight * 1.6
 
+    badgeSize = 0.03
+
     panelWidth = 0.7
     panelPadding = 0.03
     panelBorderWidth = 0.005
