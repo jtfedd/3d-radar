@@ -8,7 +8,7 @@ import requests
 import shapefile
 import shapely
 import shapely.geometry.base
-from panda3d.core import LineSegs, NodePath, PandaNode, Vec3, Vec4
+from panda3d.core import LineSegs, NodePath, PandaNode, Vec3
 
 MAPS_FOLDER = "src/assets/maps/"
 
@@ -252,19 +252,16 @@ def draw(geometry: shapely.geometry.base.BaseGeometry, lineSegs: LineSegs) -> No
 
 def render(
     geometry: shapely.geometry.base.BaseGeometry,
-    thickness: float,
     filename: str,
 ) -> None:
     print("Rendering", filename)
     lineSegs = LineSegs()
-    lineSegs.setColor(Vec4(1, 1, 1, 1))
-    lineSegs.setThickness(thickness)
     draw(geometry, lineSegs)
 
     writeBam(NodePath(lineSegs.create()), filename)
 
 
 if __name__ == "__main__":
-    render(openOrCreate("states", loadStates), 2, "states")
-    render(openOrCreate("counties", loadCounties), 1, "counties")
-    render(openOrCreate("roads_simple", simplfyRoads), 1, "roads")
+    render(openOrCreate("states", loadStates), "states")
+    render(openOrCreate("counties", loadCounties), "counties")
+    render(openOrCreate("roads_simple", simplfyRoads), "roads")
