@@ -70,6 +70,15 @@ class UIConstants:
     licenseModalWidth = 1.2
     licenseModalHeight = 0.8
 
+    alertsModalWidth = 0.8
+    alertsModalHeight = 0.8
+
+    alertsButtonHeight = 0.09
+    alertsButtonPadding = 0.01
+    alertsButtonTextLeftPadding = 0.025
+    alertsButtonTextVerticalPadding = 0.007
+    alertsButtonBorderWidth = 0.01
+
     stationModalResultButtonHeight = 0.05
     stationModalResultButtonTextPadding = 0.015
     stationModalResultButtonPadding = 0.01

@@ -46,25 +46,26 @@ class AlertsButton(Listener):
         self.updateBadge()
         self.listen(state.alerts, lambda _: self.updateBadge())
         self.listen(state.latest, lambda latest: self.button.setDisabled(not latest))
+        self.listen(self.button.onClick, events.ui.modals.alerts.send)
 
     def updateBadge(self) -> None:
         alerts = self.state.alerts.value
 
-        if alerts.status != AlertStatus.LOADED:
+        if alerts.status == AlertStatus.READY:
             self.badge.hide()
+            return
+
+        if alerts.status == AlertStatus.ERROR:
+            self.badge.setColor(UIColors.RED)
+            self.badge.setText("")
+            return
 
         if AlertType.TORNADO_WARNING in alerts.alerts:
             self.badge.setColor(UIColors.RED)
         else:
             self.badge.setColor(UIColors.ORANGE)
 
-        count = 0
-
-        if AlertType.TORNADO_WARNING in alerts.alerts:
-            count += len(alerts.alerts[AlertType.TORNADO_WARNING])
-
-        if AlertType.SEVERE_THUNDERSTORM_WARNING in alerts.alerts:
-            count += len(alerts.alerts[AlertType.SEVERE_THUNDERSTORM_WARNING])
+        count = alerts.count()
 
         if count > 0:
             self.badge.setText(str(count))

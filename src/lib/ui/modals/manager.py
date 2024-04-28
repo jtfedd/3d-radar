@@ -1,7 +1,9 @@
 from lib.app.events import AppEvents
+from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.util.events.listener import Listener
 
+from .alerts.modal import AlertsModal
 from .core.modal import Modal
 from .license.modal import LicenseModal
 from .station_search.modal import StationSearchModal
@@ -9,7 +11,7 @@ from .timezone_search.modal import TimezoneSearchModal
 
 
 class ModalManager(Listener):
-    def __init__(self, ctx: UIContext, events: AppEvents):
+    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.currentModal: Modal | None = None
@@ -27,6 +29,11 @@ class ModalManager(Listener):
         self.listen(
             events.ui.modals.license,
             lambda _: self.openModal(LicenseModal(ctx, events)),
+        )
+
+        self.listen(
+            events.ui.modals.alerts,
+            lambda _: self.openModal(AlertsModal(ctx, state, events)),
         )
 
     def openModal(self, modal: Modal) -> None:
