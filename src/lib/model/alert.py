@@ -5,9 +5,16 @@ from .geo_point import GeoPoint
 
 
 class Alert:
-    def __init__(self, alertType: AlertType, name: str, boundary: List[List[GeoPoint]]):
+    def __init__(
+        self,
+        alertType: AlertType,
+        event: str,
+        area: str,
+        boundary: List[List[GeoPoint]],
+    ):
         self.alertType = alertType
-        self.name = name
+        self.event = event
+        self.area = area
         self.boundary = boundary
 
     def center(self) -> GeoPoint:

@@ -27,11 +27,48 @@ class AlertButton(Listener):
     ) -> None:
         super().__init__()
 
+        self.ctx = ctx
+
+        self.nameText = Text(
+            root=root,
+            font=ctx.fonts.bold,
+            text=alert.event,
+            x=UIConstants.alertsButtonTextLeftPadding,
+            y=-(top + UIConstants.alertsButtonTextVerticalPadding),
+            size=UIConstants.fontSizeRegular,
+            vAlign=VAlign.TOP,
+            layer=UILayer.MODAL_CONTENT,
+        )
+
+        self.countiesText = Text(
+            root=root,
+            font=ctx.fonts.regular,
+            text=alert.area,
+            x=UIConstants.alertsButtonTextLeftPadding,
+            y=-(
+                top
+                + (UIConstants.alertsButtonHeight / 2)
+                + UIConstants.alertsButtonTextVerticalPadding
+            ),
+            size=UIConstants.fontSizeRegular,
+            vAlign=VAlign.TOP,
+            layer=UILayer.MODAL_CONTENT,
+            maxWidth=UIConstants.alertsModalWidth
+            - UIConstants.alertsButtonTextLeftPadding
+            - UIConstants.alertsButtonTextRightPadding,
+        )
+
+        lineHeight = (
+            self.ctx.fonts.regular.getLineHeight() * UIConstants.fontSizeRegular
+        )
+        excessHeight = self.countiesText.getHeight() - lineHeight
+        self.buttonHeight = UIConstants.alertsButtonHeight + excessHeight
+
         self.button = Button(
             root=root,
             ctx=ctx,
             width=contentWidth,
-            height=UIConstants.alertsButtonHeight,
+            height=self.buttonHeight,
             y=-top,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
@@ -51,7 +88,7 @@ class AlertButton(Listener):
         self.leftBorder = BackgroundCard(
             root=root,
             width=UIConstants.alertsButtonBorderWidth,
-            height=UIConstants.alertsButtonHeight,
+            height=self.buttonHeight,
             x=0,
             y=-top,
             color=borderColor,
@@ -60,37 +97,11 @@ class AlertButton(Listener):
             layer=UILayer.MODAL_CONTENT,
         )
 
-        self.nameText = Text(
-            root=root,
-            font=ctx.fonts.bold,
-            text=alert.name,
-            x=UIConstants.alertsButtonTextLeftPadding,
-            y=-(top + UIConstants.alertsButtonTextVerticalPadding),
-            size=UIConstants.fontSizeRegular,
-            vAlign=VAlign.TOP,
-            layer=UILayer.MODAL_CONTENT,
-        )
-
-        self.countiesText = Text(
-            root=root,
-            font=ctx.fonts.regular,
-            text="nothing here yet",
-            x=UIConstants.alertsButtonTextLeftPadding,
-            y=-(
-                top
-                + (
-                    UIConstants.alertsButtonHeight
-                    - UIConstants.alertsButtonTextVerticalPadding
-                )
-            ),
-            size=UIConstants.fontSizeRegular,
-            vAlign=VAlign.BOTTOM,
-            hAlign=HAlign.LEFT,
-            layer=UILayer.MODAL_CONTENT,
-        )
-
         self.onClick = EventDispatcher[str]()
         self.listen(self.button.onClick, lambda _: self.onClick.send(""))
+
+    def getHeight(self) -> float:
+        return self.buttonHeight
 
     def destroy(self) -> None:
         super().destroy()

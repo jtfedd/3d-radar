@@ -76,8 +76,9 @@ class UIConstants:
     alertsButtonHeight = 0.09
     alertsButtonPadding = 0.01
     alertsButtonTextLeftPadding = 0.025
-    alertsButtonTextVerticalPadding = 0.007
+    alertsButtonTextVerticalPadding = 0.003
     alertsButtonBorderWidth = 0.01
+    alertsButtonTextRightPadding = alertsButtonTextLeftPadding - alertsButtonBorderWidth
 
     stationModalResultButtonHeight = 0.05
     stationModalResultButtonTextPadding = 0.015

@@ -24,9 +24,11 @@ class Text(Component):
         hAlign: HAlign = HAlign.LEFT,
         vAlign: VAlign = VAlign.BASELINE,
         layer: UILayer = UILayer.CONTENT,
+        maxWidth: float = -1,
         italic: bool = False,
     ):
         self.root = root
+        self.size = size
 
         yPos = correctYForTextAlignment(y, font, size, vAlign)
 
@@ -38,6 +40,8 @@ class Text(Component):
         self.text.setFont(font)
         self.text.setText(text)
         self.text.setTextColor(color)
+        if maxWidth > 0:
+            self.text.setWordwrap(maxWidth / size)
         self.text.setAlign(horizontalAlignToTextNodeAlign(hAlign))  # type:ignore
         self.text.setSlant(slant)
 
@@ -58,6 +62,9 @@ class Text(Component):
 
     def updateColor(self, color: Vec4) -> None:
         self.text.setTextColor(color)
+
+    def getHeight(self) -> float:
+        return self.text.getHeight() * self.size
 
     def destroy(self) -> None:
         self.textNP.removeNode()

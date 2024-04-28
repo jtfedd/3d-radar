@@ -115,20 +115,20 @@ class AlertsModal(Modal):
 
         allWarnings = torWarnings + svrWarnings
 
-        for i, alert in enumerate(allWarnings):
-            buttonTop = i * (
-                UIConstants.alertsButtonHeight + UIConstants.alertsButtonPadding
+        top = 0.0
+        for alert in allWarnings:
+            button = AlertButton(
+                self.ctx,
+                self.scroll.getCanvas(),
+                alert,
+                top,
+                UIConstants.alertsModalWidth,
             )
 
-            self.alertButtons.append(
-                AlertButton(
-                    self.ctx,
-                    self.scroll.getCanvas(),
-                    alert,
-                    buttonTop,
-                    UIConstants.alertsModalWidth,
-                )
-            )
+            self.alertButtons.append(button)
+
+            top += button.getHeight()
+            top += UIConstants.alertsButtonPadding
 
     def destroy(self) -> None:
         super().destroy()
