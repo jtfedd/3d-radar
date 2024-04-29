@@ -103,7 +103,16 @@ class NWSProvider:
             event = feature["properties"]["event"]
             area = feature["properties"]["areaDesc"]
 
-            alerts.append(Alert(alertType, event, area, boundary))
+            headline = feature["properties"]["headline"]
+            description = (
+                feature["properties"]["description"]
+                + "\n\n"
+                + feature["properties"]["instruction"]
+            )
+
+            alerts.append(
+                Alert(alertType, event, area, boundary, headline, description)
+            )
 
         return (alertType, alerts)
 

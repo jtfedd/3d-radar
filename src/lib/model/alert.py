@@ -11,11 +11,15 @@ class Alert:
         event: str,
         area: str,
         boundary: List[List[GeoPoint]],
+        headline: str,
+        description: str,
     ):
         self.alertType = alertType
         self.event = event
         self.area = area
         self.boundary = boundary
+        self.headline = headline
+        self.description = description
 
     def center(self) -> GeoPoint:
         minLat = 1000.0
