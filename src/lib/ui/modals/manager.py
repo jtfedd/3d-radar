@@ -3,6 +3,7 @@ from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.util.events.listener import Listener
 
+from .alert.modal import AlertModal
 from .alerts.modal import AlertsModal
 from .core.modal import Modal
 from .license.modal import LicenseModal
@@ -34,6 +35,11 @@ class ModalManager(Listener):
         self.listen(
             events.ui.modals.alerts,
             lambda _: self.openModal(AlertsModal(ctx, state, events)),
+        )
+
+        self.listen(
+            events.ui.modals.alert,
+            lambda alert: self.openModal(AlertModal(ctx, events, alert)),
         )
 
     def openModal(self, modal: Modal) -> None:

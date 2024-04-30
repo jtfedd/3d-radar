@@ -2,6 +2,7 @@ from typing import List
 
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.alert import Alert
 from lib.model.alert_status import AlertStatus
 from lib.model.alert_type import AlertType
 from lib.ui.context import UIContext
@@ -10,6 +11,7 @@ from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
+from lib.util.events.event_subscription import EventSubscription
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
@@ -30,6 +32,7 @@ class AlertsModal(Modal):
 
         self.ctx = ctx
         self.state = state
+        self.appEvents = events
 
         self.listener = Listener()
 
@@ -62,6 +65,7 @@ class AlertsModal(Modal):
         )
 
         self.alertButtons: List[AlertButton] = []
+        self.buttonSubs: List[EventSubscription[None]] = []
 
         self.updateContent()
         self.listener.listen(state.alerts, lambda _: self.updateContent())
@@ -93,17 +97,12 @@ class AlertsModal(Modal):
     def updateAlertCards(self) -> None:
         alerts = self.state.alerts.value
 
-        self.scroll.updateFrame(
-            UIConstants.alertsModalHeight
-            - UIConstants.modalPadding
-            - self.title.height(),
-            alerts.count() * UIConstants.alertsButtonHeight
-            + (alerts.count() - 1) * UIConstants.alertsButtonPadding,
-        )
-
         for button in self.alertButtons:
             button.destroy()
+        for sub in self.buttonSubs:
+            sub.cancel()
         self.alertButtons.clear()
+        self.buttonSubs.clear()
 
         torWarnings = alerts.alerts[AlertType.TORNADO_WARNING]
         svrWarnings = alerts.alerts[AlertType.SEVERE_THUNDERSTORM_WARNING]
@@ -117,18 +116,35 @@ class AlertsModal(Modal):
 
         top = 0.0
         for alert in allWarnings:
-            button = AlertButton(
-                self.ctx,
-                self.scroll.getCanvas(),
-                alert,
-                top,
-                UIConstants.alertsModalWidth,
-            )
-
-            self.alertButtons.append(button)
+            button = self.createAlertButton(alert, top)
 
             top += button.getHeight()
             top += UIConstants.alertsButtonPadding
+
+        self.scroll.updateFrame(
+            UIConstants.alertsModalHeight
+            - UIConstants.modalPadding
+            - self.title.height(),
+            top - UIConstants.alertsButtonPadding,
+        )
+
+    def createAlertButton(self, alert: Alert, top: float) -> AlertButton:
+        button = AlertButton(
+            self.ctx,
+            self.scroll.getCanvas(),
+            alert,
+            top,
+            UIConstants.alertsModalWidth,
+        )
+
+        sub = button.onClick.listen(
+            lambda _: self.appEvents.ui.modals.alert.send(alert)
+        )
+
+        self.alertButtons.append(button)
+        self.buttonSubs.append(sub)
+
+        return button
 
     def destroy(self) -> None:
         super().destroy()
@@ -140,3 +156,5 @@ class AlertsModal(Modal):
         self.text.destroy()
         for button in self.alertButtons:
             button.destroy()
+        for sub in self.buttonSubs:
+            sub.cancel()

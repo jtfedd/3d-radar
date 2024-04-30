@@ -97,8 +97,8 @@ class AlertButton(Listener):
             layer=UILayer.MODAL_CONTENT,
         )
 
-        self.onClick = EventDispatcher[str]()
-        self.listen(self.button.onClick, lambda _: self.onClick.send(""))
+        self.onClick = EventDispatcher[None]()
+        self.listen(self.button.onClick, lambda _: self.onClick.send(None))
 
     def getHeight(self) -> float:
         return self.buttonHeight
