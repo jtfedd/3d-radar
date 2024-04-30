@@ -64,7 +64,5 @@ class TimezoneResult(AddressResultsComponent, Listener):
         return self.contentHeight
 
     def destroy(self) -> None:
-        super().destroy()
-
         self.locationText.destroy()
         self.result.destroy()

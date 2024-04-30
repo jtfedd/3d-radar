@@ -62,7 +62,5 @@ class Badge(Component):
         self.text.updateText(text)
 
     def destroy(self) -> None:
-        super().destroy()
-
         self.bg.destroy()
         self.text.destroy()
