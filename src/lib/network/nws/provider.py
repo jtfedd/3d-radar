@@ -1,5 +1,4 @@
 import concurrent.futures
-import json
 from typing import Dict, List, Tuple
 
 from lib.model.alert import Alert
@@ -57,30 +56,19 @@ class NWSProvider:
     def getAlertsForType(
         self, alertType: AlertType
     ) -> Tuple[AlertType, List[Alert]] | None:
-        # response = makeRequest(
-        #     self.HOST + "/alerts/active",
-        #     params={
-        #         "status": "actual",
-        #         "limit": 500,
-        #         "code": alertType.code(),
-        #     },
-        #     timeout=10,
-        # )
-        # if not response:
-        #     return None
+        response = makeRequest(
+            self.HOST + "/alerts/active",
+            params={
+                "status": "actual",
+                "limit": 500,
+                "code": alertType.code(),
+            },
+            timeout=10,
+        )
+        if not response:
+            return None
 
-        # responseJson = response.json()
-
-        # temporary testing stuff
-        filename = "lib/network/nws/"
-        if alertType == AlertType.TORNADO_WARNING:
-            filename += "tornado_warning.json"
-        else:
-            filename += "severe_thunderstorm_warning.json"
-
-        with open(filename, "r", encoding="utf-8") as f:
-            responseJson = json.loads(f.read())
-        # end temp stuff
+        responseJson = response.json()
 
         features = responseJson["features"]
 

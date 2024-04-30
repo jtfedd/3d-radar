@@ -84,12 +84,12 @@ class AlertsModal(Modal):
             self.scroll.hide()
 
         if alerts.status == AlertStatus.ERROR:
-            self.text.updateText("Error Loading Alerts")
+            self.text.updateText("Error Loading Warnings")
 
         if alerts.status == AlertStatus.READY or (
             alerts.status == AlertStatus.LOADED and count == 0
         ):
-            self.text.updateText("No Active Alerts")
+            self.text.updateText("No Active Warnings")
 
         if alerts.status == AlertStatus.LOADED and count > 0:
             self.updateAlertCards()

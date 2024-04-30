@@ -9,7 +9,7 @@ from lib.util.events.listener import Listener
 
 
 class AlertManager(Listener):
-    UPDATE_INTERVAL = 5
+    UPDATE_INTERVAL = 30
 
     def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__()
