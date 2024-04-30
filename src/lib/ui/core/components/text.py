@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import DynamicTextFont, NodePath, PandaNode, Vec4
+from panda3d.core import DynamicTextFont, NodePath, PandaNode, TextNode, Vec4
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -25,34 +24,47 @@ class Text(Component):
         hAlign: HAlign = HAlign.LEFT,
         vAlign: VAlign = VAlign.BASELINE,
         layer: UILayer = UILayer.CONTENT,
+        maxWidth: float = -1,
+        italic: bool = False,
     ):
         self.root = root
+        self.size = size
 
         yPos = correctYForTextAlignment(y, font, size, vAlign)
 
-        self.text = OnscreenText(
-            parent=root,
-            text=text,
-            pos=(x, yPos),
-            scale=size,
-            fg=color,
-            font=font,
-            align=horizontalAlignToTextNodeAlign(hAlign),  # type:ignore
-        )
+        slant = 0.0
+        if italic:
+            slant = 0.25
 
-        self.text.setBin("fixed", layer.value)
+        self.text = TextNode("text")
+        self.text.setFont(font)
+        self.text.setText(text)
+        self.text.setTextColor(color)
+        if maxWidth > 0:
+            self.text.setWordwrap(maxWidth / size)
+        self.text.setAlign(horizontalAlignToTextNodeAlign(hAlign))  # type:ignore
+        self.text.setSlant(slant)
+
+        self.textNP = self.root.attachNewNode(self.text)
+        self.textNP.setPos(x, 0, yPos)
+        self.textNP.setScale(size)
+
+        self.textNP.setBin("fixed", layer.value)
 
     def hide(self) -> None:
-        self.text.hide()
+        self.textNP.hide()
 
     def show(self) -> None:
-        self.text.show()
+        self.textNP.show()
 
     def updateText(self, text: str) -> None:
         self.text.setText(text)
 
     def updateColor(self, color: Vec4) -> None:
-        self.text.setFg(color)
+        self.text.setTextColor(color)
+
+    def getHeight(self) -> float:
+        return self.text.getHeight() * self.size
 
     def destroy(self) -> None:
-        self.text.destroy()
+        self.textNP.removeNode()

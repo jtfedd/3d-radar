@@ -9,6 +9,9 @@ class GeoPoint:
         self.lat = lat
         self.lon = lon
 
+    def __hash__(self) -> int:
+        return hash((self.lat, self.lon))
+
     def dist(self, other: Self) -> float:
         lat1 = math.radians(self.lat)
         lat2 = math.radians(other.lat)

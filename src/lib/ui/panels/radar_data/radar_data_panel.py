@@ -14,6 +14,7 @@ from lib.ui.panels.components.text_input import PanelTextInput
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
+from lib.util.events.observable import Observable
 
 
 class RadarDataPanel(PanelContent):
@@ -25,6 +26,8 @@ class RadarDataPanel(PanelContent):
         self.ctx = ctx
         self.events = events
         self.state = state
+
+        self.latestSelected = Observable[bool](state.latest.value)
 
         self.addComponent(SpacerComponent(self.root))
 
@@ -72,7 +75,7 @@ class RadarDataPanel(PanelContent):
             PanelButtonGroup(
                 self.root,
                 ctx,
-                state.latest,
+                self.latestSelected,
                 [
                     ("Latest", True),
                     ("Historical", False),
@@ -167,21 +170,24 @@ class RadarDataPanel(PanelContent):
         self.listener.listen(loadDataButton.button.onClick, lambda _: self.search())
 
         self.updateInputsForLatest()
-        self.listener.listen(state.latest, lambda _: self.updateInputsForLatest())
+        self.listener.listen(state.latest, self.latestSelected.setValue)
+        self.listener.listen(
+            self.latestSelected, lambda _: self.updateInputsForLatest()
+        )
 
     def updateInputsForLatest(self) -> None:
-        self.timeSpacer.setHidden(self.state.latest.value)
-        self.timeDescription.setHidden(self.state.latest.value)
-        self.yearSpacer.setHidden(self.state.latest.value)
-        self.yearInput.setHidden(self.state.latest.value)
-        self.monthInput.setHidden(self.state.latest.value)
-        self.dayInput.setHidden(self.state.latest.value)
-        self.timeInput.setHidden(self.state.latest.value)
+        self.timeSpacer.setHidden(self.latestSelected.value)
+        self.timeDescription.setHidden(self.latestSelected.value)
+        self.yearSpacer.setHidden(self.latestSelected.value)
+        self.yearInput.setHidden(self.latestSelected.value)
+        self.monthInput.setHidden(self.latestSelected.value)
+        self.dayInput.setHidden(self.latestSelected.value)
+        self.timeInput.setHidden(self.latestSelected.value)
 
         focusableItems: List[Focusable] = []
         focusableItems.append(self.radarInput.input)
 
-        if not self.state.latest.value:
+        if not self.latestSelected.value:
             focusableItems.append(self.yearInput.input)
             focusableItems.append(self.monthInput.input)
             focusableItems.append(self.dayInput.input)
@@ -257,7 +263,7 @@ class RadarDataPanel(PanelContent):
 
         # The above updates validation on the datetime controls, but override
         # that if we are latest
-        if self.state.latest.value:
+        if self.latestSelected.value:
             valid = True
 
         radar = self.radarInput.input.entry.get()
@@ -276,10 +282,11 @@ class RadarDataPanel(PanelContent):
         if not valid:
             return
 
+        self.state.latest.setValue(self.latestSelected.value)
         self.state.station.setValue(radar)
         self.state.frames.setValue(frames)
 
-        if not self.state.latest.value:
+        if not self.latestSelected.value:
             self.state.year.setValue(year)
             self.state.month.setValue(month)
             self.state.day.setValue(day)
