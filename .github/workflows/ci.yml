@@ -74,6 +74,12 @@ jobs:
       run: |
         make lint
 
+    - name: Check Shaders
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make shaders
+        git diff --exit-code
+
     - name: Run Unit Tests With Coverage
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |
