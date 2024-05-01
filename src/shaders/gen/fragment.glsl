@@ -57,25 +57,7 @@ float hash13(vec3 p3) {
     return fract((p3.x + p3.y) * p3.z);
 }
 // ########## end #include hash.part.glsl
-
-void gen_ray(
-    in float depth_clip, in vec2 uv,
-    out vec3 ray, out float d
-) {    
-    vec4 ray_clip = vec4(uv, depth_clip, 1.0);
-    vec4 ray_eye = (projection_matrix_inverse * ray_clip);
-    ray_eye /= ray_eye.w;
-    d = length(ray_eye.xyz);
-
-    ray_eye = vec4(ray_eye.xyz, 0.0);
-
-    vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
-    ray = normalize(ray_world);
-}
-
-vec4 blend_onto(vec4 front, vec4 behind) {
-    return front + (1.0 - front.a) * behind;
-}
+// ########## start #include box_intersection.part.glsl
 
 // For each coord, return the range of t for which p+t*v is inside the box defined
 // by the corners box_min and box_max, and whether the ray intersects the box.
@@ -97,6 +79,27 @@ void box_intersection(
 
     no_intersection = tRange.t < tRange.s;
 }
+// ########## end #include box_intersection.part.glsl
+// ########## start #include color_util.part.glsl
+
+vec4 blend_onto(vec4 front, vec4 behind) {
+    return front + (1.0 - front.a) * behind;
+}
+
+vec3 colorize(float value) {
+    return texture(color_scale, vec2(0, value)).rgb;
+}
+// ########## end #include color_util.part.glsl
+// ########## start #include density.part.glsl
+
+float density(float value) {
+    if (value < 0) return 0;
+
+    value = abs((value + density_params[0]) * density_params[1]);
+    return density_params[2] + density_params[3] * pow(value, density_params[4]);
+}
+// ########## end #include density.part.glsl
+// ########## start #include resolve_elevation.part.glsl
 
 int calc_sweep_index(float el) {
     int l = 0;
@@ -118,6 +121,9 @@ int calc_sweep_index(float el) {
 
     return 0;
 }
+
+// ########## end #include resolve_elevation.part.glsl
+// ########## start #include volume_sharp.part.glsl
 
 float data_value_for_sweep(vec3 point, int sweep_index) {
     if (r_count[sweep_index] == 0) {
@@ -154,16 +160,22 @@ float data_value(vec3 point) {
 
     return data_value_for_sweep(point, sweep_index);
 }
+// ########## end #include volume_sharp.part.glsl
+// ########## start #include raymarch.part.glsl
 
-float density(float value) {
-    if (value < 0) return 0;
+void gen_ray(
+    in float depth_clip, in vec2 uv,
+    out vec3 ray, out float d
+) {    
+    vec4 ray_clip = vec4(uv, depth_clip, 1.0);
+    vec4 ray_eye = (projection_matrix_inverse * ray_clip);
+    ray_eye /= ray_eye.w;
+    d = length(ray_eye.xyz);
 
-    value = abs((value + density_params[0]) * density_params[1]);
-    return density_params[2] + density_params[3] * pow(value, density_params[4]);
-}
+    ray_eye = vec4(ray_eye.xyz, 0.0);
 
-vec3 colorize(float value) {
-    return texture(color_scale, vec2(0, value)).rgb;
+    vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
+    ray = normalize(ray_world);
 }
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
@@ -215,6 +227,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     
     return color;
 }
+// ########## end #include raymarch.part.glsl
 
 void main() {
     vec4 scene_color = texelFetch(scene, ivec2(gl_FragCoord.xy), 0);
