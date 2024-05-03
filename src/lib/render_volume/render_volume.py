@@ -21,7 +21,7 @@ class VolumeRenderer(Listener):
         shader = Shader.load(
             Shader.SL_GLSL,
             vertex="shaders/gen/vertex.glsl",
-            fragment="shaders/gen/fragment_sharp.glsl",
+            fragment="shaders/gen/fragment_smooth.glsl",
         )
 
         self.reflectivityScale = self.ctx.base.loader.loadTexture(
