@@ -18,10 +18,16 @@ class VolumeRenderer(Listener):
         self.ctx = ctx
         self.state = state
 
-        shader = Shader.load(
+        self.smoothShader = Shader.load(
             Shader.SL_GLSL,
             vertex="shaders/gen/vertex.glsl",
             fragment="shaders/gen/fragment_smooth.glsl",
+        )
+
+        self.sharpShader = Shader.load(
+            Shader.SL_GLSL,
+            vertex="shaders/gen/vertex.glsl",
+            fragment="shaders/gen/fragment_sharp.glsl",
         )
 
         self.reflectivityScale = self.ctx.base.loader.loadTexture(
@@ -36,7 +42,9 @@ class VolumeRenderer(Listener):
         depth = Texture()
         self.plane = unwrap(manager.renderSceneInto(colortex=scene, depthtex=depth))
 
-        self.plane.setShader(shader)
+        self.updateShader(state.smooth.value)
+        self.listen(state.smooth, self.updateShader)
+
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
         self.plane.setShaderInput("bounds_start", (-1000, -1000, 0))
@@ -60,6 +68,12 @@ class VolumeRenderer(Listener):
 
         self.volumeDataProvider = VolumeDataProvider(ctx, state, events)
         self.volumeDataProvider.addNode(self.plane)
+
+    def updateShader(self, smooth: bool) -> None:
+        if smooth:
+            self.plane.setShader(self.smoothShader)
+        else:
+            self.plane.setShader(self.sharpShader)
 
     def updateScreenResolution(self, win: GraphicsWindow) -> None:
         newSize = (win.getXSize(), win.getYSize())

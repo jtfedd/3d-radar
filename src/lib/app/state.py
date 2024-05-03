@@ -83,6 +83,8 @@ class AppState:
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
 
+        self.smooth = self.createField("smooth", True)
+
         self.timeMode = self.createFieldCustomSerialization(
             "timeMode",
             TimeMode.RADAR,
