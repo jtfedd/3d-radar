@@ -1,6 +1,7 @@
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.context import UIContext
+from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
@@ -14,6 +15,12 @@ class RadarViewerPanel(PanelContent):
         self.state = state
         self.events = events
         self.listener = Listener()
+
+        self.addComponent(TitleComponent(self.root, ctx, "Rendering Mode"))
+
+        self.smoothCheckbox = self.addComponent(
+            CheckboxComponent(self.root, ctx, "Smooth Shading", state.smooth)
+        )
 
         self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
 

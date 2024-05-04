@@ -67,8 +67,6 @@ class MarkerResult(AddressResultsComponent, Listener):
         return self.contentHeight
 
     def destroy(self) -> None:
-        super().destroy()
-
         for button in self.buttons:
             button.destroy()
 

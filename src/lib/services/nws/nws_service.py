@@ -1,6 +1,8 @@
-from typing import Dict
+from typing import Dict, List
 
 from lib.app.files.manager import FileManager
+from lib.model.alert import Alert
+from lib.model.alert_type import AlertType
 from lib.model.radar_station import RadarStation
 from lib.network.network import Network
 
@@ -25,3 +27,6 @@ class NWSService:
             return stations
 
         raise RuntimeError("Could not load stations")
+
+    def getAlerts(self) -> Dict[AlertType, List[Alert]] | None:
+        return self.network.nws.getAlerts()

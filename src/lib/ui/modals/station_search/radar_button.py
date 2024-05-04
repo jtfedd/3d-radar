@@ -33,7 +33,9 @@ class RadarButton(Listener):
             y=-top,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
-            layer=UILayer.MODAL_CONTENT_INTERACTION,
+            bgLayer=UILayer.MODAL_CONTENT_BACKGROUND,
+            contentLayer=UILayer.MODAL_CONTENT,
+            interactionLayer=UILayer.MODAL_CONTENT_INTERACTION,
             textSize=UIConstants.fontSizeRegular,
             skin=ButtonSkin.ACCENT,
         )

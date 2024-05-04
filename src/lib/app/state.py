@@ -1,6 +1,8 @@
 import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
+from lib.model.alert_payload import AlertPayload
+from lib.model.alert_status import AlertStatus
 from lib.model.data_type import DataType
 from lib.model.location_marker import LocationMarker
 from lib.model.time_mode import TimeMode
@@ -78,6 +80,8 @@ class AppState:
 
         self.uiScale = self.createField("uiScale", 1.0)
 
+        self.smooth = self.createField("smooth", True)
+
         self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
@@ -103,6 +107,12 @@ class AppState:
         self.mapStates = self.createField("mapStates", True)
         self.mapCounties = self.createField("mapCounties", True)
         self.mapRoads = self.createField("mapRoads", True)
+
+        self.warningsOpacity = self.createField("warningsOpacity", 1.0)
+        self.showTornadoWarnings = self.createField("showTornadoWarnings", True)
+        self.showSevereThunderstormWarnings = self.createField(
+            "showSevereThunderstormWarnings", True
+        )
 
         self.mapMarkers: Observable[List[LocationMarker]] = (
             self.createFieldCustomSerialization(
@@ -133,6 +143,9 @@ class AppState:
 
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)
+        self.alerts = Observable[AlertPayload](
+            AlertPayload(status=AlertStatus.READY, alerts={})
+        )
 
     def use24HourTime(self) -> bool:
         return self.timeMode.value == TimeMode.UTC or not self.timeFormat.value

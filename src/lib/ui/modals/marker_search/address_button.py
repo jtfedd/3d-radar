@@ -40,7 +40,9 @@ class AddressButton(Listener):
             vAlign=VAlign.TOP,
             textSize=UIConstants.fontSizeRegular,
             skin=ButtonSkin.ACCENT,
-            layer=UILayer.MODAL_CONTENT_INTERACTION,
+            bgLayer=UILayer.MODAL_CONTENT_BACKGROUND,
+            contentLayer=UILayer.MODAL_CONTENT,
+            interactionLayer=UILayer.MODAL_CONTENT_INTERACTION,
         )
 
         self.labelText = Text(

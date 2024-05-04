@@ -1,3 +1,4 @@
+from lib.model.alert import Alert
 from lib.model.location import Location
 from lib.util.events.event_dispatcher import EventDispatcher
 
@@ -15,6 +16,9 @@ class ModalEvents:
 
         self.license = EventDispatcher[None]()
 
+        self.alerts = EventDispatcher[None]()
+        self.alert = EventDispatcher[Alert]()
+
     def destroy(self) -> None:
         self.stationSearch.close()
         self.stationSelected.close()
@@ -24,3 +28,8 @@ class ModalEvents:
 
         self.markerAdd.close()
         self.markerSelected.close()
+
+        self.license.close()
+
+        self.alerts.close()
+        self.alert.close()

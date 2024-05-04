@@ -10,6 +10,7 @@ from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
 from lib.util.util import defaultLight
 
+from .alerts.manager import AlertManager
 from .animation.manager import AnimationManager
 from .context import AppContext
 from .events import AppEvents
@@ -32,6 +33,7 @@ class App:
         self.cameraControl = CameraControl(self.ctx, self.events)
         self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
         self.animationManager = AnimationManager(self.ctx, self.state, self.events)
+        self.alertManager = AlertManager(self.ctx, self.state, self.events)
 
         self.map = Map(self.ctx, self.state, self.events)
 

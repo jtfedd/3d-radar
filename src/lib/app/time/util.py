@@ -69,6 +69,8 @@ class TimeUtil(Listener):
             ampm = parts[1].lower()
 
         hour = int(time.split(":")[0])
+        if hour == 12:
+            hour = 0
         minute = int(time.split(":")[1])
 
         if not self.state.use24HourTime():

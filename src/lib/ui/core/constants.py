@@ -9,6 +9,10 @@ class UIConstants:
     clockWidth = 0.22
     clockPadding = 0.01
 
+    headerButtonWidth = headerFooterHeight * 1.6
+
+    badgeSize = 0.03
+
     panelWidth = 0.7
     panelPadding = 0.03
     panelBorderWidth = 0.005
@@ -70,6 +74,19 @@ class UIConstants:
 
     licenseModalWidth = 1.2
     licenseModalHeight = 0.8
+
+    alertsModalWidth = 0.8
+    alertsModalHeight = 0.8
+
+    alertsButtonHeight = 0.09
+    alertsButtonPadding = 0.01
+    alertsButtonTextLeftPadding = 0.025
+    alertsButtonTextVerticalPadding = 0.003
+    alertsButtonBorderWidth = 0.01
+    alertsButtonTextRightPadding = alertsButtonTextLeftPadding - alertsButtonBorderWidth
+
+    alertModalWidth = 1.2
+    alertModalMaxHeight = 1.0
 
     stationModalResultButtonHeight = 0.05
     stationModalResultButtonTextPadding = 0.015
