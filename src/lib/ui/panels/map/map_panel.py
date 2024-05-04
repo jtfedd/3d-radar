@@ -69,8 +69,8 @@ class MapPanel(PanelContent):
             self.addMarkerButton.button.onClick, events.ui.modals.markerAdd.send
         )
 
+        self.addComponent(SpacerComponent(self.root))
         self.addComponent(MarkersComponent(self.root, ctx, state, events))
-
         self.addComponent(SpacerComponent(self.root))
 
         self.listener.listen(

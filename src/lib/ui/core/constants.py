@@ -38,6 +38,14 @@ class UIConstants:
 
     scrollbarWidth = 0.01
 
+    markerItemPadding = 0.015
+    markerItemButtonSize = 0.06
+    markerItemTextWidth = (
+        panelContentWidth - (4 * markerItemPadding) - (2 * markerItemButtonSize)
+    )
+    markerItemTextLeft = (2 * markerItemPadding) + markerItemButtonSize
+    markerItemMinHeight = markerItemButtonSize + (2 * markerItemPadding)
+
     animationSliderWidth = 0.6
     animationSliderPadding = headerFooterHeight / 2
     animationButtonWidth = headerFooterHeight
