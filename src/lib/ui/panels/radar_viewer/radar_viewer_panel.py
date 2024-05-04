@@ -16,11 +16,13 @@ class RadarViewerPanel(PanelContent):
         self.events = events
         self.listener = Listener()
 
-        self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
+        self.addComponent(TitleComponent(self.root, ctx, "Rendering Mode"))
 
         self.smoothCheckbox = self.addComponent(
             CheckboxComponent(self.root, ctx, "Smooth Shading", state.smooth)
         )
+
+        self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
 
         self.minSlider = self.addComponent(
             SliderComponent(
