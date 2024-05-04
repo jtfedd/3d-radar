@@ -42,24 +42,22 @@ uniform sampler2D color_scale;
 #define STEP_SIZE 1.5
 #define ALPHA_CUTOFF 0.99
 
-void gen_ray(
-    in float depth_clip, in vec2 uv,
-    out vec3 ray, out float d
-) {    
-    vec4 ray_clip = vec4(uv, depth_clip, 1.0);
-    vec4 ray_eye = (projection_matrix_inverse * ray_clip);
-    ray_eye /= ray_eye.w;
-    d = length(ray_eye.xyz);
+// ########## start #include hash.part.glsl
 
-    ray_eye = vec4(ray_eye.xyz, 0.0);
+// https://www.shadertoy.com/view/4djSRW
+// float hash12(vec2 p) {
+// 	vec3 p3  = fract(vec3(p.xyx) * .1031);
+//     p3 += dot(p3, p3.yzx + 33.33);
+//     return fract((p3.x + p3.y) * p3.z);
+// }
 
-    vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
-    ray = normalize(ray_world);
+float hash13(vec3 p3) {
+	p3  = fract(p3 * .1031);
+    p3 += dot(p3, p3.zyx + 31.32);
+    return fract((p3.x + p3.y) * p3.z);
 }
-
-vec4 blend_onto(vec4 front, vec4 behind) {
-    return front + (1.0 - front.a) * behind;
-}
+// ########## end #include hash.part.glsl
+// ########## start #include box_intersection.part.glsl
 
 // For each coord, return the range of t for which p+t*v is inside the box defined
 // by the corners box_min and box_max, and whether the ray intersects the box.
@@ -81,19 +79,27 @@ void box_intersection(
 
     no_intersection = tRange.t < tRange.s;
 }
+// ########## end #include box_intersection.part.glsl
+// ########## start #include color_util.part.glsl
 
-// https://www.shadertoy.com/view/4djSRW
-// float hash12(vec2 p) {
-// 	vec3 p3  = fract(vec3(p.xyx) * .1031);
-//     p3 += dot(p3, p3.yzx + 33.33);
-//     return fract((p3.x + p3.y) * p3.z);
-// }
-
-float hash13(vec3 p3) {
-	p3  = fract(p3 * .1031);
-    p3 += dot(p3, p3.zyx + 31.32);
-    return fract((p3.x + p3.y) * p3.z);
+vec4 blend_onto(vec4 front, vec4 behind) {
+    return front + (1.0 - front.a) * behind;
 }
+
+vec3 colorize(float value) {
+    return texture(color_scale, vec2(0, value)).rgb;
+}
+// ########## end #include color_util.part.glsl
+// ########## start #include density.part.glsl
+
+float density(float value) {
+    if (value < 0) return 0;
+
+    value = abs((value + density_params[0]) * density_params[1]);
+    return density_params[2] + density_params[3] * pow(value, density_params[4]);
+}
+// ########## end #include density.part.glsl
+// ########## start #include resolve_elevation.part.glsl
 
 int calc_sweep_index(float el) {
     int l = 0;
@@ -116,6 +122,53 @@ int calc_sweep_index(float el) {
     return 0;
 }
 
+// ########## end #include resolve_elevation.part.glsl
+// ########## start #include volume_smooth.part.glsl
+
+float interpolate(float low, float high, float factor) {
+    if (low < 0 && high < 0) {
+        return -1;
+    }
+
+    if (low < 0) {
+        low = -density_params[0];
+    }
+
+    if (high < 0) {
+        high = -density_params[0];
+    }
+
+    return (low * (1 - factor)) + (high * factor);
+}
+
+float data_value_for_indices(int sweep_index, int az_index, int r_index) {
+    int buff_index = r_count[sweep_index] * az_index + r_index;
+    return texelFetch(volume_data, offset[sweep_index] + buff_index).x;
+}
+
+float data_value_for_gate(vec3 point, int sweep_index, int r_index) {
+    if (az_count[sweep_index] == 0) {
+        return -1.0;
+    }
+
+    float az = mod(atan(point.x, point.y) - (az_step[sweep_index] / 2), PI*2);
+    int az_index = int(floor(az / az_step[sweep_index]));
+    if (az_index < 0) {
+        return -1.0;
+    }
+
+    int az_next = az_index + 1;
+    if (az_next == az_count[sweep_index]) {
+        az_next = 0;
+    }
+
+    float factor = (az - (az_index * az_step[sweep_index])) / (((az_index + 1) * az_step[sweep_index]) - (az_index * az_step[sweep_index]));
+    float low = data_value_for_indices(sweep_index, az_index, r_index);
+    float high = data_value_for_indices(sweep_index, az_next, r_index);
+
+    return interpolate(low, high, factor);
+}
+
 float data_value_for_sweep(vec3 point, int sweep_index) {
     if (r_count[sweep_index] == 0) {
         return -1.0;
@@ -127,18 +180,11 @@ float data_value_for_sweep(vec3 point, int sweep_index) {
         return -1.0;
     }
 
-    if (az_count[sweep_index] == 0) {
-        return -1.0;
-    }
-
-    float az = mod(atan(point.x, point.y), PI*2);
-    int az_index = int(floor(az / az_step[sweep_index]));
-    if (az_index < 0) {
-        return -1.0;
-    }
-
-    int buff_index = r_count[sweep_index] * az_index + r_index;
-    return texelFetch(volume_data, offset[sweep_index] + buff_index).x;
+    float low = data_value_for_gate(point, sweep_index, r_index);
+    float high = data_value_for_gate(point, sweep_index, r_index + 1);
+    float prev = r_first[sweep_index] + (r_step[sweep_index] * r_index);
+    float factor = (r - prev) / (r_step[sweep_index]);
+    return interpolate(low, high, factor);
 }
 
 float data_value(vec3 point) {
@@ -149,18 +195,28 @@ float data_value(vec3 point) {
 
     int sweep_index = calc_sweep_index(el);
 
-    return data_value_for_sweep(point, sweep_index);
+    float low = data_value_for_sweep(point, sweep_index);
+    float high = data_value_for_sweep(point, sweep_index+1);
+
+    float factor = (el - elevation[sweep_index]) / (elevation[sweep_index+1] - elevation[sweep_index]);
+    return interpolate(low, high, factor);
 }
+// ########## end #include volume_smooth.part.glsl
+// ########## start #include raymarch.part.glsl
 
-float density(float value) {
-    if (value < 0) return 0;
+void gen_ray(
+    in float depth_clip, in vec2 uv,
+    out vec3 ray, out float d
+) {    
+    vec4 ray_clip = vec4(uv, depth_clip, 1.0);
+    vec4 ray_eye = (projection_matrix_inverse * ray_clip);
+    ray_eye /= ray_eye.w;
+    d = length(ray_eye.xyz);
 
-    value = abs((value + density_params[0]) * density_params[1]);
-    return density_params[2] + density_params[3] * pow(value, density_params[4]);
-}
+    ray_eye = vec4(ray_eye.xyz, 0.0);
 
-vec3 colorize(float value) {
-    return texture(color_scale, vec2(0, value)).rgb;
+    vec3 ray_world = (inverse(trans_world_to_model_of_camera) * ray_eye).xyz;
+    ray = normalize(ray_world);
 }
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
@@ -212,6 +268,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     
     return color;
 }
+// ########## end #include raymarch.part.glsl
 
 void main() {
     vec4 scene_color = texelFetch(scene, ivec2(gl_FragCoord.xy), 0);

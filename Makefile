@@ -91,4 +91,8 @@ coverage-lcov: ## Generage lcov report from a previous test coverage run
 
 .PHONY: maps
 maps: ## Download and generate maps
-	python tool/maps/make_maps.py
+	python tool/scripts/make_maps.py
+
+.PHONY: shaders
+shaders: ## Compile shaders
+	python tool/scripts/compile_shaders.py

@@ -59,6 +59,12 @@ jobs:
       run: |
         make packages-check
 
+    - name: Check Shaders
+      if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
+      run: |
+        make shaders
+        git diff --exit-code
+
     - name: Check Import Order
       if: ${{ !cancelled() && steps.setup.conclusion == 'success' }}
       run: |

@@ -79,6 +79,8 @@ class AppState:
 
         self.uiScale = self.createField("uiScale", 1.0)
 
+        self.smooth = self.createField("smooth", True)
+
         self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)

@@ -92,11 +92,9 @@ class NWSProvider:
             area = feature["properties"]["areaDesc"]
 
             headline = feature["properties"]["headline"]
-            description = (
-                feature["properties"]["description"]
-                + "\n\n"
-                + feature["properties"]["instruction"]
-            )
+            description = feature["properties"]["description"]
+            if feature["properties"]["instruction"] is not None:
+                description += "\n\n" + feature["properties"]["instruction"]
 
             alerts.append(
                 Alert(alertType, event, area, boundary, headline, description)
