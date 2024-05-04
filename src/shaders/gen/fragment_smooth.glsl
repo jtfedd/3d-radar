@@ -125,6 +125,22 @@ int calc_sweep_index(float el) {
 // ########## end #include resolve_elevation.part.glsl
 // ########## start #include volume_smooth.part.glsl
 
+float interpolate(float low, float high, float factor) {
+    if (low < 0 && high < 0) {
+        return -1;
+    }
+
+    if (low < 0) {
+        low = -density_params[0];
+    }
+
+    if (high < 0) {
+        high = -density_params[0];
+    }
+
+    return (low * (1 - factor)) + (high * factor);
+}
+
 float data_value_for_indices(int sweep_index, int az_index, int r_index) {
     int buff_index = r_count[sweep_index] * az_index + r_index;
     return texelFetch(volume_data, offset[sweep_index] + buff_index).x;
@@ -150,7 +166,7 @@ float data_value_for_gate(vec3 point, int sweep_index, int r_index) {
     float low = data_value_for_indices(sweep_index, az_index, r_index);
     float high = data_value_for_indices(sweep_index, az_next, r_index);
 
-    return (low * (1 - factor)) + (high * factor);
+    return interpolate(low, high, factor);
 }
 
 float data_value_for_sweep(vec3 point, int sweep_index) {
@@ -168,7 +184,7 @@ float data_value_for_sweep(vec3 point, int sweep_index) {
     float high = data_value_for_gate(point, sweep_index, r_index + 1);
     float prev = r_first[sweep_index] + (r_step[sweep_index] * r_index);
     float factor = (r - prev) / (r_step[sweep_index]);
-    return (low * (1 - factor)) + (high * factor);
+    return interpolate(low, high, factor);
 }
 
 float data_value(vec3 point) {
@@ -183,7 +199,7 @@ float data_value(vec3 point) {
     float high = data_value_for_sweep(point, sweep_index+1);
 
     float factor = (el - elevation[sweep_index]) / (elevation[sweep_index+1] - elevation[sweep_index]);
-    return (low * (1 - factor)) + (high * factor);
+    return interpolate(low, high, factor);
 }
 // ########## end #include volume_smooth.part.glsl
 // ########## start #include raymarch.part.glsl
