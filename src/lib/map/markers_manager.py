@@ -20,6 +20,7 @@ class MarkersManager(Listener):
         self.listen(state.station, lambda _: self.reorderMarkers())
         self.listen(events.ui.modals.markerSelected, self.addMarker)
         self.listen(events.ui.panels.removeMarker, self.removeMarker)
+        self.listen(events.ui.panels.toggleMarker, self.toggleMarker)
 
     def addMarker(self, location: Location) -> None:
         newMarkers = self.state.mapMarkers.value.copy()
@@ -27,7 +28,7 @@ class MarkersManager(Listener):
 
         self.sortMarkers(newMarkers)
 
-        self.state.mapMarkers.setValue(newMarkers)
+        self.state.mapMarkers.setValue(newMarkers, forceSend=True)
 
     def removeMarker(self, toRemove: str) -> None:
         self.state.mapMarkers.setValue(
@@ -35,13 +36,24 @@ class MarkersManager(Listener):
                 filter(
                     lambda marker: marker.id != toRemove, self.state.mapMarkers.value
                 )
-            )
+            ),
+            forceSend=True,
         )
+
+    def toggleMarker(self, toToggle: str) -> None:
+        newMarkers = []
+
+        for marker in self.state.mapMarkers.value:
+            if marker.id == toToggle:
+                marker.visible = not marker.visible
+            newMarkers.append(marker)
+
+        self.state.mapMarkers.setValue(newMarkers, forceSend=True)
 
     def reorderMarkers(self) -> None:
         sortedMarkers = self.state.mapMarkers.value.copy()
         self.sortMarkers(sortedMarkers)
-        self.state.mapMarkers.setValue(sortedMarkers)
+        self.state.mapMarkers.setValue(sortedMarkers, forceSend=True)
 
     def sortMarkers(self, markers: List[LocationMarker]) -> None:
         station = self.ctx.services.nws.getStation(self.state.station.value)

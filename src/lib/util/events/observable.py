@@ -12,11 +12,11 @@ class Observable(EventDispatcher[T]):
 
         self.value = value
 
-    def setValue(self, newValue: T) -> None:
+    def setValue(self, newValue: T, forceSend: bool = False) -> None:
         if self.closed:
             raise StateError("Observable is closed")
 
-        if newValue == self.value:
+        if newValue == self.value and not forceSend:
             return
 
         self.value = newValue

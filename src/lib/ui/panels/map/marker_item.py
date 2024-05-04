@@ -13,9 +13,10 @@ from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
+from lib.util.events.listener import Listener
 
 
-class MarkerItem:
+class MarkerItem(Listener):
     def __init__(
         self,
         root: NodePath[PandaNode],
@@ -24,6 +25,8 @@ class MarkerItem:
         item: LocationMarker,
         top: float,
     ) -> None:
+        super().__init__()
+
         self.root = root.attachNewNode("marker-item")
         self.root.setZ(-top)
         self.root.setX(UIConstants.panelPadding)
@@ -86,10 +89,22 @@ class MarkerItem:
             skin=ButtonSkin.ACCENT,
         )
 
+        self.listen(
+            self.visibilityButton.onClick,
+            lambda _: events.ui.panels.toggleMarker.send(item.id),
+        )
+
+        self.listen(
+            self.trashButton.onClick,
+            lambda _: events.ui.panels.removeMarker.send(item.id),
+        )
+
     def height(self) -> float:
         return self.contentHeight
 
     def destroy(self) -> None:
+        super().destroy()
+
         self.text.destroy()
         self.background.destroy()
         self.visibilityButton.destroy()
