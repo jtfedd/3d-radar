@@ -4,6 +4,7 @@ class Icons:
     RADAR_DISPLAY = "assets/icons/radar_display.png"
     MAP = "assets/icons/map.png"
     INFO = "assets/icons/info.png"
+    WARNING = "assets/icons/warning.png"
 
     CLOSE = "assets/icons/close.png"
 

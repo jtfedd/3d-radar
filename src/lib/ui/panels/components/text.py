@@ -16,6 +16,8 @@ class PanelText(PanelComponent):
         ctx: UIContext,
         text: str,
         bold: bool = False,
+        italic: bool = False,
+        align: HAlign = HAlign.LEFT,
     ):
         super().__init__(root)
 
@@ -24,13 +26,20 @@ class PanelText(PanelComponent):
             self.font = ctx.fonts.bold
         self.text = text
 
+        xPos = UIConstants.panelPadding
+        if align == HAlign.CENTER:
+            xPos += UIConstants.panelContentWidth / 2
+        if align == HAlign.RIGHT:
+            xPos = UIConstants.panelWidth - UIConstants.panelPadding
+
         self.component = Text(
             root=self.root,
             font=self.font,
             text=text,
-            x=UIConstants.panelPadding,
-            hAlign=HAlign.LEFT,
+            x=xPos,
+            hAlign=align,
             vAlign=VAlign.TOP,
+            italic=italic,
         )
 
     def updateText(self, text: str) -> None:
