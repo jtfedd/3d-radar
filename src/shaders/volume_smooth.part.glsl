@@ -8,7 +8,7 @@ float data_value_for_gate(vec3 point, int sweep_index, int r_index) {
         return -1.0;
     }
 
-    float az = mod(atan(point.x, point.y), PI*2);
+    float az = mod(atan(point.x, point.y) - (az_step[sweep_index] / 2), PI*2);
     int az_index = int(floor(az / az_step[sweep_index]));
     if (az_index < 0) {
         return -1.0;
