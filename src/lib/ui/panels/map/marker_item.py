@@ -99,6 +99,10 @@ class MarkerItem(Listener):
             lambda _: events.ui.panels.removeMarker.send(item.id),
         )
 
+    def update(self, top: float, visible: bool) -> None:
+        self.root.setZ(-top)
+        self.visibilityButton.setToggleState(visible)
+
     def height(self) -> float:
         return self.contentHeight
 

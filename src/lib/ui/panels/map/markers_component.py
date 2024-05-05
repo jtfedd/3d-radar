@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Dict
 
 from panda3d.core import NodePath, PandaNode
 
@@ -27,26 +27,36 @@ class MarkersComponent(PanelComponent):
         self.events = events
 
         self.contentHeight = 0.0
-        self.markerItems: List[MarkerItem] = []
+        self.markerItems: Dict[str, MarkerItem] = {}
 
         self.generateMarkers()
         self.markerSub = state.mapMarkers.listen(lambda _: self.generateMarkers())
 
     def clearMarkers(self) -> None:
-        for item in self.markerItems:
+        for item in self.markerItems.values():
             item.destroy()
         self.markerItems.clear()
 
     def generateMarkers(self) -> None:
-        self.clearMarkers()
+        newMarkerItems: Dict[str, MarkerItem] = {}
 
         top = 0.0
         for marker in self.state.mapMarkers.value:
-            item = MarkerItem(self.root, self.ctx, self.events, marker, top)
-            self.markerItems.append(item)
+            if marker.id in self.markerItems:
+                item = self.markerItems[marker.id]
+                del self.markerItems[marker.id]
+
+                item.update(top, marker.visible)
+            else:
+                item = MarkerItem(self.root, self.ctx, self.events, marker, top)
+
+            newMarkerItems[marker.id] = item
 
             top += item.height()
             top += UIConstants.markerItemPadding
+
+        self.clearMarkers()
+        self.markerItems = newMarkerItems
 
         self.contentHeight = top - UIConstants.markerItemPadding
         self.onHeightChange.send(None)
