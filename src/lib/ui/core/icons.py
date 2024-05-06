@@ -18,4 +18,6 @@ class Icons:
     VISIBLE = "assets/icons/visible.png"
     INVISIBLE = "assets/icons/invisible.png"
 
+    LOCATION = "assets/icons/location.png"
+
     TRASH = "assets/icons/trash.png"

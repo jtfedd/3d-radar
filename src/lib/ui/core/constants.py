@@ -65,6 +65,8 @@ class UIConstants:
     legendTitleHeight = 0.06
     legendScaleBarHeight = legendScaleHeight - 4 * legendPadding - legendTitleHeight
 
+    mapMarkerSize = 0.07
+
     modalPadding = 0.05
     modalTitleHeight = 0.08
     modalScrollbarPadding = modalPadding / 2
