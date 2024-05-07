@@ -2,8 +2,11 @@ from enum import Enum
 
 
 class UILayer(Enum):
-    LABEL_BACKGROUND = 0
-    LABEL_CONTENT = 1
+    MARKER_BACKGROUND = 0
+    MARKER = 1
+
+    LABEL_BACKGROUND = 2
+    LABEL_CONTENT = 3
 
     BACKGROUND = 10
     BACKGROUND_DECORATION = 11

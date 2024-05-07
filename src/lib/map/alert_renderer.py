@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import math
 from typing import Dict, List
 
-from panda3d.core import LineSegs, NodePath, PandaNode, Vec3, Vec4
+from panda3d.core import LineSegs, NodePath, PandaNode, Vec4
 
 from lib.app.state import AppState
 from lib.model.alert import Alert
@@ -12,6 +11,8 @@ from lib.model.alert_type import AlertType
 from lib.model.geo_point import GeoPoint
 from lib.ui.core.colors import UIColors
 from lib.util.events.listener import Listener
+
+from .util import toGlobe
 
 
 class AlertRenderer(Listener):
@@ -78,19 +79,9 @@ class AlertRenderer(Listener):
         if len(loop) < 4:
             return
 
-        lineSegs.moveTo(self.toGlobe(loop[0]))
+        lineSegs.moveTo(toGlobe(loop[0]))
         for point in loop:
-            lineSegs.drawTo(self.toGlobe(point))
-
-    def toGlobe(self, point: GeoPoint) -> Vec3:
-        az = math.radians(point.lon)
-        el = math.radians(point.lat)
-
-        x = math.cos(az) * math.cos(el)
-        y = math.sin(az) * math.cos(el)
-        z = math.sin(el)
-
-        return Vec3(x, y, z)
+            lineSegs.drawTo(toGlobe(point))
 
     def getColor(self) -> Vec4:
         if self.alertType == AlertType.TORNADO_WARNING:

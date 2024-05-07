@@ -36,11 +36,11 @@ class Badge(Component):
 
         self.text = Text(
             root=root,
-            font=ctx.fonts.regular,
+            font=ctx.fonts.black,
             text=text,
             x=x,
             y=y,
-            size=UIConstants.fontSizeDetail,
+            size=UIConstants.fontSizeBadge,
             color=UIColors.CONTENT,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.CENTER,

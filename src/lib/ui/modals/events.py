@@ -1,4 +1,5 @@
 from lib.model.alert import Alert
+from lib.model.location import Location
 from lib.util.events.event_dispatcher import EventDispatcher
 
 
@@ -9,6 +10,9 @@ class ModalEvents:
 
         self.timeZoneSearch = EventDispatcher[None]()
         self.timeZoneSelected = EventDispatcher[str]()
+
+        self.markerAdd = EventDispatcher[None]()
+        self.markerSelected = EventDispatcher[Location]()
 
         self.license = EventDispatcher[None]()
 
@@ -21,6 +25,9 @@ class ModalEvents:
 
         self.timeZoneSearch.close()
         self.timeZoneSelected.close()
+
+        self.markerAdd.close()
+        self.markerSelected.close()
 
         self.license.close()
 

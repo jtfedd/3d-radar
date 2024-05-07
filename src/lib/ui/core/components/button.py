@@ -213,9 +213,13 @@ class Button(Component):
         if self.toggleState:
             if self.toggleIcon:
                 self.toggleIcon.show()
+                if self.content:
+                    self.content.hide()
+
                 self.toggleIcon.updateColor(
                     self.toggleSkin.getContentColor(buttonState)
                 )
+
             self.background.updateColor(self.toggleSkin.getBackgroundColor(buttonState))
 
             if self.content:
@@ -223,6 +227,9 @@ class Button(Component):
         else:
             if self.toggleIcon:
                 self.toggleIcon.hide()
+                if self.content:
+                    self.content.show()
+
             self.background.updateColor(self.skin.getBackgroundColor(buttonState))
 
             if self.content:
