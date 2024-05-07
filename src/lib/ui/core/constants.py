@@ -3,6 +3,7 @@ class UIConstants:
     fontSizeTitle = 0.04
     fontSizeHeader = 0.05
     fontSizeDetail = 0.025
+    fontSizeBadge = 0.02
 
     headerFooterHeight = 0.08
 
