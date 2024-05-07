@@ -1,5 +1,6 @@
 numpy>=1.26.4
 panda3d==1.10.14
+panda3d-gltf>=1.2.0
 platformdirs>=4.2.1
 pynexrad==0.0.13
 requests>=2.31.0

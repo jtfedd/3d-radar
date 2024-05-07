@@ -35,7 +35,7 @@ class App:
         self.animationManager = AnimationManager(self.ctx, self.state, self.events)
         self.alertManager = AlertManager(self.ctx, self.state, self.events)
 
-        self.map = Map(self.ctx, self.state)
+        self.map = Map(self.ctx, self.state, self.events)
 
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())

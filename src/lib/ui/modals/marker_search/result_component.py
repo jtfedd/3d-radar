@@ -1,75 +1,72 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import List
 
 from panda3d.core import NodePath, PandaNode
 
 from lib.app.events import AppEvents
 from lib.model.location import Location
-from lib.model.radar_station import RadarStation
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
 
 from ..address_search.results_component import AddressResultsComponent
-from ..core.text import ModalText
-from .radar_button import RadarButton
+from .address_button import AddressButton
 
 
-class RadarStationsResult(AddressResultsComponent, Listener):
+class MarkerResult(AddressResultsComponent, Listener):
     def __init__(
         self,
         ctx: UIContext,
         root: NodePath[PandaNode],
         events: AppEvents,
         top: float,
-        location: Location,
-        radarStations: List[RadarStation],
-        distances: Dict[str, float],
+        locations: List[Location],
     ):
         super().__init__()
 
-        self.contentHeight = 0.0
-        self.locationText = ModalText(ctx, root, top, location.getLabel())
-        self.contentHeight = self.locationText.height() + UIConstants.modalPadding
+        self.contentHeight = UIConstants.modalPadding
 
-        buttonListHeight = (
-            len(radarStations) * UIConstants.addressModalResultButtonHeight
-            + (len(radarStations) - 1) * UIConstants.addressModalResultButtonPadding
+        buttonListHeight = UIConstants.addressModalResultButtonPadding * (
+            len(locations) - 1
         )
+
+        for location in locations:
+            if "\n" in location.getLabel():
+                buttonListHeight += UIConstants.addressModalResultButtonHeightDouble
+            else:
+                buttonListHeight += UIConstants.addressModalResultButtonHeight
 
         (self.scroll, buttonRoot, self.contentHeight, buttonTop) = self.setupButtonRoot(
             ctx, events, top, self.contentHeight, buttonListHeight, root
         )
 
-        self.buttons: List[RadarButton] = []
+        self.buttons: List[AddressButton] = []
 
-        for radarStation in radarStations:
+        for location in locations:
             self.buttons.append(
-                RadarButton(
+                AddressButton(
                     ctx,
                     buttonRoot,
                     buttonTop,
                     UIConstants.addressModalWidth,
-                    radarStation,
-                    distances[radarStation.stationID],
+                    location,
                 )
             )
 
-            buttonTop += (
-                UIConstants.addressModalResultButtonHeight
-                + UIConstants.addressModalResultButtonPadding
-            )
+            buttonTop += UIConstants.addressModalResultButtonPadding
+            if "\n" in location.getLabel():
+                buttonTop += UIConstants.addressModalResultButtonHeightDouble
+            else:
+                buttonTop += UIConstants.addressModalResultButtonHeight
 
         for button in self.buttons:
-            self.listen(button.onClick, events.ui.modals.stationSelected.send)
+            self.listen(button.onClick, events.ui.modals.markerSelected.send)
 
     def height(self) -> float:
         return self.contentHeight
 
     def destroy(self) -> None:
-        self.locationText.destroy()
-
         for button in self.buttons:
             button.destroy()
 

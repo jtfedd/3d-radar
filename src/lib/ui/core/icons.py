@@ -14,3 +14,10 @@ class Icons:
 
     CHECKBOX = "assets/icons/checkbox.png"
     CHECKMARK = "assets/icons/checkmark.png"
+
+    VISIBLE = "assets/icons/visible.png"
+    INVISIBLE = "assets/icons/invisible.png"
+
+    LOCATION = "assets/icons/location.png"
+
+    TRASH = "assets/icons/trash.png"

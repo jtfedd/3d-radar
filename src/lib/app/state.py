@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Generic, List, TypeVar
 from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
 from lib.model.data_type import DataType
+from lib.model.location_marker import LocationMarker
 from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
 
@@ -111,6 +112,16 @@ class AppState:
         self.showTornadoWarnings = self.createField("showTornadoWarnings", True)
         self.showSevereThunderstormWarnings = self.createField(
             "showSevereThunderstormWarnings", True
+        )
+
+        self.show3dMarkers = self.createField("show3dMarkers", False)
+        self.mapMarkers: Observable[List[LocationMarker]] = (
+            self.createFieldCustomSerialization(
+                "mapMarkers",
+                [],
+                lambda rawL: list(map(lambda loc: loc.toJson(), rawL)),
+                lambda jsonL: list(map(LocationMarker.fromJson, jsonL)),
+            )
         )
 
         self.animationSpeed = self.createField("animationSpeed", 4)

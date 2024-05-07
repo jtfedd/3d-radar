@@ -3,6 +3,7 @@ class UIConstants:
     fontSizeTitle = 0.04
     fontSizeHeader = 0.05
     fontSizeDetail = 0.025
+    fontSizeBadge = 0.02
 
     headerFooterHeight = 0.08
 
@@ -38,6 +39,14 @@ class UIConstants:
 
     scrollbarWidth = 0.01
 
+    markerItemPadding = 0.015
+    markerItemButtonSize = 0.06
+    markerItemTextWidth = (
+        panelContentWidth - (4 * markerItemPadding) - (2 * markerItemButtonSize)
+    )
+    markerItemTextLeft = (2 * markerItemPadding) + markerItemButtonSize
+    markerItemMinHeight = markerItemButtonSize + (2 * markerItemPadding)
+
     animationSliderWidth = 0.6
     animationSliderPadding = headerFooterHeight / 2
     animationButtonWidth = headerFooterHeight
@@ -57,6 +66,8 @@ class UIConstants:
     legendTitleHeight = 0.06
     legendScaleBarHeight = legendScaleHeight - 4 * legendPadding - legendTitleHeight
 
+    mapMarkerSize = 0.07
+
     modalPadding = 0.05
     modalTitleHeight = 0.08
     modalScrollbarPadding = modalPadding / 2
@@ -66,6 +77,11 @@ class UIConstants:
 
     addressModalWidth = 0.7
     addressModalSearchbarHeight = 0.05
+    addressModalResultButtonsMaxHeight = 0.3
+    addressModalResultButtonTextPadding = 0.015
+    addressModalResultButtonPadding = 0.01
+    addressModalResultButtonHeight = 0.05
+    addressModalResultButtonHeightDouble = 0.09
 
     licenseModalWidth = 1.2
     licenseModalHeight = 0.8
@@ -82,13 +98,6 @@ class UIConstants:
 
     alertModalWidth = 1.2
     alertModalMaxHeight = 1.0
-
-    stationModalResultButtonHeight = 0.05
-    stationModalResultButtonTextPadding = 0.015
-    stationModalResultButtonPadding = 0.01
-    stationModalResultButtonsMaxHeight = 0.3
-
-    timezoneModalResultButtonHeight = 0.05
 
     labelPadding = 0.01
 

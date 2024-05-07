@@ -14,6 +14,7 @@ from panda3d.core import (
 )
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
@@ -22,14 +23,18 @@ from lib.util.optional import unwrap
 
 from .alert_renderer import AlertRenderer
 from .constants import EARTH_RADIUS, RADAR_RANGE
+from .markers.markers_manager import MarkersManager
+from .markers.markers_renderer import MarkersRenderer
 
 
 class Map(Listener):
-    def __init__(self, ctx: AppContext, state: AppState):
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.ctx = ctx
         self.state = state
+
+        self.markersManager = MarkersManager(ctx, state, events)
 
         self.root = ctx.base.render.attachNewNode("map-root")
         self.root.setZ(-EARTH_RADIUS)
@@ -39,7 +44,9 @@ class Map(Listener):
 
         self.latRoot = self.root.attachNewNode("map-lat")
         self.longRoot = self.latRoot.attachNewNode("map-long")
+
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
+        self.mapRoot.setH(90)
 
         self.clipPlane = ctx.base.render.attachNewNode(
             PlaneNode("clip-plane", Plane((0, 0, 0), (1, 0, 0), (0, 1, 0)))
@@ -60,7 +67,6 @@ class Map(Listener):
         self.roads = self.loadMapLayer("roads", UIColors.MAP_DETAILS)
 
         self.warningsRoot = self.mapRoot.attachNewNode("warningsRoot")
-        self.warningsRoot.setH(90)
         self.warningsRoot.setLightOff()
         self.warningsRoot.setAlphaScale(state.warningsOpacity.value)
         self.warningsRoot.setTransparency(TransparencyAttrib.MAlpha)
@@ -72,6 +78,9 @@ class Map(Listener):
         self.svwRenderer = AlertRenderer(
             self.svwRoot, state, AlertType.SEVERE_THUNDERSTORM_WARNING
         )
+
+        self.markersRoot = self.mapRoot.attachNewNode("map-markers")
+        self.markersRenderer = MarkersRenderer(ctx, state, self.markersRoot)
 
         self.updatePosition(state.station.value)
         self.listen(state.station, self.updatePosition)
@@ -108,7 +117,6 @@ class Map(Listener):
         node.reparentTo(self.mapRoot)
         node.setColorScale(color)
         node.setLightOff()
-        node.setH(90)
         return node
 
     def updatePosition(self, stationID: str) -> None:
@@ -138,6 +146,11 @@ class Map(Listener):
 
     def destroy(self) -> None:
         super().destroy()
+
+        self.markersManager.destroy()
+        self.markersRenderer.destroy()
+        self.towRenderer.destroy()
+        self.svwRenderer.destroy()
 
         self.root.removeNode()
         self.clipPlane.removeNode()

@@ -40,7 +40,7 @@ class AlertsButton(Listener):
             icon=Icons.WARNING,
             iconWidth=UIConstants.headerFooterHeight,
             iconHeight=UIConstants.headerFooterHeight,
-            disabled=not state.latest,
+            disabled=not state.latest.value,
         )
 
         self.updateBadge()
