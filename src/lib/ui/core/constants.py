@@ -98,13 +98,6 @@ class UIConstants:
     alertModalWidth = 1.2
     alertModalMaxHeight = 1.0
 
-    stationModalResultButtonHeight = 0.05
-    stationModalResultButtonTextPadding = 0.015
-    stationModalResultButtonPadding = 0.01
-    stationModalResultButtonsMaxHeight = 0.3
-
-    timezoneModalResultButtonHeight = 0.05
-
     labelPadding = 0.01
 
     # Higher number means slower scrolling

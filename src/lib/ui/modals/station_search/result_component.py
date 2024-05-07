@@ -44,12 +44,7 @@ class RadarStationsResult(AddressResultsComponent, Listener):
 
         self.buttons: List[RadarButton] = []
 
-        for i, radarStation in enumerate(radarStations):
-            buttonTop = buttonTop + i * (
-                UIConstants.addressModalResultButtonHeight
-                + UIConstants.addressModalResultButtonPadding
-            )
-
+        for radarStation in radarStations:
             self.buttons.append(
                 RadarButton(
                     ctx,
@@ -59,6 +54,11 @@ class RadarStationsResult(AddressResultsComponent, Listener):
                     radarStation,
                     distances[radarStation.stationID],
                 )
+            )
+
+            buttonTop += (
+                UIConstants.addressModalResultButtonHeight
+                + UIConstants.addressModalResultButtonPadding
             )
 
         for button in self.buttons:
