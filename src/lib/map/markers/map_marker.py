@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode
 
@@ -14,6 +16,7 @@ from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 from lib.util.map_3d_to_2d import map3dToAspect2d
+from lib.util.optional import unwrap
 
 from ..constants import RADAR_RANGE
 from ..util import toGlobe
@@ -53,6 +56,14 @@ class MapMarker(Listener):
             color=UIColors.ORANGE,
         )
 
+        self.model = unwrap(
+            ctx.base.loader.loadModel("assets/models/marker.glb", noCache=True)
+        )
+        self.model.reparentTo(ctx.base.render)
+        self.model.hide()
+        self.model.setColorScale(UIColors.ORANGE)
+        self.model.setScale(10)
+
         self.updateInRadarRange()
         self.listen(state.station, lambda _: self.updateInRadarRange())
         self.listen(state.uiScale, self.iconRoot.setScale)
@@ -75,13 +86,33 @@ class MapMarker(Listener):
             self.ctx, self.ctx.base.render, self.posRoot.getPos(self.ctx.base.render)
         )
 
-        show2dMarker = self.visible and self.inRadarRange
+        show2dMarker = (
+            self.visible and self.inRadarRange and not self.state.show3dMarkers.value
+        )
+        show3dMarker = (
+            self.visible and self.inRadarRange and self.state.show3dMarkers.value
+        )
 
         if markerOnscreenPos is None or not show2dMarker:
             self.iconRoot.hide()
         else:
             self.iconRoot.show()
             self.iconRoot.setPos(markerOnscreenPos)
+
+        if not show3dMarker:
+            self.model.hide()
+        else:
+            self.model.show()
+            self.model.setPos(self.posRoot.getPos(self.ctx.base.render))
+
+            pointX = self.model.getX(self.ctx.base.render)
+            pointY = self.model.getY(self.ctx.base.render)
+
+            camX = self.ctx.base.camera.getX(self.ctx.base.render)
+            camY = self.ctx.base.camera.getY(self.ctx.base.render)
+
+            heading = math.degrees(math.atan2(camY - pointY, camX - pointX))
+            self.model.setH(heading)
 
         return task.cont
 

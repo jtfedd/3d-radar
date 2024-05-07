@@ -3,6 +3,7 @@ from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign
 from lib.ui.panels.components.button import PanelButton
+from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.spacer import SpacerComponent
@@ -61,6 +62,18 @@ class MapPanel(PanelContent):
         )
 
         self.addComponent(TitleComponent(self.root, ctx, "Markers"))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.show3dMarkers,
+                [("2D", False), ("3D", True)],
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
         self.addMarkerButton = self.addComponent(
             PanelButton(self.root, ctx, "Add Marker")
         )

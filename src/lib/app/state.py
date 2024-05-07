@@ -114,6 +114,7 @@ class AppState:
             "showSevereThunderstormWarnings", True
         )
 
+        self.show3dMarkers = self.createField("show3dMarkers", False)
         self.mapMarkers: Observable[List[LocationMarker]] = (
             self.createFieldCustomSerialization(
                 "mapMarkers",
