@@ -36,7 +36,7 @@ class Badge(Component):
 
         self.text = Text(
             root=root,
-            font=ctx.fonts.black,
+            font=ctx.fonts.bold,
             text=text,
             x=x,
             y=y,
