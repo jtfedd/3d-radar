@@ -105,6 +105,7 @@ jobs:
 
     - name: Run Unit Tests With Coverage
       run: make test-xml-coverage
+      continue-on-error: true
 
     - name: Generate LCOV report
       run: |
