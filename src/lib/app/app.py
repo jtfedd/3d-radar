@@ -8,7 +8,6 @@ from lib.map.map import Map
 from lib.model.record import Record
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
-from lib.util.util import defaultLight
 
 from .alerts.manager import AlertManager
 from .animation.manager import AnimationManager
@@ -20,7 +19,6 @@ from .state import AppState
 class App:
     def __init__(self, base: ShowBase) -> None:
         base.setBackgroundColor(0, 0, 0, 1)
-        defaultLight(base)
 
         self.state = AppState()
         self.events = AppEvents()
