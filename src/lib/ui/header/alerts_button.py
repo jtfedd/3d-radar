@@ -17,7 +17,7 @@ class AlertsButton(Listener):
         super().__init__()
 
         self.ctx = ctx
-        self.state = state
+        self.state =  state
         self.events = events
 
         self.badge = Badge(
