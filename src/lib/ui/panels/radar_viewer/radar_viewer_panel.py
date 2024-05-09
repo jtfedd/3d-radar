@@ -66,6 +66,84 @@ class RadarViewerPanel(PanelContent):
             self.state.volumeFalloff, self.falloffSlider.slider.setValue
         )
 
+        self.addComponent(TitleComponent(self.root, ctx, "Lighting"))
+
+        self.ambientIntensitySlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.ambientLightIntensity.value,
+                label="Ambient",
+                valueRange=(0, 1),
+            )
+        )
+
+        self.directionalIntensitySlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.directionalLightIntensity.value,
+                label="Directional",
+                valueRange=(0, 1),
+            )
+        )
+
+        self.directionalHeading = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.directionalLightHeading.value,
+                label="Heading",
+                valueRange=(0, 1),
+            )
+        )
+
+        self.directionalPitch = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.directionalLightPitch.value,
+                label="Angle",
+                valueRange=(0, 1),
+            )
+        )
+
+        self.listener.listen(
+            self.ambientIntensitySlider.slider.onValueChange,
+            state.ambientLightIntensity.setValue,
+        )
+        self.listener.listen(
+            self.state.ambientLightIntensity,
+            self.ambientIntensitySlider.slider.setValue,
+        )
+
+        self.listener.listen(
+            self.directionalIntensitySlider.slider.onValueChange,
+            state.directionalLightIntensity.setValue,
+        )
+        self.listener.listen(
+            state.directionalLightIntensity,
+            self.directionalIntensitySlider.slider.setValue,
+        )
+
+        self.listener.listen(
+            self.directionalHeading.slider.onValueChange,
+            state.directionalLightHeading.setValue,
+        )
+        self.listener.listen(
+            state.directionalLightHeading,
+            self.directionalHeading.slider.setValue,
+        )
+
+        self.listener.listen(
+            self.directionalPitch.slider.onValueChange,
+            state.directionalLightPitch.setValue,
+        )
+        self.listener.listen(
+            state.directionalLightPitch,
+            self.directionalPitch.slider.setValue,
+        )
+
     def handleMinChange(self, newMin: float) -> None:
         self.state.volumeMin.setValue(newMin)
         self.state.volumeMax.setValue(max(newMin, self.state.volumeMax.value))

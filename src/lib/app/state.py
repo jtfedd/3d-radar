@@ -86,6 +86,11 @@ class AppState:
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
 
+        self.ambientLightIntensity = self.createField("ali", 0.2)
+        self.directionalLightIntensity = self.createField("dli", 1.0)
+        self.directionalLightHeading = self.createField("dlh", 0.75)
+        self.directionalLightPitch = self.createField("dlp", 0.5)
+
         self.timeMode = self.createFieldCustomSerialization(
             "timeMode",
             TimeMode.RADAR,
