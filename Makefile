@@ -16,11 +16,6 @@ install: ## Install only the dependencies needed to build and run the app
 	python -m pip install -r requirements.txt
 	python -m pip freeze > requirements-lock.txt
 
-.PHONY: install-tools
-install-tools: ## Install only the dev tools
-	python -m pip install -r requirements-dev.txt
-	python -m pip freeze > requirements-lock.txt
-
 .PHONY: install-dev
 install-dev: ## Install build and dev dependencies
 	python -m pip install -r requirements.txt -r requirements-dev.txt
