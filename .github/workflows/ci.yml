@@ -52,7 +52,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: requirements-dev.txt
 
-    - run: make install-tools
+    - run: make install-dev
     - run: make format-check
 
   imports:
@@ -68,7 +68,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: requirements-dev.txt
 
-    - run: make install-tools
+    - run: make install-dev
     - run: make import-check
 
   lint:
