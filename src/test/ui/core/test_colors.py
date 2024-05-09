@@ -19,7 +19,7 @@ class TestColors(unittest.TestCase):
         self.assertRaises(StateError, fromHex, "#")
         self.assertRaises(StateError, fromHex, "#FFF")
         self.assertRaises(StateError, fromHex, "#FFFFF")
-        self.assertRaises(StateError, fromHex, "#FFFFFFF")
+        self.assertRaises(StateError, fromHex, "#FFBFFFF")
         self.assertRaises(StateError, fromHex, "FFFFFF")
         self.assertRaises(StateError, fromHex, "#ABCDEG")
         self.assertRaises(StateError, fromHex, "#fFfffF")
