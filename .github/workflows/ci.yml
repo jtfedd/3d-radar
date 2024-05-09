@@ -50,7 +50,9 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
-        cache-dependency-path: requirements-dev.txt
+        cache-dependency-path: |
+          requirements.txt
+          requirements-dev.txt
 
     - run: make install-dev
     - run: make format-check
@@ -66,7 +68,9 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
-        cache-dependency-path: requirements-dev.txt
+        cache-dependency-path: |
+          requirements.txt
+          requirements-dev.txt
 
     - run: make install-dev
     - run: make import-check
