@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ PYTHON_VERSION }}
+        python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Verify Packages
       run: |
@@ -34,7 +34,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ PYTHON_VERSION }}
+        python-version: ${{ env.PYTHON_VERSION }}
 
     - run: make shaders
     - run: git diff --exit-code
@@ -48,7 +48,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ PYTHON_VERSION }}
+        python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: requirements-dev.txt
 
@@ -64,7 +64,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ PYTHON_VERSION }}
+        python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: requirements-dev.txt
 
@@ -80,7 +80,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ PYTHON_VERSION }}
+        python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: |
           requirements.txt
@@ -98,7 +98,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ PYTHON_VERSION }}
+        python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: |
           requirements.txt
