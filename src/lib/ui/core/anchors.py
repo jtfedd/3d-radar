@@ -5,9 +5,10 @@ from panda3d.core import PythonTask
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.app.state import AppState
+
 from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
+from lib.app.state import AppState
 
 
 class UIAnchors(Listener):
