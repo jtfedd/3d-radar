@@ -104,6 +104,8 @@ jobs:
           requirements.txt
           requirements-dev.txt
 
+    - run: make install-dev
+
     - name: Setup LCOV
       uses: hrishikesh-kadam/setup-lcov@v1
 
