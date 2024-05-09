@@ -50,7 +50,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - run: pip install -r requirements-dev.txt -n black
+    - run: pip install $(grep black requirements-dev.txt)
     - run: make format-check
 
   imports:
@@ -64,7 +64,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - run: pip install -r requirements-dev.txt -n isort
+    - run: pip install $(grep isort requirements-dev.txt)
     - run: make import-check
 
   lint:
