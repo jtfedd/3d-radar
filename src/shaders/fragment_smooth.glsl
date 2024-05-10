@@ -37,6 +37,7 @@ uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
 uniform float shadow_strength;
+uniform bool use_shadows;
 
 // End inputs
 

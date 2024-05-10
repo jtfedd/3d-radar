@@ -37,6 +37,7 @@ uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
 uniform float shadow_strength;
+uniform bool use_shadows;
 
 // End inputs
 
@@ -315,8 +316,12 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
         vec3 sample_color = colorize(sample_value);
         float sample_alpha = sample_density * step_size;
 
-        float brightness = sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos);
-        float lighting = ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity));
+        float brightness = use_shadows
+            ? (sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos))
+            : 1.0;
+        float lighting = use_shadows
+            ? ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity))
+            : 1.0;
 
         vec4 ci = vec4(sample_color * lighting, 1.0) * sample_alpha;
         color = blend_onto(color, ci);

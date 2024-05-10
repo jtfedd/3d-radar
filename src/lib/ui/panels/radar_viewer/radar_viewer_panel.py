@@ -118,6 +118,15 @@ class RadarViewerPanel(PanelContent):
             )
         )
 
+        self.useShadows = self.addComponent(
+            CheckboxComponent(
+                self.root,
+                ctx,
+                "Use Shadows",
+                self.state.useShadows,
+            )
+        )
+
         self.listener.listen(
             self.ambientIntensitySlider.slider.onValueChange,
             state.ambientLightIntensity.setValue,
