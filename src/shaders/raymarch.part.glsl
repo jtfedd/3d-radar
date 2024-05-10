@@ -50,9 +50,9 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
         float sample_alpha = sample_density * step_size;
 
         float brightness = sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos);
-        brightness = ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity));
+        float lighting = ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity));
 
-        vec4 ci = vec4(sample_color * brightness, 1.0) * sample_alpha;
+        vec4 ci = vec4(sample_color * lighting, 1.0) * sample_alpha;
         color = blend_onto(color, ci);
 
         t += step_size;

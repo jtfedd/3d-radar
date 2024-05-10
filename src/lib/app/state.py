@@ -92,6 +92,7 @@ class AppState:
         self.directionalLightIntensity = self.createField("dli", 1.0)
         self.directionalLightHeading = self.createField("dlh", 0.75)
         self.directionalLightPitch = self.createField("dlp", 0.5)
+        self.shadowStrength = self.createField("shadows", 1.0)
 
         self.timeMode = self.createFieldCustomSerialization(
             "timeMode",

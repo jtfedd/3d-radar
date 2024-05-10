@@ -84,7 +84,7 @@ class RadarViewerPanel(PanelContent):
                 ctx,
                 self.state.directionalLightIntensity.value,
                 label="Directional",
-                valueRange=(0, 1),
+                valueRange=(0, 10),
             )
         )
 
@@ -105,6 +105,16 @@ class RadarViewerPanel(PanelContent):
                 self.state.directionalLightPitch.value,
                 label="Angle",
                 valueRange=(0, 1),
+            )
+        )
+
+        self.shadowStrength = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.shadowStrength.value,
+                label="Shadows",
+                valueRange=(0, 10),
             )
         )
 
@@ -142,6 +152,15 @@ class RadarViewerPanel(PanelContent):
         self.listener.listen(
             state.directionalLightPitch,
             self.directionalPitch.slider.setValue,
+        )
+
+        self.listener.listen(
+            self.shadowStrength.slider.onValueChange,
+            state.shadowStrength.setValue,
+        )
+        self.listener.listen(
+            state.shadowStrength,
+            self.shadowStrength.slider.setValue,
         )
 
     def handleMinChange(self, newMin: float) -> None:

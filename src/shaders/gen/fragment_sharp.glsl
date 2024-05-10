@@ -206,7 +206,7 @@ float light_amount(in vec3 ro) {
 
         float sample_value = data_value(sample_pos);
         float sample_density = density(sample_value);
-        float sample_opacity = sample_density * step_size;
+        float sample_opacity = sample_density * step_size * shadow_strength;
 
         opacity = sample_opacity + (1.0 - sample_opacity) * opacity;
         
@@ -214,7 +214,7 @@ float light_amount(in vec3 ro) {
     }
 
     if (opacity > ALPHA_CUTOFF) {
-        return 1.0;
+        return 0.0;
     }
 
     return 1 - opacity;
@@ -274,9 +274,9 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
         float sample_alpha = sample_density * step_size;
 
         float brightness = sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos);
-        brightness = ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity));
+        float lighting = ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity));
 
-        vec4 ci = vec4(sample_color * brightness, 1.0) * sample_alpha;
+        vec4 ci = vec4(sample_color * lighting, 1.0) * sample_alpha;
         color = blend_onto(color, ci);
 
         t += step_size;
