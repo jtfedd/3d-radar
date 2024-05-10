@@ -1,6 +1,8 @@
 import json
 from typing import Any, Callable, Dict, Generic, List, TypeVar
 
+from panda3d.core import Vec3
+
 from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
 from lib.model.data_type import DataType
@@ -152,6 +154,8 @@ class AppState:
         self.alerts = Observable[AlertPayload](
             AlertPayload(status=AlertStatus.READY, alerts={})
         )
+
+        self.directionalLightDirection = Observable[Vec3](Vec3(0, 0, 0))
 
     def use24HourTime(self) -> bool:
         return self.timeMode.value == TimeMode.UTC or not self.timeFormat.value

@@ -8,6 +8,7 @@ from lib.app.state import AppState
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
+from .lighting_data_provider import LightingDataProvider
 from .volume_data_provider import VolumeDataProvider
 
 
@@ -63,11 +64,15 @@ class VolumeRenderer(Listener):
         self.updateScreenResolution(window)
         self.listen(events.window.onWindowUpdate, self.updateScreenResolution)
 
-        self.ctx.base.taskMgr.add(self.updateCameraParams, "update-camera-params")
-        self.ctx.base.taskMgr.add(self.updateTime, "update-time")
+        self.cameraTask = self.ctx.base.taskMgr.add(
+            self.updateCameraParams, "update-camera-params"
+        )
+        self.timeTask = self.ctx.base.taskMgr.add(self.updateTime, "update-time")
 
-        self.volumeDataProvider = VolumeDataProvider(ctx, state, events)
+        self.volumeDataProvider = VolumeDataProvider(ctx, state)
+        self.lightingDataProvider = LightingDataProvider(ctx, state)
         self.volumeDataProvider.addNode(self.plane)
+        self.lightingDataProvider.addNode(self.plane)
 
     def updateShader(self, smooth: bool) -> None:
         if smooth:
@@ -100,3 +105,12 @@ class VolumeRenderer(Listener):
         self.plane.setShaderInput("time", task.time)
 
         return task.cont
+
+    def destroy(self) -> None:
+        super().destroy()
+
+        self.lightingDataProvider.destroy()
+        self.volumeDataProvider.destroy()
+
+        self.cameraTask.cancel()
+        self.timeTask.cancel()

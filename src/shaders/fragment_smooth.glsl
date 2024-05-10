@@ -33,6 +33,10 @@ uniform float density_params[5];
 uniform samplerBuffer volume_data;
 uniform sampler2D color_scale;
 
+uniform float ambient_intensity;
+uniform float directional_intensity;
+uniform vec3 directional_orientation;
+
 // End inputs
 
 #define PI 3.1415926538
@@ -40,6 +44,11 @@ uniform sampler2D color_scale;
 #define MIN_STEPS 5
 #define MAX_STEPS 1000
 #define STEP_SIZE 1.5
+
+#define MIN_L_STEPS 5
+#define MAX_L_STEPS 100
+#define L_STEP_SIZE 1.5
+
 #define ALPHA_CUTOFF 0.99
 
 #include hash.part.glsl
@@ -48,6 +57,7 @@ uniform sampler2D color_scale;
 #include density.part.glsl
 #include resolve_elevation.part.glsl
 #include volume_smooth.part.glsl
+#include lightmarch.part.glsl
 #include raymarch.part.glsl
 
 void main() {

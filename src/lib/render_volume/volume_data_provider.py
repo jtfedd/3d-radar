@@ -6,7 +6,6 @@ from typing import Dict
 from panda3d.core import GeomEnums, NodePath, PandaNode, PTA_float, PTA_int, Texture
 
 from lib.app.context import AppContext
-from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_type import DataType
 from lib.model.scan import Scan
@@ -18,11 +17,10 @@ from lib.util.uuid import uuid
 class VolumeDataProvider(Listener):
     MAX_SCANS = 20
 
-    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState) -> None:
         super().__init__()
         self.ctx = ctx
         self.state = state
-        self.events = events
 
         self.nodes: Dict[str, NodePath[PandaNode]] = {}
 

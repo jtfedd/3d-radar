@@ -1,4 +1,4 @@
-from panda3d.core import AmbientLight, DirectionalLight
+from panda3d.core import AmbientLight, DirectionalLight, Point3
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
@@ -10,9 +10,12 @@ class LightingManager(Listener):
         super().__init__()
 
         self.ctx = ctx
+        self.state = state
 
         self.headingRoot = ctx.base.render.attachNewNode("light-heading-root")
         self.pitchRoot = self.headingRoot.attachNewNode("light-pitch-root")
+        self.forward = self.pitchRoot.attachNewNode("light-forward")
+        self.forward.setY(1.0)
 
         self.alight = AmbientLight("alight")
         self.alnp = ctx.base.render.attachNewNode(self.alight)
@@ -35,9 +38,16 @@ class LightingManager(Listener):
 
     def updateDirectionalHeading(self, dlh: float) -> None:
         self.headingRoot.setH(dlh * -360)
+        self.updateForward()
 
     def updateDirectionalPitch(self, dlp: float) -> None:
         self.pitchRoot.setP(dlp * -90)
+        self.updateForward()
+
+    def updateForward(self) -> None:
+        self.state.directionalLightDirection.setValue(
+            self.forward.getPos(self.ctx.base.render) - Point3(0, 0, 0)
+        )
 
     def destroy(self) -> None:
         super().destroy()
