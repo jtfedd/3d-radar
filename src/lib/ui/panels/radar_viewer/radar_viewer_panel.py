@@ -6,6 +6,7 @@ from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
+from lib.util.events.observable import Observable
 
 
 class RadarViewerPanel(PanelContent):
@@ -81,32 +82,11 @@ class RadarViewerPanel(PanelContent):
             )
         )
 
-        self.listener.listen(
-            self.lowCutSlider.slider.onValueChange,
-            state.volumeLowCut.setValue,
-        )
-        self.listener.listen(
-            self.highCutSlider.slider.onValueChange,
-            state.volumeHighCut.setValue,
-        )
-        self.listener.listen(
-            self.minSlider.slider.onValueChange,
-            state.volumeMin.setValue,
-        )
-        self.listener.listen(
-            self.maxSlider.slider.onValueChange,
-            state.volumeMax.setValue,
-        )
-        self.listener.listen(
-            self.falloffSlider.slider.onValueChange,
-            state.volumeFalloff.setValue,
-        )
-
-        self.listener.listen(state.volumeLowCut, self.lowCutSlider.slider.setValue)
-        self.listener.listen(state.volumeHighCut, self.highCutSlider.slider.setValue)
-        self.listener.listen(state.volumeMin, self.minSlider.slider.setValue)
-        self.listener.listen(state.volumeMax, self.maxSlider.slider.setValue)
-        self.listener.listen(state.volumeFalloff, self.falloffSlider.slider.setValue)
+        self.linkSlider(state.volumeLowCut, self.lowCutSlider)
+        self.linkSlider(state.volumeHighCut, self.highCutSlider)
+        self.linkSlider(state.volumeMin, self.minSlider)
+        self.linkSlider(state.volumeMax, self.maxSlider)
+        self.linkSlider(state.volumeFalloff, self.falloffSlider)
 
         self.addComponent(TitleComponent(self.root, ctx, "Lighting"))
 
@@ -150,41 +130,18 @@ class RadarViewerPanel(PanelContent):
             )
         )
 
-        self.listener.listen(
-            self.ambientIntensitySlider.slider.onValueChange,
-            state.ambientLightIntensity.setValue,
+        self.linkSlider(state.ambientLightIntensity, self.ambientIntensitySlider)
+        self.linkSlider(
+            state.directionalLightIntensity, self.directionalIntensitySlider
         )
-        self.listener.listen(
-            state.ambientLightIntensity,
-            self.ambientIntensitySlider.slider.setValue,
-        )
+        self.linkSlider(state.directionalLightHeading, self.directionalHeading)
+        self.linkSlider(state.directionalLightPitch, self.directionalPitch)
 
-        self.listener.listen(
-            self.directionalIntensitySlider.slider.onValueChange,
-            state.directionalLightIntensity.setValue,
-        )
-        self.listener.listen(
-            state.directionalLightIntensity,
-            self.directionalIntensitySlider.slider.setValue,
-        )
-
-        self.listener.listen(
-            self.directionalHeading.slider.onValueChange,
-            state.directionalLightHeading.setValue,
-        )
-        self.listener.listen(
-            state.directionalLightHeading,
-            self.directionalHeading.slider.setValue,
-        )
-
-        self.listener.listen(
-            self.directionalPitch.slider.onValueChange,
-            state.directionalLightPitch.setValue,
-        )
-        self.listener.listen(
-            state.directionalLightPitch,
-            self.directionalPitch.slider.setValue,
-        )
+    def linkSlider(
+        self, observable: Observable[float], slider: SliderComponent
+    ) -> None:
+        self.listener.listen(slider.slider.onValueChange, observable.setValue)
+        self.listener.listen(observable, slider.slider.setValue)
 
     def headerText(self) -> str:
         return "Radar Viewer"
