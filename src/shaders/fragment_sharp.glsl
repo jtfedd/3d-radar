@@ -1,6 +1,7 @@
 #version 330
 
 #define MAX_SCANS 20
+$constants
 
 // Outputs to Panda3D
 out vec4 p3d_FragColor;
@@ -31,16 +32,15 @@ uniform int offset[MAX_SCANS];
 uniform float density_params[7];
 
 uniform samplerBuffer volume_data;
-uniform sampler2D color_scale;
 
 uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
 uniform bool volumetric_lighting;
 
-// End inputs
+$inputs
 
-#define PI 3.1415926538
+// End inputs
 
 #define MIN_STEPS 5
 #define MAX_STEPS 1000

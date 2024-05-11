@@ -1,3 +1,7 @@
+$begin constants
+#define PI 3.1415926538
+$end
+
 float interpolate(float low, float high, float factor) {
     if (low < 0 && high < 0) {
         return -1.0;

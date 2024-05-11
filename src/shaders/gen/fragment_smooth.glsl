@@ -1,6 +1,7 @@
 #version 330
 
 #define MAX_SCANS 20
+#define PI 3.1415926538
 
 // Outputs to Panda3D
 out vec4 p3d_FragColor;
@@ -31,16 +32,15 @@ uniform int offset[MAX_SCANS];
 uniform float density_params[7];
 
 uniform samplerBuffer volume_data;
-uniform sampler2D color_scale;
 
 uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
 uniform bool volumetric_lighting;
 
-// End inputs
+uniform sampler2D color_scale;
 
-#define PI 3.1415926538
+// End inputs
 
 #define MIN_STEPS 5
 #define MAX_STEPS 1000
@@ -51,8 +51,6 @@ uniform bool volumetric_lighting;
 #define L_STEP_SIZE 1.5
 
 #define ALPHA_CUTOFF 0.99
-
-// ########## start #include hash.part.glsl
 
 // https://www.shadertoy.com/view/4djSRW
 // float hash12(vec2 p) {
@@ -72,9 +70,6 @@ float hash14(vec4 p4) {
     p4 += dot(p4, p4.wzxy+33.33);
     return fract((p4.x + p4.y) * (p4.z + p4.w));
 }
-// ########## end #include hash.part.glsl
-// ########## start #include box_intersection.part.glsl
-
 // For each coord, return the range of t for which p+t*v is inside the box defined
 // by the corners box_min and box_max, and whether the ray intersects the box.
 // More on this method here: https://tavianator.com/2011/ray_box.html
@@ -95,8 +90,6 @@ void box_intersection(
 
     no_intersection = tRange.t < tRange.s;
 }
-// ########## end #include box_intersection.part.glsl
-// ########## start #include color_util.part.glsl
 
 vec4 blend_onto(vec4 front, vec4 behind) {
     return front + (1.0 - front.a) * behind;
@@ -105,9 +98,6 @@ vec4 blend_onto(vec4 front, vec4 behind) {
 vec3 colorize(float value) {
     return texture(color_scale, vec2(0, value)).rgb;
 }
-// ########## end #include color_util.part.glsl
-// ########## start #include density.part.glsl
-
 float density(float value) {
     if (value < 0) return 0.0;
 
@@ -120,9 +110,6 @@ float density(float value) {
     value = (value - density_params[5]) / (density_params[6] - density_params[5]);
     return density_params[2] + density_params[3] * pow(value, density_params[4]);
 }
-// ########## end #include density.part.glsl
-// ########## start #include resolve_elevation.part.glsl
-
 int calc_sweep_index(float el) {
     int l = 0;
     int r = scan_count[0];
@@ -144,8 +131,6 @@ int calc_sweep_index(float el) {
     return 0;
 }
 
-// ########## end #include resolve_elevation.part.glsl
-// ########## start #include volume_smooth.part.glsl
 
 float interpolate(float low, float high, float factor) {
     if (low < 0 && high < 0) {
@@ -223,9 +208,6 @@ float data_value(vec3 point) {
     float factor = (el - elevation[sweep_index]) / (elevation[sweep_index+1] - elevation[sweep_index]);
     return interpolate(low, high, factor);
 }
-// ########## end #include volume_smooth.part.glsl
-// ########## start #include lightmarch.part.glsl
-
 float light_amount(in vec3 ro) {
     vec3 rd = -directional_orientation;
 
@@ -267,9 +249,6 @@ float light_amount(in vec3 ro) {
 
     return 1 - opacity;
 }
-// ########## end #include lightmarch.part.glsl
-// ########## start #include raymarch.part.glsl
-
 void gen_ray(
     in float depth_clip, in vec2 uv,
     out vec3 ray, out float d
@@ -340,7 +319,6 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     
     return color;
 }
-// ########## end #include raymarch.part.glsl
 
 void main() {
     vec4 scene_color = texelFetch(scene, ivec2(gl_FragCoord.xy), 0);

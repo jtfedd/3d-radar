@@ -1,6 +1,10 @@
+# pylint: disable=broad-exception-caught
+# pylint: disable=broad-exception-raised
+
 import pathlib
 import sys
-from typing import List
+from enum import Enum
+from typing import Dict, List, Set
 
 SHADER_SRC = "src/shaders"
 SHADER_OUT = "src/shaders/gen"
@@ -56,32 +60,154 @@ def collectShaders() -> List[pathlib.Path]:
     return shaderFiles
 
 
-def compileShader(shader: pathlib.Path) -> None:
-    shaderOut = getOutputPath().joinpath(shader.name)
-    print("Compiling", shader, "to", shaderOut)
+class MetaState(Enum):
+    NONE = 1
+    INPUTS = 2
+    CONSTANTS = 3
 
-    with open(shader, "r", encoding="utf-8") as inputFile:
-        with open(shaderOut, "w+", encoding="utf-8") as outputFile:
-            for line in inputFile.readlines():
-                if line.startswith("#include"):
-                    outputFile.write("// ########## start " + line)
-                    outputFile.write("\n")
-                    includeFilename = line.strip().split(" ")[1]
-                    includePath = getSrcPath().joinpath(includeFilename)
-                    print("> Including", includePath)
-                    with open(includePath, "r", encoding="utf-8") as includeFile:
-                        for iline in includeFile.readlines():
-                            outputFile.write(iline)
 
-                    outputFile.write("\n")
-                    outputFile.write("// ########## end " + line)
-                else:
-                    outputFile.write(line)
+class Compiler:
+    def __init__(self, shader: pathlib.Path) -> None:
+        self.includes: Set[str] = set()
+        self.constants: Dict[str, str] = {}
+        self.inputs: Dict[str, str] = {}
+
+        self.shaderIn = shader
+        self.shaderOut = getOutputPath().joinpath(shader.name)
+
+    def compile(self) -> None:
+        print("Compiling", self.shaderIn, "to", self.shaderOut)
+
+        lines = self.readFile(self.shaderIn)
+
+        lines = self.collectMeta(lines)
+        lines = self.processIncludes(lines)
+        lines = self.applyMeta(lines)
+
+        with open(self.shaderOut, "w+", encoding="utf-8") as outputFile:
+            outputFile.write("\n".join(lines))
+
+    def readFile(self, file: pathlib.Path) -> List[str]:
+        with open(file, "r", encoding="utf-8") as f:
+            contents = f.read()
+
+        return contents.split("\n")
+
+    def addInput(self, line: str) -> None:
+        parts = line.split(" ")
+        t = parts[1]
+        name = parts[2]
+
+        if name in self.inputs and self.inputs[name] != t:
+            raise Exception(
+                "Conflicting types for " + name + ": " + self.inputs[name] + ", " + t
+            )
+
+        self.inputs[name] = t
+
+    def addConstant(self, line: str) -> None:
+        parts = line.split(" ")
+        name = parts[1]
+        value = parts[2]
+
+        if name in self.constants and self.constants[name] != value:
+            raise Exception(
+                "Conflicting values for "
+                + name
+                + ": "
+                + self.constants[name]
+                + ", "
+                + value
+            )
+
+        self.constants[name] = value
+
+    def collectMeta(self, lines: List[str]) -> List[str]:
+        outputLines: List[str] = []
+
+        state = MetaState.NONE
+
+        for line in lines:
+            if line == "$end":
+                state = MetaState.NONE
+                continue
+
+            if state == MetaState.INPUTS:
+                self.addInput(line)
+                continue
+
+            if state == MetaState.CONSTANTS:
+                self.addConstant(line)
+                continue
+
+            if line == "$begin inputs":
+                state = MetaState.INPUTS
+                continue
+
+            if line == "$begin constants":
+                state = MetaState.CONSTANTS
+                continue
+
+            outputLines.append(line)
+
+        return outputLines
+
+    def processIncludes(self, lines: List[str]) -> List[str]:
+        outputLines: List[str] = []
+
+        for line in lines:
+            if line.startswith("#include"):
+                includeFilename = line.strip().split(" ")[1]
+                if includeFilename in self.includes:
+                    print("> " + includeFilename + " already included")
+
+                self.includes.add(includeFilename)
+                includePath = getSrcPath().joinpath(includeFilename)
+                print("> Including", includePath)
+
+                lines = self.readFile(includePath)
+                lines = self.collectMeta(lines)
+                outputLines += lines
+            else:
+                outputLines.append(line)
+
+        return outputLines
+
+    def applyMeta(self, lines: List[str]) -> List[str]:
+        outputLines: List[str] = []
+
+        for line in lines:
+            if line == "$inputs":
+                for name, t in self.inputs.items():
+                    outputLines.append("uniform " + t + " " + name)
+            elif line == "$constants":
+                for name, value in self.constants.items():
+                    outputLines.append("#define " + name + " " + value)
+            else:
+                outputLines.append(line)
+
+        return outputLines
 
 
 if __name__ == "__main__":
-    removeCompiledShaders()
-    shaders = collectShaders()
+    try:
+        removeCompiledShaders()
+    except Exception as e:
+        print("Failed to remove compiled shaders")
+        print(e)
+        sys.exit(1)
+
+    try:
+        shaders = collectShaders()
+    except Exception as e:
+        print("Failed to find shader files")
+        print(e)
+        sys.exit(1)
 
     for s in shaders:
-        compileShader(s)
+        try:
+            Compiler(s).compile()
+        except Exception as e:
+            print("Failed to compile", s)
+            print(e)
+            sys.exit(1)
