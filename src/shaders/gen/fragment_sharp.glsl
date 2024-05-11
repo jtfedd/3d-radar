@@ -47,7 +47,7 @@ uniform bool volumetric_lighting;
 #define STEP_SIZE 1.5
 
 #define MIN_L_STEPS 5
-#define MAX_L_STEPS 100
+#define MAX_L_STEPS 20
 #define L_STEP_SIZE 1.5
 
 #define ALPHA_CUTOFF 0.99

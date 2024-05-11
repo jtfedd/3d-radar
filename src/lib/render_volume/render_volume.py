@@ -5,6 +5,7 @@ from panda3d.core import GraphicsWindow, Shader, Texture
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.map.constants import RADAR_RANGE
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
@@ -48,8 +49,8 @@ class VolumeRenderer(Listener):
 
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
-        self.plane.setShaderInput("bounds_start", (-1000, -1000, 0))
-        self.plane.setShaderInput("bounds_end", (1000, 1000, 20))
+        self.plane.setShaderInput("bounds_start", (-RADAR_RANGE, -RADAR_RANGE, 0))
+        self.plane.setShaderInput("bounds_end", (RADAR_RANGE, RADAR_RANGE, 15))
         self.plane.setShaderInput("camera", self.ctx.base.camera)
         self.plane.setShaderInput("time", 0)
 
