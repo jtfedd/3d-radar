@@ -69,8 +69,12 @@ class MetaState(Enum):
 class Compiler:
     def __init__(self, shader: pathlib.Path) -> None:
         self.includes: Set[str] = set()
+
         self.constants: Dict[str, str] = {}
+        self.constantsOrder: List[str] = []
+
         self.inputs: Dict[str, str] = {}
+        self.inputsOrder: List[str] = []
 
         self.shaderIn = shader
         self.shaderOut = getOutputPath().joinpath(shader.name)
@@ -104,6 +108,7 @@ class Compiler:
             )
 
         self.inputs[name] = t
+        self.inputsOrder.append(name)
 
     def addConstant(self, line: str) -> None:
         parts = line.split(" ")
@@ -121,6 +126,7 @@ class Compiler:
             )
 
         self.constants[name] = value
+        self.constantsOrder.append(name)
 
     def collectMeta(self, lines: List[str]) -> List[str]:
         outputLines: List[str] = []
@@ -178,11 +184,11 @@ class Compiler:
 
         for line in lines:
             if line == "$inputs":
-                for name, t in self.inputs.items():
-                    outputLines.append("uniform " + t + " " + name)
+                for name in self.inputsOrder:
+                    outputLines.append("uniform " + self.inputs[name] + " " + name)
             elif line == "$constants":
-                for name, value in self.constants.items():
-                    outputLines.append("#define " + name + " " + value)
+                for name in self.constantsOrder:
+                    outputLines.append("#define " + name + " " + self.constants[name])
             else:
                 outputLines.append(line)
 
