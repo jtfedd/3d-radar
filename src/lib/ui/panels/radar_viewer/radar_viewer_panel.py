@@ -68,7 +68,7 @@ class RadarViewerPanel(PanelContent):
                 ctx,
                 state.volumeMax.value,
                 label="Max",
-                valueRange=(0.1, 10),
+                valueRange=(0, 10),
             )
         )
 
@@ -87,6 +87,30 @@ class RadarViewerPanel(PanelContent):
         self.linkSlider(state.volumeMin, self.minSlider)
         self.linkSlider(state.volumeMax, self.maxSlider)
         self.linkSlider(state.volumeFalloff, self.falloffSlider)
+
+        self.listener.listen(
+            self.minSlider.slider.onValueChange,
+            lambda value: state.volumeMax.setValue(max(value, state.volumeMax.value)),
+        )
+
+        self.listener.listen(
+            self.maxSlider.slider.onValueChange,
+            lambda value: state.volumeMin.setValue(min(value, state.volumeMin.value)),
+        )
+
+        self.listener.listen(
+            self.lowCutSlider.slider.onValueChange,
+            lambda value: state.volumeHighCut.setValue(
+                max(value, state.volumeHighCut.value)
+            ),
+        )
+
+        self.listener.listen(
+            self.highCutSlider.slider.onValueChange,
+            lambda value: state.volumeLowCut.setValue(
+                min(value, state.volumeLowCut.value)
+            ),
+        )
 
         self.addComponent(TitleComponent(self.root, ctx, "Lighting"))
 
