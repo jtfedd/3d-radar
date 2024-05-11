@@ -26,7 +26,6 @@ class LightingDataProvider(Listener):
         self.listen(
             state.directionalLightDirection, self.updateDirectionalLightDirection
         )
-        self.listen(state.shadowStrength, self.updateShadowStrength)
         self.listen(state.useShadows, self.updateUseShadows)
 
     def addNode(self, node: NodePath[PandaNode]) -> str:
@@ -37,7 +36,6 @@ class LightingDataProvider(Listener):
             ambient_intensity=self.state.ambientLightIntensity.value,
             directional_intensity=self.state.directionalLightIntensity.value,
             directional_orientation=self.state.directionalLightDirection.value,
-            shadow_strength=self.state.shadowStrength.value,
             use_shadows=self.state.useShadows.value,
         )
 
@@ -57,10 +55,6 @@ class LightingDataProvider(Listener):
     def updateDirectionalLightDirection(self, value: Vec3) -> None:
         for node in self.nodes.values():
             node.setShaderInput("directional_orientation", value)
-
-    def updateShadowStrength(self, value: float) -> None:
-        for node in self.nodes.values():
-            node.setShaderInput("shadow_strength", value)
 
     def updateUseShadows(self, value: bool) -> None:
         for node in self.nodes.values():

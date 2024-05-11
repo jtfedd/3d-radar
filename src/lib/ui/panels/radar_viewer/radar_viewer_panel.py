@@ -12,8 +12,6 @@ class RadarViewerPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
-        self.state = state
-        self.events = events
         self.listener = Listener()
 
         self.addComponent(TitleComponent(self.root, ctx, "Rendering Mode"))
@@ -30,7 +28,7 @@ class RadarViewerPanel(PanelContent):
                 ctx,
                 state.volumeMin.value,
                 label="Min",
-                valueRange=(0, 1),
+                valueRange=(0, 0.1),
             )
         )
 
@@ -40,7 +38,7 @@ class RadarViewerPanel(PanelContent):
                 ctx,
                 state.volumeMax.value,
                 label="Max",
-                valueRange=(0, 1),
+                valueRange=(0.1, 10),
             )
         )
 
@@ -54,17 +52,22 @@ class RadarViewerPanel(PanelContent):
             )
         )
 
-        self.listener.listen(self.minSlider.slider.onValueChange, self.handleMinChange)
-        self.listener.listen(self.maxSlider.slider.onValueChange, self.handleMaxChange)
         self.listener.listen(
-            self.falloffSlider.slider.onValueChange, self.handleFalloffChange
+            self.minSlider.slider.onValueChange,
+            state.volumeMin.setValue,
+        )
+        self.listener.listen(
+            self.maxSlider.slider.onValueChange,
+            state.volumeMax.setValue,
+        )
+        self.listener.listen(
+            self.falloffSlider.slider.onValueChange,
+            state.volumeFalloff.setValue,
         )
 
-        self.listener.listen(self.state.volumeMin, self.minSlider.slider.setValue)
-        self.listener.listen(self.state.volumeMax, self.maxSlider.slider.setValue)
-        self.listener.listen(
-            self.state.volumeFalloff, self.falloffSlider.slider.setValue
-        )
+        self.listener.listen(state.volumeMin, self.minSlider.slider.setValue)
+        self.listener.listen(state.volumeMax, self.maxSlider.slider.setValue)
+        self.listener.listen(state.volumeFalloff, self.falloffSlider.slider.setValue)
 
         self.addComponent(TitleComponent(self.root, ctx, "Lighting"))
 
@@ -72,7 +75,7 @@ class RadarViewerPanel(PanelContent):
             SliderComponent(
                 self.root,
                 ctx,
-                self.state.ambientLightIntensity.value,
+                state.ambientLightIntensity.value,
                 label="Ambient",
                 valueRange=(0, 1),
             )
@@ -82,9 +85,9 @@ class RadarViewerPanel(PanelContent):
             SliderComponent(
                 self.root,
                 ctx,
-                self.state.directionalLightIntensity.value,
+                state.directionalLightIntensity.value,
                 label="Directional",
-                valueRange=(0, 10),
+                valueRange=(0, 1),
             )
         )
 
@@ -92,7 +95,7 @@ class RadarViewerPanel(PanelContent):
             SliderComponent(
                 self.root,
                 ctx,
-                self.state.directionalLightHeading.value,
+                state.directionalLightHeading.value,
                 label="Heading",
                 valueRange=(0, 1),
             )
@@ -102,19 +105,9 @@ class RadarViewerPanel(PanelContent):
             SliderComponent(
                 self.root,
                 ctx,
-                self.state.directionalLightPitch.value,
+                state.directionalLightPitch.value,
                 label="Angle",
                 valueRange=(0, 1),
-            )
-        )
-
-        self.shadowStrength = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                self.state.shadowStrength.value,
-                label="Shadows",
-                valueRange=(0, 10),
             )
         )
 
@@ -123,7 +116,7 @@ class RadarViewerPanel(PanelContent):
                 self.root,
                 ctx,
                 "Use Shadows",
-                self.state.useShadows,
+                state.useShadows,
             )
         )
 
@@ -132,7 +125,7 @@ class RadarViewerPanel(PanelContent):
             state.ambientLightIntensity.setValue,
         )
         self.listener.listen(
-            self.state.ambientLightIntensity,
+            state.ambientLightIntensity,
             self.ambientIntensitySlider.slider.setValue,
         )
 
@@ -162,26 +155,6 @@ class RadarViewerPanel(PanelContent):
             state.directionalLightPitch,
             self.directionalPitch.slider.setValue,
         )
-
-        self.listener.listen(
-            self.shadowStrength.slider.onValueChange,
-            state.shadowStrength.setValue,
-        )
-        self.listener.listen(
-            state.shadowStrength,
-            self.shadowStrength.slider.setValue,
-        )
-
-    def handleMinChange(self, newMin: float) -> None:
-        self.state.volumeMin.setValue(newMin)
-        self.state.volumeMax.setValue(max(newMin, self.state.volumeMax.value))
-
-    def handleMaxChange(self, newMax: float) -> None:
-        self.state.volumeMax.setValue(newMax)
-        self.state.volumeMin.setValue(min(newMax, self.state.volumeMin.value))
-
-    def handleFalloffChange(self, newFalloff: float) -> None:
-        self.state.volumeFalloff.setValue(newFalloff)
 
     def headerText(self) -> str:
         return "Radar Viewer"

@@ -36,7 +36,6 @@ uniform sampler2D color_scale;
 uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
-uniform float shadow_strength;
 uniform bool use_shadows;
 
 // End inputs
@@ -249,7 +248,7 @@ float light_amount(in vec3 ro) {
 
         float sample_value = data_value(sample_pos);
         float sample_density = density(sample_value);
-        float sample_opacity = sample_density * step_size * shadow_strength;
+        float sample_opacity = sample_density * step_size;
 
         opacity = sample_opacity + (1.0 - sample_opacity) * opacity;
         

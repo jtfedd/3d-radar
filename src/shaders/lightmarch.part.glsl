@@ -26,7 +26,7 @@ float light_amount(in vec3 ro) {
 
         float sample_value = data_value(sample_pos);
         float sample_density = density(sample_value);
-        float sample_opacity = sample_density * step_size * shadow_strength;
+        float sample_opacity = sample_density * step_size;
 
         opacity = sample_opacity + (1.0 - sample_opacity) * opacity;
         

@@ -92,7 +92,6 @@ class AppState:
         self.directionalLightIntensity = self.createField("dli", 1.0)
         self.directionalLightHeading = self.createField("dlh", 0.75)
         self.directionalLightPitch = self.createField("dlp", 0.5)
-        self.shadowStrength = self.createField("shadows", 1.0)
         self.useShadows = self.createField("useShadows", False)
 
         self.timeMode = self.createFieldCustomSerialization(
@@ -118,10 +117,8 @@ class AppState:
         self.mapRoads = self.createField("mapRoads", True)
 
         self.warningsOpacity = self.createField("warningsOpacity", 1.0)
-        self.showTornadoWarnings = self.createField("showTornadoWarnings", True)
-        self.showSevereThunderstormWarnings = self.createField(
-            "showSevereThunderstormWarnings", True
-        )
+        self.showTornadoWarnings = self.createField("showTOW", True)
+        self.showSevereThunderstormWarnings = self.createField("showSVW", True)
 
         self.show3dMarkers = self.createField("show3dMarkers", False)
         self.mapMarkers: Observable[List[LocationMarker]] = (
