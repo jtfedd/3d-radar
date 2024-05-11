@@ -54,14 +54,18 @@ class VolumeDataProvider(Listener):
         self.setupBuffer()
 
         self.updateDensityParams()
-        self.listen(self.state.volumeMin, lambda _: self.updateDensityParams())
-        self.listen(self.state.volumeMax, lambda _: self.updateDensityParams())
-        self.listen(self.state.volumeFalloff, lambda _: self.updateDensityParams())
-        self.listen(self.state.volumeLowCut, lambda _: self.updateDensityParams())
-        self.listen(self.state.volumeHighCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.rMin, lambda _: self.updateDensityParams())
+        self.listen(self.state.rMax, lambda _: self.updateDensityParams())
+        self.listen(self.state.rFalloff, lambda _: self.updateDensityParams())
+        self.listen(self.state.rLowCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.rHighCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.vMin, lambda _: self.updateDensityParams())
+        self.listen(self.state.vMax, lambda _: self.updateDensityParams())
+        self.listen(self.state.vFalloff, lambda _: self.updateDensityParams())
+        self.listen(self.state.vLowCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.vHighCut, lambda _: self.updateDensityParams())
 
-        self.updateDataType(state.dataType.value)
-        self.listen(state.dataType, self.updateDataType)
+        self.bind(state.dataType, self.updateDataType)
 
         self.listen(state.animationFrame, lambda _: self.updateFrame())
         self.listen(state.dataType, lambda _: self.updateFrame())
@@ -113,18 +117,28 @@ class VolumeDataProvider(Listener):
             self.densityParams[0] = -0.5
             self.densityParams[1] = 2
 
+        self.updateDensityParams()
+
     def updateDensityParams(self) -> None:
+        isRef = self.state.dataType.value == DataType.REFLECTIVITY
+
         # Params for rendering the volume
-        densityMin = self.state.volumeMin.value
-        densityMax = self.state.volumeMax.value
+        densityMin = self.state.rMin.value if isRef else self.state.vMin.value
+        densityMax = self.state.rMax.value if isRef else self.state.vMax.value
         densityScale = densityMax - densityMin
-        densityExp = math.pow(10, self.state.volumeFalloff.value)
+
+        falloff = self.state.rFalloff.value if isRef else self.state.vFalloff.value
+        densityExp = math.pow(10, falloff)
 
         self.densityParams[2] = densityMin
         self.densityParams[3] = densityScale
         self.densityParams[4] = densityExp
-        self.densityParams[5] = self.state.volumeLowCut.value
-        self.densityParams[6] = self.state.volumeHighCut.value
+        self.densityParams[5] = (
+            self.state.rLowCut.value if isRef else self.state.vLowCut.value
+        )
+        self.densityParams[6] = (
+            self.state.rHighCut.value if isRef else self.state.vHighCut.value
+        )
 
     def updateVolumeData(self, scan: Scan) -> None:
         scanData = scan.reflectivity

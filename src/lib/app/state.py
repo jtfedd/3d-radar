@@ -85,11 +85,17 @@ class AppState:
         self.smooth = self.createField("smooth", True)
         self.volumetricLighting = self.createField("volumetricLighting", False)
 
-        self.volumeMin = self.createField("volumeMin", 0.04)
-        self.volumeMax = self.createField("volumeMax", 1.0)
-        self.volumeFalloff = self.createField("volumeFalloff", 0.7)
-        self.volumeLowCut = self.createField("volumeLowCut", 0.0)
-        self.volumeHighCut = self.createField("volumeHighCut", 1.0)
+        self.rMin = self.createField("rMin", 0.04)
+        self.rMax = self.createField("rMax", 1.0)
+        self.rFalloff = self.createField("rFalloff", 0.7)
+        self.rLowCut = self.createField("rLow", 0.0)
+        self.rHighCut = self.createField("rHigh", 1.0)
+
+        self.vMin = self.createField("vMin", 0.04)
+        self.vMax = self.createField("vMax", 1.0)
+        self.vFalloff = self.createField("vFalloff", 0.7)
+        self.vLowCut = self.createField("vLow", 0.0)
+        self.vHighCut = self.createField("vHigh", 1.0)
 
         self.ambientLightIntensity = self.createField("ali", 0.2)
         self.directionalLightIntensity = self.createField("dli", 1.0)

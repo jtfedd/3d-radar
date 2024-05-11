@@ -1,5 +1,6 @@
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.data_type import DataType
 from lib.ui.context import UIContext
 from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
@@ -12,6 +13,9 @@ from lib.util.events.observable import Observable
 class RadarViewerPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
+
+        self.ctx = ctx
+        self.state = state
 
         self.listener = Listener()
 
@@ -32,84 +36,22 @@ class RadarViewerPanel(PanelContent):
 
         self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
 
-        self.lowCutSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.volumeLowCut.value,
-                label="Low Cut",
-                valueRange=(0, 1),
-            )
+        self.createVolumeControls(
+            state.rLowCut,
+            state.rHighCut,
+            state.rMin,
+            state.rMax,
+            state.rFalloff,
+            DataType.REFLECTIVITY,
         )
 
-        self.highCutSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.volumeHighCut.value,
-                label="High Cut",
-                valueRange=(0, 1),
-            )
-        )
-
-        self.minSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.volumeMin.value,
-                label="Min",
-                valueRange=(0, 0.1),
-            )
-        )
-
-        self.maxSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.volumeMax.value,
-                label="Max",
-                valueRange=(0, 10),
-            )
-        )
-
-        self.falloffSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.volumeFalloff.value,
-                label="Falloff",
-                valueRange=(0, 1),
-            )
-        )
-
-        self.linkSlider(state.volumeLowCut, self.lowCutSlider)
-        self.linkSlider(state.volumeHighCut, self.highCutSlider)
-        self.linkSlider(state.volumeMin, self.minSlider)
-        self.linkSlider(state.volumeMax, self.maxSlider)
-        self.linkSlider(state.volumeFalloff, self.falloffSlider)
-
-        self.listener.listen(
-            self.minSlider.slider.onValueChange,
-            lambda value: state.volumeMax.setValue(max(value, state.volumeMax.value)),
-        )
-
-        self.listener.listen(
-            self.maxSlider.slider.onValueChange,
-            lambda value: state.volumeMin.setValue(min(value, state.volumeMin.value)),
-        )
-
-        self.listener.listen(
-            self.lowCutSlider.slider.onValueChange,
-            lambda value: state.volumeHighCut.setValue(
-                max(value, state.volumeHighCut.value)
-            ),
-        )
-
-        self.listener.listen(
-            self.highCutSlider.slider.onValueChange,
-            lambda value: state.volumeLowCut.setValue(
-                min(value, state.volumeLowCut.value)
-            ),
+        self.createVolumeControls(
+            state.vLowCut,
+            state.vHighCut,
+            state.vMin,
+            state.vMax,
+            state.vFalloff,
+            DataType.VELOCITY,
         )
 
         self.addComponent(TitleComponent(self.root, ctx, "Lighting"))
@@ -160,6 +102,107 @@ class RadarViewerPanel(PanelContent):
         )
         self.linkSlider(state.directionalLightHeading, self.directionalHeading)
         self.linkSlider(state.directionalLightPitch, self.directionalPitch)
+
+    def createVolumeControls(
+        self,
+        low: Observable[float],
+        high: Observable[float],
+        minVal: Observable[float],
+        maxVal: Observable[float],
+        falloff: Observable[float],
+        dataType: DataType,
+    ) -> None:
+        lowCutSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                low.value,
+                label="Low Cut",
+                valueRange=(0, 1),
+            )
+        )
+
+        highCutSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                high.value,
+                label="High Cut",
+                valueRange=(0, 1),
+            )
+        )
+
+        minSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                minVal.value,
+                label="Min",
+                valueRange=(0, 0.1),
+            )
+        )
+
+        maxSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                maxVal.value,
+                label="Max",
+                valueRange=(0, 10),
+            )
+        )
+
+        falloffSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                falloff.value,
+                label="Falloff",
+                valueRange=(0, 1),
+            )
+        )
+
+        self.linkSlider(low, lowCutSlider)
+        self.linkSlider(high, highCutSlider)
+        self.linkSlider(minVal, minSlider)
+        self.linkSlider(maxVal, maxSlider)
+        self.linkSlider(falloff, falloffSlider)
+
+        self.listener.listen(
+            minSlider.slider.onValueChange,
+            lambda value: maxVal.setValue(max(value, maxVal.value)),
+        )
+
+        self.listener.listen(
+            maxSlider.slider.onValueChange,
+            lambda value: minVal.setValue(min(value, minVal.value)),
+        )
+
+        self.listener.listen(
+            lowCutSlider.slider.onValueChange,
+            lambda value: high.setValue(max(value, high.value)),
+        )
+
+        self.listener.listen(
+            highCutSlider.slider.onValueChange,
+            lambda value: low.setValue(min(value, low.value)),
+        )
+
+        self.listener.bind(
+            self.state.dataType, lambda dt: lowCutSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: highCutSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: minSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: maxSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: falloffSlider.setHidden(dt != dataType)
+        )
 
     def linkSlider(
         self, observable: Observable[float], slider: SliderComponent
