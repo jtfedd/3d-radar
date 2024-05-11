@@ -45,7 +45,9 @@ class VolumeDataProvider(Listener):
         # 2 = min
         # 3 = scale
         # 4 = exp
-        self.densityParams = PTA_float.emptyArray(5)
+        # 5 = low
+        # 6 = high
+        self.densityParams = PTA_float.emptyArray(7)
 
         self.bufferSize = 0
         self.buffer = Texture("volume_data")
@@ -55,6 +57,8 @@ class VolumeDataProvider(Listener):
         self.listen(self.state.volumeMin, lambda _: self.updateDensityParams())
         self.listen(self.state.volumeMax, lambda _: self.updateDensityParams())
         self.listen(self.state.volumeFalloff, lambda _: self.updateDensityParams())
+        self.listen(self.state.volumeLowCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.volumeHighCut, lambda _: self.updateDensityParams())
 
         self.updateDataType(state.dataType.value)
         self.listen(state.dataType, self.updateDataType)
@@ -119,6 +123,8 @@ class VolumeDataProvider(Listener):
         self.densityParams[2] = densityMin
         self.densityParams[3] = densityScale
         self.densityParams[4] = densityExp
+        self.densityParams[5] = self.state.volumeLowCut.value
+        self.densityParams[6] = self.state.volumeHighCut.value
 
     def updateVolumeData(self, scan: Scan) -> None:
         scanData = scan.reflectivity

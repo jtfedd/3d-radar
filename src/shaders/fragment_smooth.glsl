@@ -28,7 +28,7 @@ uniform float r_step[MAX_SCANS];
 uniform int r_count[MAX_SCANS];
 uniform int offset[MAX_SCANS];
 
-uniform float density_params[5];
+uniform float density_params[7];
 
 uniform samplerBuffer volume_data;
 uniform sampler2D color_scale;

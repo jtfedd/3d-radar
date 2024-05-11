@@ -28,7 +28,7 @@ uniform float r_step[MAX_SCANS];
 uniform int r_count[MAX_SCANS];
 uniform int offset[MAX_SCANS];
 
-uniform float density_params[5];
+uniform float density_params[7];
 
 uniform samplerBuffer volume_data;
 uniform sampler2D color_scale;
@@ -112,6 +112,12 @@ float density(float value) {
     if (value < 0) return 0.0;
 
     value = abs((value + density_params[0]) * density_params[1]);
+
+    // Apply low and high cutoff
+    value = max(value, density_params[5]);
+    value = min(value, density_params[6]);
+
+    value = (value - density_params[5]) / (density_params[6] - density_params[5]);
     return density_params[2] + density_params[3] * pow(value, density_params[4]);
 }
 // ########## end #include density.part.glsl

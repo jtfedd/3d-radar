@@ -3,7 +3,6 @@ from lib.app.state import AppState
 from lib.ui.context import UIContext
 from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
-from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
@@ -31,6 +30,26 @@ class RadarViewerPanel(PanelContent):
         )
 
         self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
+
+        self.lowCutSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                state.volumeLowCut.value,
+                label="Low Cut",
+                valueRange=(0, 1),
+            )
+        )
+
+        self.highCutSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                state.volumeHighCut.value,
+                label="High Cut",
+                valueRange=(0, 1),
+            )
+        )
 
         self.minSlider = self.addComponent(
             SliderComponent(
@@ -63,6 +82,14 @@ class RadarViewerPanel(PanelContent):
         )
 
         self.listener.listen(
+            self.lowCutSlider.slider.onValueChange,
+            state.volumeLowCut.setValue,
+        )
+        self.listener.listen(
+            self.highCutSlider.slider.onValueChange,
+            state.volumeHighCut.setValue,
+        )
+        self.listener.listen(
             self.minSlider.slider.onValueChange,
             state.volumeMin.setValue,
         )
@@ -75,6 +102,8 @@ class RadarViewerPanel(PanelContent):
             state.volumeFalloff.setValue,
         )
 
+        self.listener.listen(state.volumeLowCut, self.lowCutSlider.slider.setValue)
+        self.listener.listen(state.volumeHighCut, self.highCutSlider.slider.setValue)
         self.listener.listen(state.volumeMin, self.minSlider.slider.setValue)
         self.listener.listen(state.volumeMax, self.maxSlider.slider.setValue)
         self.listener.listen(state.volumeFalloff, self.falloffSlider.slider.setValue)

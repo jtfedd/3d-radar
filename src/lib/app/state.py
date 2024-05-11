@@ -88,6 +88,8 @@ class AppState:
         self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
         self.volumeFalloff = self.createField("volumeFalloff", 0.7)
+        self.volumeLowCut = self.createField("volumeLowCut", 0.0)
+        self.volumeHighCut = self.createField("volumeHighCut", 1.0)
 
         self.ambientLightIntensity = self.createField("ali", 0.2)
         self.directionalLightIntensity = self.createField("dli", 1.0)
