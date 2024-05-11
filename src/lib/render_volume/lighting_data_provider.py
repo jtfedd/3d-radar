@@ -26,7 +26,7 @@ class LightingDataProvider(Listener):
         self.listen(
             state.directionalLightDirection, self.updateDirectionalLightDirection
         )
-        self.listen(state.useShadows, self.updateUseShadows)
+        self.listen(state.volumetricLighting, self.updateVolumetricLighting)
 
     def addNode(self, node: NodePath[PandaNode]) -> str:
         nodeID = uuid()
@@ -36,7 +36,7 @@ class LightingDataProvider(Listener):
             ambient_intensity=self.state.ambientLightIntensity.value,
             directional_intensity=self.state.directionalLightIntensity.value,
             directional_orientation=self.state.directionalLightDirection.value,
-            use_shadows=self.state.useShadows.value,
+            volumetric_lighting=self.state.volumetricLighting.value,
         )
 
         return nodeID
@@ -56,6 +56,6 @@ class LightingDataProvider(Listener):
         for node in self.nodes.values():
             node.setShaderInput("directional_orientation", value)
 
-    def updateUseShadows(self, value: bool) -> None:
+    def updateVolumetricLighting(self, value: bool) -> None:
         for node in self.nodes.values():
-            node.setShaderInput("use_shadows", value)
+            node.setShaderInput("volumetric_lighting", value)

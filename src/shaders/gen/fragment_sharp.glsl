@@ -36,7 +36,7 @@ uniform sampler2D color_scale;
 uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
-uniform bool use_shadows;
+uniform bool volumetric_lighting;
 
 // End inputs
 
@@ -274,10 +274,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
         vec3 sample_color = colorize(sample_value);
         float sample_alpha = sample_density * step_size;
 
-        float brightness = use_shadows
+        float brightness = volumetric_lighting
             ? (sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos))
             : 1.0;
-        float lighting = use_shadows
+        float lighting = volumetric_lighting
             ? ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity))
             : 1.0;
 

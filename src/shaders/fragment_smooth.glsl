@@ -36,7 +36,7 @@ uniform sampler2D color_scale;
 uniform float ambient_intensity;
 uniform float directional_intensity;
 uniform vec3 directional_orientation;
-uniform bool use_shadows;
+uniform bool volumetric_lighting;
 
 // End inputs
 

@@ -83,6 +83,7 @@ class AppState:
         self.uiScale = self.createField("uiScale", 1.0)
 
         self.smooth = self.createField("smooth", True)
+        self.volumetricLighting = self.createField("volumetricLighting", False)
 
         self.volumeMin = self.createField("volumeMin", 0.04)
         self.volumeMax = self.createField("volumeMax", 1.0)
@@ -92,7 +93,6 @@ class AppState:
         self.directionalLightIntensity = self.createField("dli", 1.0)
         self.directionalLightHeading = self.createField("dlh", 0.75)
         self.directionalLightPitch = self.createField("dlp", 0.5)
-        self.useShadows = self.createField("useShadows", False)
 
         self.timeMode = self.createFieldCustomSerialization(
             "timeMode",
