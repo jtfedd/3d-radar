@@ -49,6 +49,7 @@ class UIConstants:
     densityGraphContentHeight = densityGraphHeightPx - (2 * densityGraphPadding)
     densityGraphDashedLineRadius = 1
     densityGraphDashLength = 8
+    densityGraphFalloffSteps = 20
 
     scrollbarWidth = 0.01
 

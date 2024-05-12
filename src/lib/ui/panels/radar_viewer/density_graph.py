@@ -81,6 +81,7 @@ class DensityGraph(PanelComponent):
         self.drawHorizontalComponents(painter, self.drawCutoffLines, scale)
         self.drawHorizontalComponents(painter, self.drawCutoffMarkers, scale)
         self.drawHorizontalComponents(painter, self.drawMinMaxLines, scale)
+        self.drawHorizontalComponents(painter, self.drawFalloffGraph, scale)
 
     def drawHorizontalComponents(
         self,
@@ -91,6 +92,56 @@ class DensityGraph(PanelComponent):
         draw(painter, lambda value: value, scale)
         if self.dataType == DataType.VELOCITY:
             draw(painter, lambda value: -value, scale)
+
+    def drawFalloffGraph(
+        self,
+        painter: PNMPainter,
+        transform: Callable[[float], float],
+        scale: float,
+    ) -> None:
+        painter.setPen(self.makeLinePen())
+
+        if self.low.value == self.high.value:
+            minY = UIConstants.densityGraphPadding + (self.min.value * scale)
+            maxY = UIConstants.densityGraphPadding + (self.max.value * scale)
+            lowX = UIConstants.densityGraphContentWidth * self.normalize(
+                transform(self.low.value)
+            )
+            highX = UIConstants.densityGraphContentWidth * self.normalize(
+                transform(self.low.value)
+            )
+
+            painter.drawLine(lowX, minY, highX, maxY)
+            return
+
+        stepSize = (
+            self.high.value - self.low.value
+        ) / UIConstants.densityGraphFalloffSteps
+
+        lastX = UIConstants.densityGraphContentWidth * self.normalize(
+            transform(self.low.value)
+        )
+        lastY = UIConstants.densityGraphPadding + (self.min.value * scale)
+
+        for i in range(UIConstants.densityGraphFalloffSteps):
+            stepValue = self.low.value + ((i + 1) * stepSize)
+            stepX = UIConstants.densityGraphContentWidth * self.normalize(
+                transform(stepValue)
+            )
+
+            stepDensity = self.density(stepValue)
+            stepY = UIConstants.densityGraphPadding + (stepDensity * scale)
+
+            painter.drawLine(lastX, lastY, stepX, stepY)
+
+            lastX = stepX
+            lastY = stepY
+
+    def density(self, value: float) -> float:
+        value = (value - self.low.value) / (self.high.value - self.low.value)
+        return self.min.value + (
+            self.max.value * math.pow(value, math.pow(10, self.falloff.value))
+        )
 
     def drawMinMaxLines(
         self,
