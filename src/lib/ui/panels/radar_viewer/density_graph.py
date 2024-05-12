@@ -80,6 +80,7 @@ class DensityGraph(PanelComponent):
         self.drawScaleLines(painter, graphMax, scale)
         self.drawHorizontalComponents(painter, self.drawCutoffLines, scale)
         self.drawHorizontalComponents(painter, self.drawCutoffMarkers, scale)
+        self.drawHorizontalComponents(painter, self.drawMinMaxLines, scale)
 
     def drawHorizontalComponents(
         self,
@@ -90,6 +91,34 @@ class DensityGraph(PanelComponent):
         draw(painter, lambda value: value, scale)
         if self.dataType == DataType.VELOCITY:
             draw(painter, lambda value: -value, scale)
+
+    def drawMinMaxLines(
+        self,
+        painter: PNMPainter,
+        transform: Callable[[float], float],
+        scale: float,
+    ) -> None:
+        painter.setPen(self.makeLinePen())
+
+        if self.low.value > 0:
+            minY = UIConstants.densityGraphPadding + (self.min.value * scale)
+            painter.drawLine(
+                UIConstants.densityGraphContentWidth * self.normalize(transform(0)),
+                minY,
+                UIConstants.densityGraphContentWidth
+                * self.normalize(transform(self.low.value)),
+                minY,
+            )
+
+        if self.high.value < 1:
+            maxY = UIConstants.densityGraphPadding + (self.max.value * scale)
+            painter.drawLine(
+                UIConstants.densityGraphContentWidth
+                * self.normalize(transform(self.high.value)),
+                maxY,
+                UIConstants.densityGraphContentWidth * self.normalize(transform(1)),
+                maxY,
+            )
 
     def drawCutoffMarkers(
         self,
