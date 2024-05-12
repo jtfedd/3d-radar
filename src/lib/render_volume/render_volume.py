@@ -32,13 +32,6 @@ class VolumeRenderer(Listener):
             fragment="shaders/gen/fragment_sharp.glsl",
         )
 
-        self.reflectivityScale = self.ctx.base.loader.loadTexture(
-            "assets/reflectivity_scale.png"
-        )
-        self.velocityScale = self.ctx.base.loader.loadTexture(
-            "assets/velocity_scale.png"
-        )
-
         manager = FilterManager(self.ctx.base.win, self.ctx.base.cam)
         scene = Texture()
         depth = Texture()

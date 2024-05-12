@@ -38,7 +38,7 @@ class UIConstants:
     checkboxPadding = 0.015
 
     densityGraphHeight = panelContentWidth / 2
-    densityLabelHeight = 0.03
+    densityLegendHeight = 0.01
 
     densityGraphWidthPx = 512
     densityGraphHeightPx = 256
@@ -49,7 +49,7 @@ class UIConstants:
     densityGraphContentHeight = densityGraphHeightPx - (2 * densityGraphPadding)
     densityGraphDashedLineRadius = 1
     densityGraphDashLength = 8
-    densityGraphFalloffSteps = 20
+    densityGraphFalloffSteps = 30
 
     scrollbarWidth = 0.01
 

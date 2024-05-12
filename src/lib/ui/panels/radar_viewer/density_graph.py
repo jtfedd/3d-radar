@@ -40,11 +40,7 @@ class DensityGraph(PanelComponent):
         self.graphImage = PNMImage(
             UIConstants.densityGraphWidthPx, UIConstants.densityGraphHeightPx
         )
-
-        self.drawGraph()
-
         self.graphTexture = Texture()
-        self.graphTexture.load(self.graphImage)
 
         self.graph = Image(
             self.root,
@@ -59,11 +55,33 @@ class DensityGraph(PanelComponent):
             layer=UILayer.CONTENT,
         )
 
+        self.legendRoot = self.root.attachNewNode("legend-root")
+        self.legendRoot.setX(UIConstants.panelPadding)
+        self.legendRoot.setZ(-UIConstants.densityGraphHeight)
+        self.legendRoot.setR(90)
+
+        self.legend = Image(
+            self.legendRoot,
+            image=(
+                "assets/reflectivity_scale.png"
+                if dataType == DataType.REFLECTIVITY
+                else "assets/velocity_scale.png"
+            ),
+            width=UIConstants.densityLegendHeight,
+            height=UIConstants.panelContentWidth,
+            color=UIColors.WHITE,
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.BOTTOM,
+            layer=UILayer.CONTENT,
+        )
+
         self.listener.listen(self.min, lambda _: self.updateGraph())
         self.listener.listen(self.max, lambda _: self.updateGraph())
         self.listener.listen(self.low, lambda _: self.updateGraph())
         self.listener.listen(self.high, lambda _: self.updateGraph())
         self.listener.listen(self.falloff, lambda _: self.updateGraph())
+
+        self.updateGraph()
 
     def updateGraph(self) -> None:
         self.drawGraph()
@@ -270,10 +288,17 @@ class DensityGraph(PanelComponent):
         return value
 
     def getHeight(self) -> float:
-        return UIConstants.densityGraphHeight + UIConstants.densityLabelHeight
+        return (
+            UIConstants.densityGraphHeight
+            + UIConstants.densityLegendHeight
+            + UIConstants.panelPadding
+        )
 
     def destroy(self) -> None:
         super().destroy()
         self.listener.destroy()
 
         self.graph.destroy()
+        self.legend.destroy()
+
+        self.legendRoot.removeNode()
