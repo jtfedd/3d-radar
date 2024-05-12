@@ -9,6 +9,8 @@ from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
 from lib.util.events.observable import Observable
 
+from .density_graph import DensityGraph
+
 
 class RadarViewerPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
@@ -112,6 +114,10 @@ class RadarViewerPanel(PanelContent):
         falloff: Observable[float],
         dataType: DataType,
     ) -> None:
+        graph = self.addComponent(
+            DensityGraph(self.root, low, high, minVal, maxVal, falloff, dataType)
+        )
+
         lowCutSlider = self.addComponent(
             SliderComponent(
                 self.root,
@@ -188,6 +194,9 @@ class RadarViewerPanel(PanelContent):
             lambda value: low.setValue(min(value, low.value)),
         )
 
+        self.listener.bind(
+            self.state.dataType, lambda dt: graph.setHidden(dt != dataType)
+        )
         self.listener.bind(
             self.state.dataType, lambda dt: lowCutSlider.setHidden(dt != dataType)
         )

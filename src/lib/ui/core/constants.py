@@ -37,6 +37,19 @@ class UIConstants:
     checkboxSize = 0.04
     checkboxPadding = 0.015
 
+    densityGraphHeight = panelContentWidth / 2
+    densityLabelHeight = 0.03
+
+    densityGraphWidthPx = 512
+    densityGraphHeightPx = 256
+    densityGraphLineRadius = 2
+    densityGraphPointRadius = 5
+    densityGraphPadding = 20
+    densityGraphContentWidth = densityGraphWidthPx - 1
+    densityGraphContentHeight = densityGraphHeightPx - (2 * densityGraphPadding)
+    densityGraphDashedLineRadius = 1
+    densityGraphDashLength = 8
+
     scrollbarWidth = 0.01
 
     markerItemPadding = 0.015
