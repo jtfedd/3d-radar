@@ -10,6 +10,7 @@ from lib.util.events.listener import Listener
 from lib.util.events.observable import Observable
 
 from .density_graph import DensityGraph
+from .lighting_direction import LightingDirection
 
 
 class RadarViewerPanel(PanelContent):
@@ -104,6 +105,10 @@ class RadarViewerPanel(PanelContent):
         )
         self.linkSlider(state.directionalLightHeading, self.directionalHeading)
         self.linkSlider(state.directionalLightPitch, self.directionalPitch)
+
+        self.lightingDirection = self.addComponent(
+            LightingDirection(self.root, ctx, state)
+        )
 
     def createVolumeControls(
         self,
