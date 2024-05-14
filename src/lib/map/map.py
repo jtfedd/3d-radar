@@ -23,6 +23,7 @@ from lib.util.optional import unwrap
 
 from .alert_renderer import AlertRenderer
 from .constants import EARTH_RADIUS, RADAR_RANGE
+from .lighting import LightingManager
 from .markers.markers_manager import MarkersManager
 from .markers.markers_renderer import MarkersRenderer
 
@@ -33,6 +34,8 @@ class Map(Listener):
 
         self.ctx = ctx
         self.state = state
+
+        self.lightingManager = LightingManager(ctx, state)
 
         self.markersManager = MarkersManager(ctx, state, events)
 
@@ -147,6 +150,7 @@ class Map(Listener):
     def destroy(self) -> None:
         super().destroy()
 
+        self.lightingManager.destroy()
         self.markersManager.destroy()
         self.markersRenderer.destroy()
         self.towRenderer.destroy()

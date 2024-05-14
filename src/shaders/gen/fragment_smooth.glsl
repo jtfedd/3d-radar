@@ -1,6 +1,7 @@
 #version 330
 
 #define MAX_SCANS 20
+#define PI 3.1415926538
 
 // Outputs to Panda3D
 out vec4 p3d_FragColor;
@@ -28,21 +29,28 @@ uniform float r_step[MAX_SCANS];
 uniform int r_count[MAX_SCANS];
 uniform int offset[MAX_SCANS];
 
-uniform float density_params[5];
+uniform float density_params[7];
 
 uniform samplerBuffer volume_data;
+
+uniform float ambient_intensity;
+uniform float directional_intensity;
+uniform vec3 directional_orientation;
+uniform bool volumetric_lighting;
+
 uniform sampler2D color_scale;
 
 // End inputs
 
-#define PI 3.1415926538
-
 #define MIN_STEPS 5
 #define MAX_STEPS 1000
 #define STEP_SIZE 1.5
-#define ALPHA_CUTOFF 0.99
 
-// ########## start #include hash.part.glsl
+#define MIN_L_STEPS 5
+#define MAX_L_STEPS 20
+#define L_STEP_SIZE 1.5
+
+#define ALPHA_CUTOFF 0.99
 
 // https://www.shadertoy.com/view/4djSRW
 // float hash12(vec2 p) {
@@ -56,9 +64,12 @@ float hash13(vec3 p3) {
     p3 += dot(p3, p3.zyx + 31.32);
     return fract((p3.x + p3.y) * p3.z);
 }
-// ########## end #include hash.part.glsl
-// ########## start #include box_intersection.part.glsl
 
+float hash14(vec4 p4) {
+	p4 = fract(p4  * vec4(.1031, .1030, .0973, .1099));
+    p4 += dot(p4, p4.wzxy+33.33);
+    return fract((p4.x + p4.y) * (p4.z + p4.w));
+}
 // For each coord, return the range of t for which p+t*v is inside the box defined
 // by the corners box_min and box_max, and whether the ray intersects the box.
 // More on this method here: https://tavianator.com/2011/ray_box.html
@@ -79,8 +90,6 @@ void box_intersection(
 
     no_intersection = tRange.t < tRange.s;
 }
-// ########## end #include box_intersection.part.glsl
-// ########## start #include color_util.part.glsl
 
 vec4 blend_onto(vec4 front, vec4 behind) {
     return front + (1.0 - front.a) * behind;
@@ -89,18 +98,18 @@ vec4 blend_onto(vec4 front, vec4 behind) {
 vec3 colorize(float value) {
     return texture(color_scale, vec2(0, value)).rgb;
 }
-// ########## end #include color_util.part.glsl
-// ########## start #include density.part.glsl
-
 float density(float value) {
-    if (value < 0) return 0;
+    if (value < 0) return 0.0;
 
     value = abs((value + density_params[0]) * density_params[1]);
+
+    // Apply low and high cutoff
+    if (value <= density_params[5]) return density_params[2];
+    if (value >= density_params[6]) return density_params[3];
+
+    value = (value - density_params[5]) / (density_params[6] - density_params[5]);
     return density_params[2] + density_params[3] * pow(value, density_params[4]);
 }
-// ########## end #include density.part.glsl
-// ########## start #include resolve_elevation.part.glsl
-
 int calc_sweep_index(float el) {
     int l = 0;
     int r = scan_count[0];
@@ -122,12 +131,10 @@ int calc_sweep_index(float el) {
     return 0;
 }
 
-// ########## end #include resolve_elevation.part.glsl
-// ########## start #include volume_smooth.part.glsl
 
 float interpolate(float low, float high, float factor) {
     if (low < 0 && high < 0) {
-        return -1;
+        return -1.0;
     }
 
     if (low < 0) {
@@ -201,9 +208,47 @@ float data_value(vec3 point) {
     float factor = (el - elevation[sweep_index]) / (elevation[sweep_index+1] - elevation[sweep_index]);
     return interpolate(low, high, factor);
 }
-// ########## end #include volume_smooth.part.glsl
-// ########## start #include raymarch.part.glsl
+float light_amount(in vec3 ro) {
+    vec3 rd = -directional_orientation;
 
+    vec2 tRange;
+    bool no_intersection;
+    box_intersection(bounds_start, bounds_end, ro, rd, tRange, no_intersection);
+
+    if (no_intersection) {
+        return 1.0;
+    }
+
+    // Make sure the range starts at the origin
+    tRange.s = max(0.0, tRange.s);
+
+    float step_size = min(L_STEP_SIZE, (tRange.t - tRange.s) / MIN_L_STEPS);
+    float jitter = min(tRange.t - tRange.s, step_size)*hash14(vec4(ro.xyz, time));
+    float t = tRange.s + jitter;
+
+    float opacity = 0.0;
+    for (int i = 0; i < MAX_L_STEPS; i++) {
+        if (t > tRange.t || (opacity > ALPHA_CUTOFF)) {
+            break;
+        }
+
+        vec3 sample_pos = ro + t * rd;
+
+        float sample_value = data_value(sample_pos);
+        float sample_density = density(sample_value);
+        float sample_opacity = sample_density * step_size;
+
+        opacity = sample_opacity + (1.0 - sample_opacity) * opacity;
+        
+        t += step_size;
+    }
+
+    if (opacity > ALPHA_CUTOFF) {
+        return 0.0;
+    }
+
+    return 1 - opacity;
+}
 void gen_ray(
     in float depth_clip, in vec2 uv,
     out vec3 ray, out float d
@@ -225,17 +270,16 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     bool no_intersection;
     box_intersection(bounds_start, bounds_end, ro, rd, tRange, no_intersection);
 
+    vec4 color = vec4(0.0);
+    if (no_intersection) {
+        return color;
+    }
+
     // Make sure the range does not start behind the camera
     tRange.s = max(0.0, tRange.s);
     
     // Don't cast the ray further than the first rendered object
     tRange.t = min(d, tRange.t);
-
-    vec4 color = vec4(0.0);
-
-    if (no_intersection) {
-        return color;
-    }
 
     // Use a smaller step size when the slice of volume is very thin
     float step_size = min(STEP_SIZE, (tRange.t - tRange.s) / MIN_STEPS);
@@ -256,7 +300,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
         vec3 sample_color = colorize(sample_value);
         float sample_alpha = sample_density * step_size;
 
-        vec4 ci = vec4(sample_color, 1.0) * sample_alpha;
+        float brightness = volumetric_lighting
+            ? (sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos))
+            : 1.0;
+        float lighting = volumetric_lighting
+            ? ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity))
+            : 1.0;
+
+        vec4 ci = vec4(sample_color * lighting, 1.0) * sample_alpha;
         color = blend_onto(color, ci);
 
         t += step_size;
@@ -268,7 +319,6 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     
     return color;
 }
-// ########## end #include raymarch.part.glsl
 
 void main() {
     vec4 scene_color = texelFetch(scene, ivec2(gl_FragCoord.xy), 0);

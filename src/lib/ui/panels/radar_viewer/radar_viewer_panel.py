@@ -1,19 +1,25 @@
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.data_type import DataType
 from lib.ui.context import UIContext
 from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
+from lib.util.events.observable import Observable
+
+from .density_graph import DensityGraph
+from .lighting_direction import LightingDirection
 
 
 class RadarViewerPanel(PanelContent):
     def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
+        self.ctx = ctx
         self.state = state
-        self.events = events
+
         self.listener = Listener()
 
         self.addComponent(TitleComponent(self.root, ctx, "Rendering Mode"))
@@ -22,60 +28,180 @@ class RadarViewerPanel(PanelContent):
             CheckboxComponent(self.root, ctx, "Smooth Shading", state.smooth)
         )
 
+        self.volumetricLighting = self.addComponent(
+            CheckboxComponent(
+                self.root,
+                ctx,
+                "Volumetric Lighting",
+                state.volumetricLighting,
+            )
+        )
+
         self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
 
-        self.minSlider = self.addComponent(
+        self.createVolumeControls(
+            state.rLowCut,
+            state.rHighCut,
+            state.rMin,
+            state.rMax,
+            state.rFalloff,
+            DataType.REFLECTIVITY,
+        )
+
+        self.createVolumeControls(
+            state.vLowCut,
+            state.vHighCut,
+            state.vMin,
+            state.vMax,
+            state.vFalloff,
+            DataType.VELOCITY,
+        )
+
+        self.addComponent(TitleComponent(self.root, ctx, "Ambient Lighting"))
+
+        self.ambientIntensitySlider = self.addComponent(
             SliderComponent(
                 self.root,
                 ctx,
-                state.volumeMin.value,
+                state.ambientLightIntensity.value,
+                label="Intensity",
+                valueRange=(0, 1),
+            )
+        )
+        self.linkSlider(state.ambientLightIntensity, self.ambientIntensitySlider)
+
+        self.addComponent(TitleComponent(self.root, ctx, "Directional Lighting"))
+
+        self.directionalIntensitySlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                state.directionalLightIntensity.value,
+                label="Intensity",
+                valueRange=(0, 1),
+            )
+        )
+        self.linkSlider(
+            state.directionalLightIntensity, self.directionalIntensitySlider
+        )
+
+        self.lightingDirection = self.addComponent(
+            LightingDirection(self.root, ctx, state)
+        )
+
+    def createVolumeControls(
+        self,
+        low: Observable[float],
+        high: Observable[float],
+        minVal: Observable[float],
+        maxVal: Observable[float],
+        falloff: Observable[float],
+        dataType: DataType,
+    ) -> None:
+        graph = self.addComponent(
+            DensityGraph(self.root, low, high, minVal, maxVal, falloff, dataType)
+        )
+
+        lowCutSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                low.value,
+                label="Low Cut",
+                valueRange=(0, 1),
+            )
+        )
+
+        highCutSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                high.value,
+                label="High Cut",
+                valueRange=(0, 1),
+            )
+        )
+
+        minSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                minVal.value,
                 label="Min",
-                valueRange=(0, 1),
+                valueRange=(0, 0.1),
             )
         )
 
-        self.maxSlider = self.addComponent(
+        maxSlider = self.addComponent(
             SliderComponent(
                 self.root,
-                ctx,
-                state.volumeMax.value,
+                self.ctx,
+                maxVal.value,
                 label="Max",
-                valueRange=(0, 1),
+                valueRange=(0, 10),
             )
         )
 
-        self.falloffSlider = self.addComponent(
+        falloffSlider = self.addComponent(
             SliderComponent(
                 self.root,
-                ctx,
-                state.volumeFalloff.value,
+                self.ctx,
+                falloff.value,
                 label="Falloff",
                 valueRange=(0, 1),
             )
         )
 
-        self.listener.listen(self.minSlider.slider.onValueChange, self.handleMinChange)
-        self.listener.listen(self.maxSlider.slider.onValueChange, self.handleMaxChange)
+        self.linkSlider(low, lowCutSlider)
+        self.linkSlider(high, highCutSlider)
+        self.linkSlider(minVal, minSlider)
+        self.linkSlider(maxVal, maxSlider)
+        self.linkSlider(falloff, falloffSlider)
+
         self.listener.listen(
-            self.falloffSlider.slider.onValueChange, self.handleFalloffChange
+            minSlider.slider.onValueChange,
+            lambda value: maxVal.setValue(max(value, maxVal.value)),
         )
 
-        self.listener.listen(self.state.volumeMin, self.minSlider.slider.setValue)
-        self.listener.listen(self.state.volumeMax, self.maxSlider.slider.setValue)
         self.listener.listen(
-            self.state.volumeFalloff, self.falloffSlider.slider.setValue
+            maxSlider.slider.onValueChange,
+            lambda value: minVal.setValue(min(value, minVal.value)),
         )
 
-    def handleMinChange(self, newMin: float) -> None:
-        self.state.volumeMin.setValue(newMin)
-        self.state.volumeMax.setValue(max(newMin, self.state.volumeMax.value))
+        self.listener.listen(
+            lowCutSlider.slider.onValueChange,
+            lambda value: high.setValue(max(value, high.value)),
+        )
 
-    def handleMaxChange(self, newMax: float) -> None:
-        self.state.volumeMax.setValue(newMax)
-        self.state.volumeMin.setValue(min(newMax, self.state.volumeMin.value))
+        self.listener.listen(
+            highCutSlider.slider.onValueChange,
+            lambda value: low.setValue(min(value, low.value)),
+        )
 
-    def handleFalloffChange(self, newFalloff: float) -> None:
-        self.state.volumeFalloff.setValue(newFalloff)
+        self.listener.bind(
+            self.state.dataType, lambda dt: graph.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: lowCutSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: highCutSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: minSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: maxSlider.setHidden(dt != dataType)
+        )
+        self.listener.bind(
+            self.state.dataType, lambda dt: falloffSlider.setHidden(dt != dataType)
+        )
+
+    def linkSlider(
+        self, observable: Observable[float], slider: SliderComponent
+    ) -> None:
+        self.listener.listen(slider.slider.onValueChange, observable.setValue)
+        self.listener.listen(observable, slider.slider.setValue)
 
     def headerText(self) -> str:
         return "Radar Viewer"

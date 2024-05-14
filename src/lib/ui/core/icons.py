@@ -19,5 +19,8 @@ class Icons:
     INVISIBLE = "assets/icons/invisible.png"
 
     LOCATION = "assets/icons/location.png"
+    SUN = "assets/icons/sun.png"
 
+    ARROW = "assets/icons/arrow-up.png"
+    DASHED_LINE = "assets/icons/dashed-line.png"
     TRASH = "assets/icons/trash.png"

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from direct.gui.OnscreenImage import OnscreenImage
-from panda3d.core import NodePath, PandaNode, TransparencyAttrib, Vec4
+from panda3d.core import NodePath, PandaNode, Texture, TransparencyAttrib, Vec4
 
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -15,7 +15,7 @@ class Image(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        image: str,
+        image: str | Texture,
         width: float,
         height: float,
         x: float = 0,
@@ -29,7 +29,7 @@ class Image(Component):
         y = correctYForAlignment(y, height, vAlign)
 
         self.card = OnscreenImage(
-            image=image,
+            image=image,  # type:ignore
             pos=(x, 0, y),
             scale=(width / 2, 1, height / 2),
             parent=root,
