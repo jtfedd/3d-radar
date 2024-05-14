@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import math
+
+import direct.gui.DirectGuiGlobals as DGG
+from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode
 
 from lib.ui.context import UIContext
@@ -25,6 +29,13 @@ class AnglePicker(Listener):
         centerOffset: float = 0,
     ):
         super().__init__()
+
+        self.ctx = ctx
+
+        self.scale = scale
+        self.offset = offset
+
+        self.observable = observable
 
         self.button = Button(
             root,
@@ -63,11 +74,46 @@ class AnglePicker(Listener):
 
         self.bind(
             observable,
-            lambda value: self.arrowRoot.setR((scale * value) + offset),
+            lambda value: self.arrowRoot.setR((self.scale * value) + self.offset),
         )
+
+        self.updateTask = ctx.appContext.base.taskMgr.add(self.update, "angle-update")
+
+    def update(self, task: Task) -> int:
+        buttonState = self.button.button.guiItem.getState()  # type:ignore
+        if buttonState != DGG.BUTTON_DEPRESSED_STATE:
+            return task.cont
+
+        mouseWatcher = self.ctx.appContext.base.mouseWatcherNode
+        if not mouseWatcher.hasMouse():
+            return task.cont
+
+        mouseX = mouseWatcher.getMouseX()
+        mouseY = mouseWatcher.getMouseY()
+
+        aspectRatio = self.ctx.appContext.base.getAspectRatio()
+        if aspectRatio >= 1:
+            mouseX *= aspectRatio
+        else:
+            mouseY /= aspectRatio
+
+        pivot = self.arrowRoot.getPos(self.ctx.appContext.base.aspect2dp)
+        dx = mouseX - pivot.getX()
+        dy = mouseY - pivot.getZ()
+
+        angle = math.degrees(math.atan2(dy, dx))
+        angle = (90 - angle) % 360
+
+        value = (angle - self.offset) / self.scale
+        value = min(1, max(value, 0))
+
+        self.observable.setValue(value)
+
+        return task.cont
 
     def destroy(self) -> None:
         super().destroy()
+        self.updateTask.cancel()
 
         self.button.destroy()
         self.sun.destroy()

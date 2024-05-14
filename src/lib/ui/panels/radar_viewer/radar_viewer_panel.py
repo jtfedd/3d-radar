@@ -57,54 +57,33 @@ class RadarViewerPanel(PanelContent):
             DataType.VELOCITY,
         )
 
-        self.addComponent(TitleComponent(self.root, ctx, "Lighting"))
+        self.addComponent(TitleComponent(self.root, ctx, "Ambient Lighting"))
 
         self.ambientIntensitySlider = self.addComponent(
             SliderComponent(
                 self.root,
                 ctx,
                 state.ambientLightIntensity.value,
-                label="Ambient",
+                label="Intensity",
                 valueRange=(0, 1),
             )
         )
+        self.linkSlider(state.ambientLightIntensity, self.ambientIntensitySlider)
+
+        self.addComponent(TitleComponent(self.root, ctx, "Directional Lighting"))
 
         self.directionalIntensitySlider = self.addComponent(
             SliderComponent(
                 self.root,
                 ctx,
                 state.directionalLightIntensity.value,
-                label="Directional",
+                label="Intensity",
                 valueRange=(0, 1),
             )
         )
-
-        self.directionalHeading = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.directionalLightHeading.value,
-                label="Heading",
-                valueRange=(0, 1),
-            )
-        )
-
-        self.directionalPitch = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                state.directionalLightPitch.value,
-                label="Angle",
-                valueRange=(0, 1),
-            )
-        )
-
-        self.linkSlider(state.ambientLightIntensity, self.ambientIntensitySlider)
         self.linkSlider(
             state.directionalLightIntensity, self.directionalIntensitySlider
         )
-        self.linkSlider(state.directionalLightHeading, self.directionalHeading)
-        self.linkSlider(state.directionalLightPitch, self.directionalPitch)
 
         self.lightingDirection = self.addComponent(
             LightingDirection(self.root, ctx, state)

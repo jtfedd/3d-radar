@@ -51,7 +51,7 @@ class UIConstants:
     densityGraphDashLength = 8
     densityGraphFalloffSteps = 30
 
-    lightingParametersSize = (panelContentWidth - panelPadding) / 2
+    lightingParametersSize = panelContentWidth / 3
     lightingParametersIconSize = lightingParametersSize / 3
 
     scrollbarWidth = 0.01
