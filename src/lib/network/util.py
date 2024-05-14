@@ -9,10 +9,15 @@ def makeRequest(  # type: ignore
     timeout: float,
 ) -> requests.Response | None:
     try:
+        headers = {
+            "User-Agent": "Stormfront3DRadar/0.0.0",
+        }
+
         response = requests.get(
             url,
             params=params,
             timeout=timeout,
+            headers=headers,
         )
         response.raise_for_status()
     except requests.exceptions.HTTPError:
