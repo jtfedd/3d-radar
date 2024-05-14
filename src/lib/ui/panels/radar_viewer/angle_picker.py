@@ -27,6 +27,7 @@ class AnglePicker(Listener):
         scale: float,
         offset: float,
         centerOffset: float = 0,
+        showLimits: bool = False,
     ):
         super().__init__()
 
@@ -34,6 +35,7 @@ class AnglePicker(Listener):
 
         self.scale = scale
         self.offset = offset
+        self.showLimits = showLimits
 
         self.observable = observable
 
@@ -43,6 +45,7 @@ class AnglePicker(Listener):
             width=UIConstants.lightingParametersSize,
             height=UIConstants.lightingParametersSize,
             skin=ButtonSkin.ACCENT,
+            bgLayer=UILayer.BACKGROUND_DECORATION,
         )
 
         self.sun = Image(
@@ -71,6 +74,43 @@ class AnglePicker(Listener):
             color=UIColors.CONTENT,
             layer=UILayer.CONTENT,
         )
+
+        if showLimits:
+            self.zeroLimit = root.attachNewNode("zero-limit")
+            self.zeroLimit.setX(centerOffset)
+            self.zeroLimit.setZ(centerOffset)
+
+            self.zeroLimit.setR(self.offset)
+
+            self.zeroLimitIcon = Image(
+                self.zeroLimit,
+                image=Icons.DASHED_LINE,
+                width=UIConstants.lightingParametersIconSize,
+                height=UIConstants.lightingParametersIconSize,
+                x=0,
+                y=UIConstants.lightingParametersIconSize / 2,
+                vAlign=VAlign.BOTTOM,
+                color=UIColors.CONTENT,
+                layer=UILayer.CONTENT_BACKGROUND,
+            )
+
+            self.oneLimit = root.attachNewNode("one-limit")
+            self.oneLimit.setX(centerOffset)
+            self.oneLimit.setZ(centerOffset)
+
+            self.oneLimit.setR(self.offset + self.scale)
+
+            self.oneLimitIcon = Image(
+                self.oneLimit,
+                image=Icons.DASHED_LINE,
+                width=UIConstants.lightingParametersIconSize,
+                height=UIConstants.lightingParametersIconSize,
+                x=0,
+                y=UIConstants.lightingParametersIconSize / 2,
+                vAlign=VAlign.BOTTOM,
+                color=UIColors.CONTENT,
+                layer=UILayer.CONTENT_BACKGROUND,
+            )
 
         self.bind(
             observable,
@@ -120,3 +160,10 @@ class AnglePicker(Listener):
         self.arrow.destroy()
 
         self.arrowRoot.removeNode()
+
+        if self.showLimits:
+            self.zeroLimitIcon.destroy()
+            self.zeroLimit.removeNode()
+
+            self.oneLimitIcon.destroy()
+            self.oneLimit.removeNode()

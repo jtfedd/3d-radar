@@ -68,6 +68,7 @@ class LightingDirection(PanelComponent):
             scale=-90,
             offset=270,
             centerOffset=UIConstants.lightingParametersIconSize / 2,
+            showLimits=True,
         )
 
     def getHeight(self) -> float:

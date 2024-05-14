@@ -22,4 +22,5 @@ class Icons:
     SUN = "assets/icons/sun.png"
 
     ARROW = "assets/icons/arrow-up.png"
+    DASHED_LINE = "assets/icons/dashed-line.png"
     TRASH = "assets/icons/trash.png"
