@@ -1,3 +1,7 @@
+$begin constants
+#define PI 3.1415926538
+$end
+
 float data_value_for_sweep(vec3 point, int sweep_index) {
     if (r_count[sweep_index] == 0) {
         return -1.0;

@@ -19,17 +19,16 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     bool no_intersection;
     box_intersection(bounds_start, bounds_end, ro, rd, tRange, no_intersection);
 
+    vec4 color = vec4(0.0);
+    if (no_intersection) {
+        return color;
+    }
+
     // Make sure the range does not start behind the camera
     tRange.s = max(0.0, tRange.s);
     
     // Don't cast the ray further than the first rendered object
     tRange.t = min(d, tRange.t);
-
-    vec4 color = vec4(0.0);
-
-    if (no_intersection) {
-        return color;
-    }
 
     // Use a smaller step size when the slice of volume is very thin
     float step_size = min(STEP_SIZE, (tRange.t - tRange.s) / MIN_STEPS);
@@ -50,7 +49,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
         vec3 sample_color = colorize(sample_value);
         float sample_alpha = sample_density * step_size;
 
-        vec4 ci = vec4(sample_color, 1.0) * sample_alpha;
+        float brightness = volumetric_lighting
+            ? (sample_alpha < (1 - ALPHA_CUTOFF) ? 1.0 : light_amount(sample_pos))
+            : 1.0;
+        float lighting = volumetric_lighting
+            ? ambient_intensity + ((1 - ambient_intensity) * (brightness * directional_intensity))
+            : 1.0;
+
+        vec4 ci = vec4(sample_color * lighting, 1.0) * sample_alpha;
         color = blend_onto(color, ci);
 
         t += step_size;

@@ -6,7 +6,6 @@ from typing import Dict
 from panda3d.core import GeomEnums, NodePath, PandaNode, PTA_float, PTA_int, Texture
 
 from lib.app.context import AppContext
-from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_type import DataType
 from lib.model.scan import Scan
@@ -18,11 +17,10 @@ from lib.util.uuid import uuid
 class VolumeDataProvider(Listener):
     MAX_SCANS = 20
 
-    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState) -> None:
         super().__init__()
         self.ctx = ctx
         self.state = state
-        self.events = events
 
         self.nodes: Dict[str, NodePath[PandaNode]] = {}
 
@@ -47,19 +45,27 @@ class VolumeDataProvider(Listener):
         # 2 = min
         # 3 = scale
         # 4 = exp
-        self.densityParams = PTA_float.emptyArray(5)
+        # 5 = low
+        # 6 = high
+        self.densityParams = PTA_float.emptyArray(7)
 
         self.bufferSize = 0
         self.buffer = Texture("volume_data")
         self.setupBuffer()
 
         self.updateDensityParams()
-        self.listen(self.state.volumeMin, lambda _: self.updateDensityParams())
-        self.listen(self.state.volumeMax, lambda _: self.updateDensityParams())
-        self.listen(self.state.volumeFalloff, lambda _: self.updateDensityParams())
+        self.listen(self.state.rMin, lambda _: self.updateDensityParams())
+        self.listen(self.state.rMax, lambda _: self.updateDensityParams())
+        self.listen(self.state.rFalloff, lambda _: self.updateDensityParams())
+        self.listen(self.state.rLowCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.rHighCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.vMin, lambda _: self.updateDensityParams())
+        self.listen(self.state.vMax, lambda _: self.updateDensityParams())
+        self.listen(self.state.vFalloff, lambda _: self.updateDensityParams())
+        self.listen(self.state.vLowCut, lambda _: self.updateDensityParams())
+        self.listen(self.state.vHighCut, lambda _: self.updateDensityParams())
 
-        self.updateDataType(state.dataType.value)
-        self.listen(state.dataType, self.updateDataType)
+        self.bind(state.dataType, self.updateDataType)
 
         self.listen(state.animationFrame, lambda _: self.updateFrame())
         self.listen(state.dataType, lambda _: self.updateFrame())
@@ -111,16 +117,28 @@ class VolumeDataProvider(Listener):
             self.densityParams[0] = -0.5
             self.densityParams[1] = 2
 
+        self.updateDensityParams()
+
     def updateDensityParams(self) -> None:
+        isRef = self.state.dataType.value == DataType.REFLECTIVITY
+
         # Params for rendering the volume
-        densityMin = self.state.volumeMin.value
-        densityMax = self.state.volumeMax.value
+        densityMin = self.state.rMin.value if isRef else self.state.vMin.value
+        densityMax = self.state.rMax.value if isRef else self.state.vMax.value
         densityScale = densityMax - densityMin
-        densityExp = math.pow(10, self.state.volumeFalloff.value)
+
+        falloff = self.state.rFalloff.value if isRef else self.state.vFalloff.value
+        densityExp = math.pow(10, falloff)
 
         self.densityParams[2] = densityMin
         self.densityParams[3] = densityScale
         self.densityParams[4] = densityExp
+        self.densityParams[5] = (
+            self.state.rLowCut.value if isRef else self.state.vLowCut.value
+        )
+        self.densityParams[6] = (
+            self.state.rHighCut.value if isRef else self.state.vHighCut.value
+        )
 
     def updateVolumeData(self, scan: Scan) -> None:
         scanData = scan.reflectivity
