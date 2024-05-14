@@ -8,7 +8,6 @@ from lib.app.app import App
 # - [ ] Custom shader for map
 #   - [ ] Clip planes
 #   - [ ] Line thickness
-# - [ ] Window title in toolbar
 
 CONFIG = """
 gl-version 3 2
