@@ -4,7 +4,7 @@ from panda3d.core import loadPrcFileData
 from lib.app.app import App
 
 # TODO for mac support
-# - [ ] Custom shader for 3-d markers
+# - [x] Custom shader for 3-d markers
 # - [ ] Custom shader for map
 #   - [x] Clip planes
 #   - [ ] Line thickness
