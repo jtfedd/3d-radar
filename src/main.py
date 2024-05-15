@@ -6,7 +6,7 @@ from lib.app.app import App
 # TODO for mac support
 # - [ ] Custom shader for 3-d markers
 # - [ ] Custom shader for map
-#   - [ ] Clip planes
+#   - [x] Clip planes
 #   - [ ] Line thickness
 
 CONFIG = """

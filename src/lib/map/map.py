@@ -7,8 +7,7 @@ from panda3d.core import (
     LineSegs,
     NodePath,
     PandaNode,
-    Plane,
-    PlaneNode,
+    Shader,
     TransparencyAttrib,
     Vec4,
 )
@@ -51,17 +50,20 @@ class Map(Listener):
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
         self.mapRoot.setH(90)
 
-        self.clipPlane = ctx.base.render.attachNewNode(
-            PlaneNode("clip-plane", Plane((0, 0, 0), (1, 0, 0), (0, 1, 0)))
+        self.mapRoot.setShader(
+            Shader.load(
+                Shader.SL_GLSL,
+                vertex="shaders/gen/map_vertex.glsl",
+                fragment="shaders/gen/map_fragment.glsl",
+            )
         )
-
-        self.mapRoot.setClipPlane(self.clipPlane)
 
         self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
         self.boundary.setLightOff()
 
         clipPlaneOffset = -(EARTH_RADIUS * (1 - math.cos(RADAR_RANGE / EARTH_RADIUS)))
-        self.clipPlane.setZ(clipPlaneOffset)
+        self.mapRoot.setShaderInput("clip_z", clipPlaneOffset)
+
         self.boundary.setZ(clipPlaneOffset)
         self.boundary.setScale(EARTH_RADIUS * math.sin(RADAR_RANGE / EARTH_RADIUS))
 
@@ -157,4 +159,3 @@ class Map(Listener):
         self.svwRenderer.destroy()
 
         self.root.removeNode()
-        self.clipPlane.removeNode()
