@@ -17,6 +17,7 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
+from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
@@ -67,9 +68,13 @@ class Map(Listener):
         self.boundary.setZ(clipPlaneOffset)
         self.boundary.setScale(EARTH_RADIUS * math.sin(RADAR_RANGE / EARTH_RADIUS))
 
-        self.states = self.loadMapLayer("states", UIColors.MAP_BOUNDARIES)
-        self.counties = self.loadMapLayer("counties", UIColors.MAP_BOUNDARIES)
-        self.roads = self.loadMapLayer("roads", UIColors.MAP_DETAILS)
+        self.states = self.loadMapLayer(
+            "states", UILayer.MAP_STATES, UIColors.MAP_BOUNDARIES
+        )
+        self.counties = self.loadMapLayer(
+            "counties", UILayer.MAP_COUNTIES, UIColors.MAP_BOUNDARIES
+        )
+        self.roads = self.loadMapLayer("roads", UILayer.MAP_ROADS, UIColors.MAP_DETAILS)
 
         self.warningsRoot = self.mapRoot.attachNewNode("warningsRoot")
         self.warningsRoot.setLightOff()
@@ -77,7 +82,12 @@ class Map(Listener):
         self.warningsRoot.setTransparency(TransparencyAttrib.MAlpha)
 
         self.towRoot = self.warningsRoot.attachNewNode("towRoot")
+        self.towRoot.setBin("background", UILayer.MAP_TOW.value)
+        self.towRoot.setDepthTest(False)
+
         self.svwRoot = self.warningsRoot.attachNewNode("svwRoot")
+        self.svwRoot.setBin("background", UILayer.MAP_SVW.value)
+        self.svwRoot.setDepthTest(False)
 
         self.towRenderer = AlertRenderer(self.towRoot, state, AlertType.TORNADO_WARNING)
         self.svwRenderer = AlertRenderer(
@@ -117,11 +127,15 @@ class Map(Listener):
         if self.state.showSevereThunderstormWarnings.value:
             self.svwRoot.show()
 
-    def loadMapLayer(self, name: str, color: Vec4) -> NodePath[PandaNode]:
+    def loadMapLayer(
+        self, name: str, layer: UILayer, color: Vec4
+    ) -> NodePath[PandaNode]:
         node = unwrap(self.ctx.base.loader.loadModel("assets/maps/" + name + ".bam"))
         node.reparentTo(self.mapRoot)
         node.setColorScale(color)
         node.setLightOff()
+        node.setBin("background", layer.value)
+        node.setDepthTest(False)
         return node
 
     def updatePosition(self, stationID: str) -> None:

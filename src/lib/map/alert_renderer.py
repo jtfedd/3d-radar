@@ -65,14 +65,13 @@ class AlertRenderer(Listener):
 
     def drawAlert(self, alert: Alert) -> NodePath[PandaNode]:
         lineSegs = LineSegs()
-        lineSegs.setColor(self.getColor())
-        lineSegs.setThickness(2)
 
         for loop in alert.boundary:
             self.drawLoop(loop, lineSegs)
 
         np = NodePath(lineSegs.create())
         np.reparentTo(self.root)
+        np.setColorScale(self.getColor())
         return np
 
     def drawLoop(self, loop: List[GeoPoint], lineSegs: LineSegs) -> None:
