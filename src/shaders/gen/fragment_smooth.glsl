@@ -12,7 +12,7 @@ uniform float time;
 uniform sampler2D scene;
 uniform sampler2D depth;
 
-uniform vec2 resolution;
+uniform vec2 window_size;
 uniform vec3 camera_position;
 uniform mat4 trans_world_to_model_of_camera;
 uniform mat4 projection_matrix_inverse;
@@ -324,7 +324,7 @@ void main() {
     vec4 scene_color = texelFetch(scene, ivec2(gl_FragCoord.xy), 0);
     vec4 depth_pixel = texelFetch(depth, ivec2(gl_FragCoord.xy), 0);
 
-    vec2 uv = (gl_FragCoord.xy * 2.0) / resolution.xy - 1.0;
+    vec2 uv = (gl_FragCoord.xy * 2.0) / window_size.xy - 1.0;
     float scaled_depth = depth_pixel.x * 2.0 - 1.0;
 
     vec3 ro = camera_position;
