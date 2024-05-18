@@ -67,7 +67,6 @@ def makeSmoothSegs() -> None:
     np.setShaderInputs(
         window_size=(base.win.getXSize(), base.win.getYSize()),
         thickness=10,
-        miter_limit=0.5,
     )
 
     np.setColorScale(0.8, 0.8, 0.8, 1.0)

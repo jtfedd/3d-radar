@@ -1,8 +1,10 @@
 #version 150
 
 uniform float	thickness;		// the thickness of the line in pixels
-uniform float	miter_limit;	// 1.0: always miter, -1.0: never miter, 0.75: default
 uniform vec2	window_size;	// the size of the viewport in pixels
+
+// 1.0: always miter, -1.0: never miter, 0.75: default
+#define MITER_LIMIT 0.5
 
 layout( lines_adjacency ) in;
 layout( triangle_strip, max_vertices = 7 ) out;
@@ -44,7 +46,7 @@ void main( void ) {
 	float length_b = thickness / dot( miter_b, n1 );
 
 	// prevent excessively long miters at sharp corners
-	if( dot( v0, v1 ) < -miter_limit ) {
+	if( dot( v0, v1 ) < -MITER_LIMIT ) {
 		miter_a = n1;
 		length_a = thickness;
 
@@ -74,7 +76,7 @@ void main( void ) {
 		}
 	}
 
-	if ( dot( v1, v2 ) < -miter_limit ) {
+	if ( dot( v1, v2 ) < -MITER_LIMIT ) {
 		miter_b = n1;
 		length_b = thickness;
 	}
