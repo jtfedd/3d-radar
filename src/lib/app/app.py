@@ -29,7 +29,7 @@ class App:
         self.ui = UI(self.ctx, self.state, self.events)
 
         self.cameraControl = CameraControl(self.ctx, self.events)
-        self.volumeRenderer = VolumeRenderer(self.ctx, self.state, self.events)
+        self.volumeRenderer = VolumeRenderer(self.ctx, self.state)
         self.animationManager = AnimationManager(self.ctx, self.state, self.events)
         self.alertManager = AlertManager(self.ctx, self.state, self.events)
 

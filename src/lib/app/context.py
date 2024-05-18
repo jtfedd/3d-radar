@@ -19,7 +19,7 @@ class AppContext:
         self.fileManager = FileManager()
         self.focusManager = FocusManager()
         self.inputManager = InputManager(self.focusManager, state, events.input)
-        self.windowManager = WindowManager(events.window)
+        self.windowManager = WindowManager(base, events.window)
         self.services = Services(self.fileManager, Network())
         self.radarCache = RadarCache()
         self.timeUtil = TimeUtil(state, events, self.services)

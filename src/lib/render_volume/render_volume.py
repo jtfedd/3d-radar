@@ -1,9 +1,8 @@
 from direct.filter.FilterManager import FilterManager
 from direct.task import Task
-from panda3d.core import GraphicsWindow, Shader, Texture
+from panda3d.core import Shader, Texture
 
 from lib.app.context import AppContext
-from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.map.constants import RADAR_RANGE
 from lib.util.events.listener import Listener
@@ -14,7 +13,7 @@ from .volume_data_provider import VolumeDataProvider
 
 
 class VolumeRenderer(Listener):
-    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState) -> None:
         super().__init__()
 
         self.ctx = ctx
@@ -52,12 +51,6 @@ class VolumeRenderer(Listener):
             self.ctx.base.cam.node().getLens().getProjectionMatInv(),
         )
 
-        # For some reason this seems to be typed incorrectly; override the type
-        window: GraphicsWindow = self.ctx.base.win  # type: ignore
-        self.windowSize = (0, 0)
-        self.updateScreenResolution(window)
-        self.listen(events.window.onWindowUpdate, self.updateScreenResolution)
-
         self.cameraTask = self.ctx.base.taskMgr.add(
             self.updateCameraParams, "update-camera-params"
         )
@@ -73,14 +66,6 @@ class VolumeRenderer(Listener):
             self.plane.setShader(self.smoothShader)
         else:
             self.plane.setShader(self.sharpShader)
-
-    def updateScreenResolution(self, win: GraphicsWindow) -> None:
-        newSize = (win.getXSize(), win.getYSize())
-        if newSize[0] == self.windowSize[0] and newSize[1] == self.windowSize[1]:
-            return
-
-        self.windowSize = newSize
-        self.plane.setShaderInput("resolution", self.windowSize)
 
     def updateCameraParams(self, task: Task.Task) -> int:
         self.plane.setShaderInput(
