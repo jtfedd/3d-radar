@@ -4,7 +4,7 @@ layout(lines) in;
 layout(triangle_strip, max_vertices = 4) out;
 
 uniform vec2 window_size;
-uniform float line_width;
+uniform float thickness;
 
 in vec4 vertex_color[];
 out vec4 geometry_color;
@@ -21,8 +21,8 @@ void main() {
     vec2 dir = normalize(vec2( line_vector.x, line_vector.y * u_aspect_ratio ));
 
     vec2 normal    = vec2( -dir.y, dir.x );
-    vec2 normal_a  = vec2( line_width/u_width, line_width/u_height ) * normal;
-    vec2 normal_b  = vec2( line_width/u_width, line_width/u_height ) * normal;
+    vec2 normal_a  = vec2( thickness/u_width, thickness/u_height ) * normal;
+    vec2 normal_b  = vec2( thickness/u_width, thickness/u_height ) * normal;
 
     // Start point
     geometry_color = vertex_color[0];

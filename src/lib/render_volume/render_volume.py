@@ -39,6 +39,8 @@ class VolumeRenderer(Listener):
         self.updateShader(state.smooth.value)
         self.listen(state.smooth, self.updateShader)
 
+        ctx.windowManager.resolutionProvider.addNode(self.plane)
+
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
         self.plane.setShaderInput("bounds_start", (-RADAR_RANGE, -RADAR_RANGE, 0))
@@ -87,6 +89,8 @@ class VolumeRenderer(Listener):
 
     def destroy(self) -> None:
         super().destroy()
+
+        self.ctx.windowManager.resolutionProvider.removeNode(self.plane)
 
         self.lightingDataProvider.destroy()
         self.volumeDataProvider.destroy()
