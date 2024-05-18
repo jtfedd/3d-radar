@@ -3,15 +3,15 @@
 layout(lines) in;
 layout(triangle_strip, max_vertices = 4) out;
 
-uniform vec2 window_size;
+uniform vec2 viewport_size;
 uniform float line_width;
 
 in vec4 vertex_color[];
 out vec4 geometry_color;
 
 void main() {
-    float u_width        = window_size[0];
-    float u_height       = window_size[1];
+    float u_width        = viewport_size[0];
+    float u_height       = viewport_size[1];
     float u_aspect_ratio = u_height / u_width;
 
     vec2 ndc_a = gl_in[0].gl_Position.xy / gl_in[0].gl_Position.w;
