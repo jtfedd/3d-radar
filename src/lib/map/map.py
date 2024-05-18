@@ -54,10 +54,15 @@ class Map(Listener):
         self.mapRoot.setShader(
             Shader.load(
                 Shader.SL_GLSL,
-                vertex="shaders/gen/map_vertex.glsl",
-                fragment="shaders/gen/map_fragment.glsl",
+                vertex="shaders/gen/line_v.glsl",
+                geometry="shaders/gen/line_g.glsl",
+                fragment="shaders/gen/line_f.glsl",
             )
         )
+
+        self.ctx.windowManager.resolutionProvider.addNode(self.mapRoot)
+
+        self.mapRoot.setShaderInput("thickness", 1.0)
 
         self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
         self.boundary.setLightOff()
@@ -75,6 +80,8 @@ class Map(Listener):
             "counties", UILayer.MAP_COUNTIES, UIColors.MAP_BOUNDARIES
         )
         self.roads = self.loadMapLayer("roads", UILayer.MAP_ROADS, UIColors.MAP_DETAILS)
+
+        self.states.setShaderInput("thickness", 2.0)
 
         self.warningsRoot = self.mapRoot.attachNewNode("warningsRoot")
         self.warningsRoot.setLightOff()
@@ -165,6 +172,8 @@ class Map(Listener):
 
     def destroy(self) -> None:
         super().destroy()
+
+        self.ctx.windowManager.resolutionProvider.removeNode(self.mapRoot)
 
         self.lightingManager.destroy()
         self.markersManager.destroy()
