@@ -1,5 +1,5 @@
 from direct.showbase.ShowBase import ShowBase
-from panda3d.core import LineSegs, NodePath, Shader, TransparencyAttrib
+from panda3d.core import LineSegs, NodePath, Shader
 
 base = ShowBase()
 
@@ -24,8 +24,7 @@ np.setShader(
 
 np.setShaderInputs(
     viewport_size=(base.win.getXSize(), base.win.getYSize()),
-    line_width=5,
-    aa_radius=0,
+    line_width=10,
 )
 
 
