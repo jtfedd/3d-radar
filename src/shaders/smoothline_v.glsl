@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 uniform mat4 p3d_ModelViewProjectionMatrix;
 in vec4 p3d_Vertex;

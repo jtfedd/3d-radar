@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 uniform vec4 p3d_ColorScale;
 out vec4 p3d_FragColor;

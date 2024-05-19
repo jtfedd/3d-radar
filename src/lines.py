@@ -28,15 +28,20 @@ def makeLineSegs() -> None:
 
 
 def makeSmoothSegs() -> None:
-    vdata = GeomVertexData("name", GeomVertexFormat.getV3(), Geom.UHStatic)
+    vdata = GeomVertexData("name", GeomVertexFormat.getV3c4(), Geom.UHStatic)
     vdata.setNumRows(4)
 
     vertex = GeomVertexWriter(vdata, "vertex")
+    color = GeomVertexWriter(vdata, "color")
 
     vertex.addData3(0, 0, 0)
+    color.addData4(1, 1, 1, 1)
     vertex.addData3(1, 0, 0)
+    color.addData4(1, 1, 1, 1)
     vertex.addData3(1, 1, 0)
+    color.addData4(1, 0, 0, 1)
     vertex.addData3(-1, 1, 0)
+    color.addData4(0, 1, 1, 1)
 
     prim = GeomLinestripsAdjacency(Geom.UH_static)
     prim.addVertex(1)
@@ -58,9 +63,9 @@ def makeSmoothSegs() -> None:
     np.setShader(
         Shader.load(
             Shader.SL_GLSL,
-            vertex="shaders/smoothline_v.glsl",
-            geometry="shaders/smoothline_g.glsl",
-            fragment="shaders/smoothline_f.glsl",
+            vertex="shaders/line_v.glsl",
+            geometry="shaders/line_g.glsl",
+            fragment="shaders/line_f.glsl",
         )
     )
 
@@ -69,7 +74,7 @@ def makeSmoothSegs() -> None:
         thickness=10,
     )
 
-    np.setColorScale(0.8, 0.8, 0.8, 1.0)
+    # np.setColorScale(0.8, 0.8, 0.8, 1.0)
 
 
 # makeLineSegs()

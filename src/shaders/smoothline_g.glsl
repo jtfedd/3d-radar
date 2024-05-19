@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 uniform float	thickness;		// the thickness of the line in pixels
 uniform vec2	window_size;	// the size of the viewport in pixels
@@ -19,13 +19,6 @@ void main( void ) {
 	vec2 p1 = toScreenSpace( gl_in[1].gl_Position );	// end of previous segment, start of current segment
 	vec2 p2 = toScreenSpace( gl_in[2].gl_Position );	// end of current segment, start of next segment
 	vec2 p3 = toScreenSpace( gl_in[3].gl_Position );	// end of next segment
-
-	// perform naive culling
-	// vec2 area = window_size * 1.2;
-	// if( p1.x < -area.x || p1.x > area.x ) return;
-	// if( p1.y < -area.y || p1.y > area.y ) return;
-	// if( p2.x < -area.x || p2.x > area.x ) return;
-	// if( p2.y < -area.y || p2.y > area.y ) return;
 
 	// determine the direction of each of the 3 segments (previous, current, next)
 	vec2 v0 = normalize( p1 - p0 );
