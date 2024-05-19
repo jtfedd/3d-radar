@@ -6,9 +6,6 @@ layout(triangle_strip, max_vertices = 7) out;
 uniform vec2 window_size;
 uniform float thickness;
 
-in vec4 vertex_color[];
-out vec4 geometry_color;
-
 void main() {
     float u_width        = window_size[0];
     float u_height       = window_size[1];
@@ -33,8 +30,6 @@ void main() {
     vec2 ctl_normal = vec2( thickness/u_width, thickness/u_height ) * vec2( -ctl_dir.y, ctl_dir.x );
 
     // Generate a triangle to bridge this segment with the previous
-    geometry_color = vertex_color[1];
-
     gl_Position = gl_in[1].gl_Position;
     EmitVertex();
 
@@ -54,17 +49,12 @@ void main() {
 
     EndPrimitive();
 
-    // Start point
-    geometry_color = vertex_color[1];
-
+    // Generate the segment
     gl_Position = vec4( (ndc_a + normal) * gl_in[1].gl_Position.w, gl_in[1].gl_Position.zw );
     EmitVertex();
 
     gl_Position = vec4( (ndc_a - normal) * gl_in[1].gl_Position.w, gl_in[1].gl_Position.zw );
     EmitVertex();
-
-    // End point
-    geometry_color = vertex_color[2];
 
     gl_Position = vec4( (ndc_b + normal) * gl_in[2].gl_Position.w, gl_in[2].gl_Position.zw );
     EmitVertex();
