@@ -74,6 +74,7 @@ def makeSmoothSegs() -> None:
         thickness=10,
     )
 
+    # np.setRenderModeWireframe()
     # np.setColorScale(0.8, 0.8, 0.8, 1.0)
 
 

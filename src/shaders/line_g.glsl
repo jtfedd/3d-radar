@@ -1,7 +1,7 @@
 #version 330
 
 layout(lines_adjacency) in;
-layout(triangle_strip, max_vertices = 4) out;
+layout(triangle_strip, max_vertices = 7) out;
 
 uniform vec2 window_size;
 uniform float thickness;
@@ -14,15 +14,45 @@ void main() {
     float u_height       = window_size[1];
     float u_aspect_ratio = u_height / u_width;
 
+    // ndc_ctl references the control point before the current segment
+    // This is used to generate a triangle to bridge the segment with the previous
+    vec2 ndc_ctl = gl_in[0].gl_Position.xy / gl_in[0].gl_Position.w;
     vec2 ndc_a = gl_in[1].gl_Position.xy / gl_in[1].gl_Position.w;
     vec2 ndc_b = gl_in[2].gl_Position.xy / gl_in[2].gl_Position.w;
 
     vec2 line_vector = ndc_b - ndc_a;
     vec2 dir = normalize(vec2( line_vector.x, line_vector.y * u_aspect_ratio ));
 
+    vec2 ctl_vector = ndc_a - ndc_ctl;
+    vec2 ctl_dir = normalize(vec2( ctl_vector.x, ctl_vector.y * u_aspect_ratio ));
+
     // vec2( -dir.y, dir.x ) is the normal vector
     // vec2( thicknes/u_width, thickness/u_height ) scales it by the thickness of the line
     vec2 normal  = vec2( thickness/u_width, thickness/u_height ) * vec2( -dir.y, dir.x );
+
+    vec2 ctl_normal = vec2( thickness/u_width, thickness/u_height ) * vec2( -ctl_dir.y, ctl_dir.x );
+
+    // Generate a triangle to bridge this segment with the previous
+    geometry_color = vertex_color[1];
+
+    gl_Position = gl_in[1].gl_Position;
+    EmitVertex();
+
+    if ( dot( ctl_normal, dir ) > 0 ) {
+        gl_Position = vec4( (ndc_a - ctl_normal) * gl_in[1].gl_Position.w, gl_in[1].gl_Position.zw);
+        EmitVertex();
+
+        gl_Position = vec4( (ndc_a - normal) * gl_in[1].gl_Position.w, gl_in[1].gl_Position.zw);
+        EmitVertex();
+    } else {
+        gl_Position = vec4( (ndc_a + normal) * gl_in[1].gl_Position.w, gl_in[1].gl_Position.zw);
+        EmitVertex();
+
+        gl_Position = vec4( (ndc_a + ctl_normal) * gl_in[1].gl_Position.w, gl_in[1].gl_Position.zw);
+        EmitVertex();
+    }
+
+    EndPrimitive();
 
     // Start point
     geometry_color = vertex_color[1];

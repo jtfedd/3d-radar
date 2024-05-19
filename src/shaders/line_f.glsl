@@ -1,5 +1,3 @@
-// Port of the geometry shader example from https://github.com/mhalber/Lines
-
 #version 330
 
 uniform vec4 p3d_ColorScale;
