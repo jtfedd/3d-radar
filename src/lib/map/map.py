@@ -54,9 +54,9 @@ class Map(Listener):
         self.mapRoot.setShader(
             Shader.load(
                 Shader.SL_GLSL,
-                vertex="shaders/gen/line_v.glsl",
-                geometry="shaders/gen/line_g.glsl",
-                fragment="shaders/gen/line_f.glsl",
+                vertex="shaders/gen/map_vertex.glsl",
+                geometry="shaders/gen/map_geometry.glsl",
+                fragment="shaders/gen/map_fragment.glsl",
             )
         )
 
