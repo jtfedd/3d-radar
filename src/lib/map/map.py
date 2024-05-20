@@ -3,8 +3,12 @@ from __future__ import annotations
 import math
 
 from panda3d.core import (
+    Geom,
+    GeomLinestripsAdjacency,
     GeomNode,
-    LineSegs,
+    GeomVertexData,
+    GeomVertexFormat,
+    GeomVertexWriter,
     NodePath,
     PandaNode,
     Shader,
@@ -51,27 +55,29 @@ class Map(Listener):
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
         self.mapRoot.setH(90)
 
-        self.mapRoot.setShader(
-            Shader.load(
-                Shader.SL_GLSL,
-                vertex="shaders/gen/map_vertex.glsl",
-                geometry="shaders/gen/map_geometry.glsl",
-                fragment="shaders/gen/map_fragment.glsl",
-            )
+        mapShader = Shader.load(
+            Shader.SL_GLSL,
+            vertex="shaders/gen/map_vertex.glsl",
+            geometry="shaders/gen/map_geometry.glsl",
+            fragment="shaders/gen/map_fragment.glsl",
         )
 
-        self.ctx.windowManager.resolutionProvider.addNode(self.mapRoot)
-
+        self.mapRoot.setShader(mapShader)
         self.mapRoot.setShaderInput("thickness", 1.0)
 
-        self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
-        self.boundary.setLightOff()
+        self.ctx.windowManager.resolutionProvider.addNode(self.mapRoot)
 
         clipPlaneOffset = -(EARTH_RADIUS * (1 - math.cos(RADAR_RANGE / EARTH_RADIUS)))
         self.mapRoot.setShaderInput("clip_z", clipPlaneOffset)
 
+        self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
         self.boundary.setZ(clipPlaneOffset)
         self.boundary.setScale(EARTH_RADIUS * math.sin(RADAR_RANGE / EARTH_RADIUS))
+        self.boundary.setShader(mapShader)
+        self.boundary.setShaderInput("thickness", 1.0)
+        self.boundary.setShaderInput("clip_z", 2 * clipPlaneOffset)
+        self.boundary.setColorScale(UIColors.MAP_BOUNDARIES)
+        self.ctx.windowManager.resolutionProvider.addNode(self.boundary)
 
         self.states = self.loadMapLayer(
             "states", UILayer.MAP_STATES, UIColors.MAP_BOUNDARIES
@@ -154,21 +160,37 @@ class Map(Listener):
         self.longRoot.setH(-radarStation.geoPoint.lon)
 
     def drawCircle(self) -> GeomNode:
-        lineSegs = LineSegs()
-        lineSegs.setThickness(1)
-        lineSegs.setColor(UIColors.MAP_BOUNDARIES)
-        lineSegs.moveTo(1, 0, 0)
-
         steps = 720
+
+        vdata = GeomVertexData("name", GeomVertexFormat.getV3(), Geom.UHStatic)
+        vdata.setNumRows(steps)
+
+        vertex = GeomVertexWriter(vdata, "vertex")
+
+        prim = GeomLinestripsAdjacency(Geom.UH_static)
+
+        prim.addVertex(steps - 1)
+
         stepSize = 360 / steps
-        for i in range(steps + 1):
-            lineSegs.drawTo(
+        for i in range(steps):
+            vertex.addData3(
                 math.cos(math.radians(i * stepSize)),
                 math.sin(math.radians(i * stepSize)),
                 0,
             )
+            prim.addVertex(i)
 
-        return lineSegs.create()
+        prim.addVertex(0)
+        prim.addVertex(1)
+        prim.closePrimitive()
+
+        geom = Geom(vdata)
+        geom.addPrimitive(prim)
+
+        node = GeomNode("circle")
+        node.addGeom(geom)
+
+        return node
 
     def destroy(self) -> None:
         super().destroy()
