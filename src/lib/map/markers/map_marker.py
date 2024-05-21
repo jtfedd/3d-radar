@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 
 from direct.task.Task import Task
-from panda3d.core import NodePath, PandaNode
+from panda3d.core import NodePath, PandaNode, Shader
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
@@ -63,6 +63,13 @@ class MapMarker(Listener):
         self.model.hide()
         self.model.setColorScale(UIColors.ORANGE)
         self.model.setScale(10)
+        self.model.setShader(
+            Shader.load(
+                Shader.SL_GLSL,
+                vertex="shaders/gen/marker_vertex.glsl",
+                fragment="shaders/gen/marker_fragment.glsl",
+            )
+        )
 
         self.updateInRadarRange()
         self.listen(state.station, lambda _: self.updateInRadarRange())

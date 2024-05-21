@@ -2,6 +2,15 @@ from enum import Enum
 
 
 class UILayer(Enum):
+    # 3D Layers
+    MAP_ROADS = 0
+    MAP_COUNTIES = 1
+    MAP_STATES = 2
+
+    MAP_SVW = 3
+    MAP_TOW = 4
+
+    # 2D Layers
     MARKER_BACKGROUND = 0
     MARKER = 1
 

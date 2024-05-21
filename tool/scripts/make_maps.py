@@ -8,7 +8,17 @@ import requests
 import shapefile
 import shapely
 import shapely.geometry.base
-from panda3d.core import LineSegs, NodePath, PandaNode, Vec3, Vec4
+from panda3d.core import (
+    Geom,
+    GeomLinestripsAdjacency,
+    GeomNode,
+    GeomVertexData,
+    GeomVertexFormat,
+    GeomVertexWriter,
+    NodePath,
+    PandaNode,
+    Vec3,
+)
 
 MAPS_FOLDER = "src/assets/maps/"
 
@@ -215,56 +225,131 @@ def toGlobe(coord: Tuple[float, float]) -> Vec3:
     return Vec3(x, y, z)
 
 
-def drawSegs(seq: shapely.geometry.base.CoordinateSequence, lineSegs: LineSegs) -> None:
+class LineDrawer:
+    def __init__(self) -> None:
+        self.infos: List[LinesAdjacencyInfo] = []
+
+    def add(self, info: LinesAdjacencyInfo) -> None:
+        self.infos.append(info)
+
+    def create(self) -> NodePath[PandaNode]:
+        vertexCount = sum(info.count() for info in self.infos)
+
+        vdata = GeomVertexData("name", GeomVertexFormat.getV3(), Geom.UHStatic)
+        vdata.setNumRows(vertexCount)
+
+        vertex = GeomVertexWriter(vdata, "vertex")
+        prim = GeomLinestripsAdjacency(Geom.UH_static)
+
+        index = 0
+        for info in self.infos:
+            points = info.getPoints()
+            if len(points) < 2:
+                continue
+
+            firstIndex = index
+            lastIndex = index + len(points) - 1
+            index += len(points)
+
+            for point in points:
+                vertex.addData3(point)
+
+            # Leading control point
+            if info.isLoop:
+                prim.addVertex(lastIndex)
+            else:
+                prim.addVertex(firstIndex + 1)
+
+            for i in range(firstIndex, lastIndex + 1):
+                prim.addVertex(i)
+
+            # Trailing control point
+            if info.isLoop:
+                prim.addVertex(firstIndex)
+                prim.addVertex(firstIndex + 1)
+            else:
+                prim.addVertex(lastIndex - 1)
+
+            prim.closePrimitive()
+
+        geom = Geom(vdata)
+        geom.addPrimitive(prim)
+
+        node = GeomNode("gnode")
+        node.addGeom(geom)
+
+        return NodePath(node)
+
+
+class LinesAdjacencyInfo:
+    def __init__(self) -> None:
+        self.isLoop = False
+        self.points: List[Vec3] = []
+
+    def add(self, point: Vec3) -> None:
+        self.points.append(point)
+        self.isLoop = self.points[0] == point
+
+    def count(self) -> int:
+        if self.isLoop:
+            return len(self.points) - 1
+        return len(self.points)
+
+    def getPoints(self) -> List[Vec3]:
+        if self.isLoop:
+            return self.points[:-1]
+        return self.points
+
+
+def drawSegs(seq: shapely.geometry.base.CoordinateSequence, drawer: LineDrawer) -> None:
     coords = list(seq)
 
-    lineSegs.moveTo(toGlobe(coords[0]))
-
+    info = LinesAdjacencyInfo()
     for point in coords:
-        lineSegs.drawTo(toGlobe(point))
+        info.add(toGlobe(point))
+
+    drawer.add(info)
 
 
-def draw(geometry: shapely.geometry.base.BaseGeometry, lineSegs: LineSegs) -> None:
+def draw(geometry: shapely.geometry.base.BaseGeometry, drawer: LineDrawer) -> None:
     geomType = shapely.get_type_id(geometry)
 
     if geomType == shapely.GeometryType.LINESTRING:
-        drawSegs(geometry.coords, lineSegs)
+        drawSegs(geometry.coords, drawer)
     if geomType == shapely.GeometryType.LINEARRING:
-        drawSegs(geometry.coords, lineSegs)
+        drawSegs(geometry.coords, drawer)
     if geomType == shapely.GeometryType.POLYGON:
         polygon = cast(shapely.Polygon, geometry)
-        draw(polygon.exterior, lineSegs)
+        draw(polygon.exterior, drawer)
         for ring in polygon.interiors:
-            draw(ring, lineSegs)
+            draw(ring, drawer)
     if geomType == shapely.GeometryType.MULTILINESTRING:
         multiLineString = cast(shapely.MultiLineString, geometry)
         for linestring in multiLineString.geoms:
-            draw(linestring, lineSegs)
+            draw(linestring, drawer)
     if geomType == shapely.GeometryType.MULTIPOLYGON:
         multipolygon = cast(shapely.MultiPolygon, geometry)
         for polygon in multipolygon.geoms:
-            draw(polygon, lineSegs)
+            draw(polygon, drawer)
     if geomType == shapely.GeometryType.GEOMETRYCOLLECTION:
         collection = cast(shapely.GeometryCollection, geometry)
         for geom in collection.geoms:
-            draw(geom, lineSegs)
+            draw(geom, drawer)
 
 
 def render(
     geometry: shapely.geometry.base.BaseGeometry,
-    thickness: float,
     filename: str,
 ) -> None:
     print("Rendering", filename)
-    lineSegs = LineSegs()
-    lineSegs.setColor(Vec4(1, 1, 1, 1))
-    lineSegs.setThickness(thickness)
-    draw(geometry, lineSegs)
 
-    writeBam(NodePath(lineSegs.create()), filename)
+    drawer = LineDrawer()
+    draw(geometry, drawer)
+
+    writeBam(drawer.create(), filename)
 
 
 if __name__ == "__main__":
-    render(openOrCreate("states", loadStates), 2, "states")
-    render(openOrCreate("counties", loadCounties), 1, "counties")
-    render(openOrCreate("roads_simple", simplfyRoads), 1, "roads")
+    render(openOrCreate("states", loadStates), "states")
+    render(openOrCreate("counties", loadCounties), "counties")
+    render(openOrCreate("roads_simple", simplfyRoads), "roads")

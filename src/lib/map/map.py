@@ -4,20 +4,21 @@ import math
 
 from panda3d.core import (
     GeomNode,
-    LineSegs,
     NodePath,
     PandaNode,
-    Plane,
-    PlaneNode,
+    Shader,
     TransparencyAttrib,
+    Vec3,
     Vec4,
 )
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.geometry.segments import Segments
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
+from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
@@ -51,23 +52,39 @@ class Map(Listener):
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
         self.mapRoot.setH(90)
 
-        self.clipPlane = ctx.base.render.attachNewNode(
-            PlaneNode("clip-plane", Plane((0, 0, 0), (1, 0, 0), (0, 1, 0)))
+        mapShader = Shader.load(
+            Shader.SL_GLSL,
+            vertex="shaders/gen/map_vertex.glsl",
+            geometry="shaders/gen/map_geometry.glsl",
+            fragment="shaders/gen/map_fragment.glsl",
         )
 
-        self.mapRoot.setClipPlane(self.clipPlane)
+        self.mapRoot.setShader(mapShader)
+        self.mapRoot.setShaderInput("thickness", 1.0)
 
-        self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
-        self.boundary.setLightOff()
+        self.ctx.windowManager.resolutionProvider.addNode(self.mapRoot)
 
         clipPlaneOffset = -(EARTH_RADIUS * (1 - math.cos(RADAR_RANGE / EARTH_RADIUS)))
-        self.clipPlane.setZ(clipPlaneOffset)
+        self.mapRoot.setShaderInput("clip_z", clipPlaneOffset)
+
+        self.boundary = ctx.base.render.attachNewNode(self.drawCircle())
         self.boundary.setZ(clipPlaneOffset)
         self.boundary.setScale(EARTH_RADIUS * math.sin(RADAR_RANGE / EARTH_RADIUS))
+        self.boundary.setShader(mapShader)
+        self.boundary.setShaderInput("thickness", 1.0)
+        self.boundary.setShaderInput("clip_z", 2 * clipPlaneOffset)
+        self.boundary.setColorScale(UIColors.MAP_BOUNDARIES)
+        self.ctx.windowManager.resolutionProvider.addNode(self.boundary)
 
-        self.states = self.loadMapLayer("states", UIColors.MAP_BOUNDARIES)
-        self.counties = self.loadMapLayer("counties", UIColors.MAP_BOUNDARIES)
-        self.roads = self.loadMapLayer("roads", UIColors.MAP_DETAILS)
+        self.states = self.loadMapLayer(
+            "states", UILayer.MAP_STATES, UIColors.MAP_BOUNDARIES
+        )
+        self.counties = self.loadMapLayer(
+            "counties", UILayer.MAP_COUNTIES, UIColors.MAP_BOUNDARIES
+        )
+        self.roads = self.loadMapLayer("roads", UILayer.MAP_ROADS, UIColors.MAP_DETAILS)
+
+        self.states.setShaderInput("thickness", 2.0)
 
         self.warningsRoot = self.mapRoot.attachNewNode("warningsRoot")
         self.warningsRoot.setLightOff()
@@ -75,7 +92,12 @@ class Map(Listener):
         self.warningsRoot.setTransparency(TransparencyAttrib.MAlpha)
 
         self.towRoot = self.warningsRoot.attachNewNode("towRoot")
+        self.towRoot.setBin("background", UILayer.MAP_TOW.value)
+        self.towRoot.setDepthTest(False)
+
         self.svwRoot = self.warningsRoot.attachNewNode("svwRoot")
+        self.svwRoot.setBin("background", UILayer.MAP_SVW.value)
+        self.svwRoot.setDepthTest(False)
 
         self.towRenderer = AlertRenderer(self.towRoot, state, AlertType.TORNADO_WARNING)
         self.svwRenderer = AlertRenderer(
@@ -115,11 +137,15 @@ class Map(Listener):
         if self.state.showSevereThunderstormWarnings.value:
             self.svwRoot.show()
 
-    def loadMapLayer(self, name: str, color: Vec4) -> NodePath[PandaNode]:
+    def loadMapLayer(
+        self, name: str, layer: UILayer, color: Vec4
+    ) -> NodePath[PandaNode]:
         node = unwrap(self.ctx.base.loader.loadModel("assets/maps/" + name + ".bam"))
         node.reparentTo(self.mapRoot)
         node.setColorScale(color)
         node.setLightOff()
+        node.setBin("background", layer.value)
+        node.setDepthTest(False)
         return node
 
     def updatePosition(self, stationID: str) -> None:
@@ -131,24 +157,26 @@ class Map(Listener):
         self.longRoot.setH(-radarStation.geoPoint.lon)
 
     def drawCircle(self) -> GeomNode:
-        lineSegs = LineSegs()
-        lineSegs.setThickness(1)
-        lineSegs.setColor(UIColors.MAP_BOUNDARIES)
-        lineSegs.moveTo(1, 0, 0)
-
         steps = 720
-        stepSize = 360 / steps
-        for i in range(steps + 1):
-            lineSegs.drawTo(
-                math.cos(math.radians(i * stepSize)),
-                math.sin(math.radians(i * stepSize)),
-                0,
-            )
+        stepSize = (math.pi * 2) / steps
 
-        return lineSegs.create()
+        segments = Segments(steps)
+        segments.addLoop(
+            [
+                Vec3(
+                    math.cos(i * stepSize),
+                    math.sin(i * stepSize),
+                    0,
+                )
+                for i in range(steps)
+            ]
+        )
+        return segments.create()
 
     def destroy(self) -> None:
         super().destroy()
+
+        self.ctx.windowManager.resolutionProvider.removeNode(self.mapRoot)
 
         self.lightingManager.destroy()
         self.markersManager.destroy()
@@ -157,4 +185,3 @@ class Map(Listener):
         self.svwRenderer.destroy()
 
         self.root.removeNode()
-        self.clipPlane.removeNode()
