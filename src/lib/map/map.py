@@ -3,22 +3,19 @@ from __future__ import annotations
 import math
 
 from panda3d.core import (
-    Geom,
-    GeomLinestripsAdjacency,
     GeomNode,
-    GeomVertexData,
-    GeomVertexFormat,
-    GeomVertexWriter,
     NodePath,
     PandaNode,
     Shader,
     TransparencyAttrib,
+    Vec3,
     Vec4,
 )
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.geometry.segments import Segments
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
 from lib.ui.core.layers import UILayer
@@ -161,36 +158,20 @@ class Map(Listener):
 
     def drawCircle(self) -> GeomNode:
         steps = 720
+        stepSize = (math.pi * 2) / steps
 
-        vdata = GeomVertexData("name", GeomVertexFormat.getV3(), Geom.UHStatic)
-        vdata.setNumRows(steps)
-
-        vertex = GeomVertexWriter(vdata, "vertex")
-
-        prim = GeomLinestripsAdjacency(Geom.UH_static)
-
-        prim.addVertex(steps - 1)
-
-        stepSize = 360 / steps
-        for i in range(steps):
-            vertex.addData3(
-                math.cos(math.radians(i * stepSize)),
-                math.sin(math.radians(i * stepSize)),
-                0,
-            )
-            prim.addVertex(i)
-
-        prim.addVertex(0)
-        prim.addVertex(1)
-        prim.closePrimitive()
-
-        geom = Geom(vdata)
-        geom.addPrimitive(prim)
-
-        node = GeomNode("circle")
-        node.addGeom(geom)
-
-        return node
+        segments = Segments(steps)
+        segments.addLoop(
+            [
+                Vec3(
+                    math.cos(i * stepSize),
+                    math.sin(i * stepSize),
+                    0,
+                )
+                for i in range(steps)
+            ]
+        )
+        return segments.create()
 
     def destroy(self) -> None:
         super().destroy()

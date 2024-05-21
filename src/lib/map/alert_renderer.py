@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from panda3d.core import LineSegs, NodePath, PandaNode, Vec4
+from panda3d.core import NodePath, PandaNode, Vec4
 
 from lib.app.state import AppState
+from lib.geometry.segments import Segments
 from lib.model.alert import Alert
 from lib.model.alert_status import AlertStatus
 from lib.model.alert_type import AlertType
@@ -64,23 +65,22 @@ class AlertRenderer(Listener):
         return hash(tuple(loopHashes))
 
     def drawAlert(self, alert: Alert) -> NodePath[PandaNode]:
-        lineSegs = LineSegs()
+        segments = Segments(sum(len(loop) - 1 for loop in alert.boundary))
 
         for loop in alert.boundary:
-            self.drawLoop(loop, lineSegs)
+            self.drawLoop(loop, segments)
 
-        np = NodePath(lineSegs.create())
+        np = NodePath(segments.create())
         np.reparentTo(self.root)
         np.setColorScale(self.getColor())
+        np.setShaderInput("thickness", 2)
         return np
 
-    def drawLoop(self, loop: List[GeoPoint], lineSegs: LineSegs) -> None:
+    def drawLoop(self, loop: List[GeoPoint], segments: Segments) -> None:
         if len(loop) < 4:
             return
 
-        lineSegs.moveTo(toGlobe(loop[0]))
-        for point in loop:
-            lineSegs.drawTo(toGlobe(point))
+        segments.addLoop(list(map(toGlobe, loop[:-1])))
 
     def getColor(self) -> Vec4:
         if self.alertType == AlertType.TORNADO_WARNING:
