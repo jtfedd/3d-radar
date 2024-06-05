@@ -10,7 +10,7 @@ from lib.model.scan_data import ScanData
 from lib.model.sweep_meta import SweepMeta
 
 
-def sweepMetaFromSweep(sweep: pynexrad.Sweep) -> SweepMeta:
+def sweepMetaFromSweep(sweep: pynexrad.Sweep, offset: int) -> SweepMeta:
     return SweepMeta(
         sweep.elevation,
         sweep.az_first,
@@ -19,18 +19,21 @@ def sweepMetaFromSweep(sweep: pynexrad.Sweep) -> SweepMeta:
         sweep.range_first,
         sweep.range_step,
         sweep.range_count,
-        sweep.offset,
+        offset,
     )
 
 
 def scanDataFromScan(scan: pynexrad.Scan) -> ScanData:
-    data = np.array(scan.data, dtype=np.float32).tobytes()
+    data = bytearray()
 
-    metas = []
-    for meta in scan.meta:
-        metas.append(sweepMetaFromSweep(meta))
+    sweeps = []
+    offset = 0
+    for meta in scan.sweeps:
+        sweeps.append(sweepMetaFromSweep(meta, offset))
+        data += np.array(meta.data, dtype=np.float32).tobytes()
+        offset += len(meta.data)
 
-    return ScanData(metas, data)
+    return ScanData(sweeps, data)
 
 
 def scanFromLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
