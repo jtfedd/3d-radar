@@ -2,7 +2,7 @@ numpy>=1.26.4
 panda3d==1.10.14
 panda3d-gltf>=1.2.0
 platformdirs>=4.2.2
-pynexrad==0.0.15
+pynexrad==0.0.16
 requests>=2.32.3
 tzdata>=2024.1
 tzfpy>=0.15.5
