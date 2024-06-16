@@ -2,8 +2,6 @@ import datetime
 import random
 import unittest
 
-import numpy as np
-
 from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.model.scan_data import ScanData
@@ -40,7 +38,7 @@ def newTestSweepMeta() -> SweepMeta:
 def newTestScanData() -> ScanData:
     return ScanData(
         [newTestSweepMeta() for _ in range(10)],
-        np.random.uniform(low=0, high=1, size=1000).astype(np.float32).tobytes(),
+        random.randbytes(1000),
     )
 
 
