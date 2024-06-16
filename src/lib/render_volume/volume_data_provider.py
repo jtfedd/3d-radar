@@ -95,9 +95,9 @@ class VolumeDataProvider(Listener):
 
     def setupBuffer(self) -> None:
         self.buffer.setupBufferTexture(
-            int(self.bufferSize / 4),  # buffer size is in bytes
-            Texture.T_float,
-            Texture.F_r32,
+            int(self.bufferSize),
+            Texture.T_unsigned_byte,
+            Texture.F_r8i,
             GeomEnums.UH_dynamic,
         )
 

@@ -1,7 +1,6 @@
 import datetime
 from typing import List
 
-import numpy as np
 import pynexrad
 
 from lib.model.record import Record
@@ -30,7 +29,7 @@ def scanDataFromScan(scan: pynexrad.Scan) -> ScanData:
     offset = 0
     for meta in scan.sweeps:
         sweeps.append(sweepMetaFromSweep(meta, offset))
-        data += np.array(meta.data, dtype=np.float32).tobytes()
+        data += bytearray(meta.data)
         offset += len(meta.data)
 
     return ScanData(sweeps, data)

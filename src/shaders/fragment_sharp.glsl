@@ -31,7 +31,7 @@ uniform int offset[MAX_SCANS];
 
 uniform float density_params[7];
 
-uniform samplerBuffer volume_data;
+uniform usamplerBuffer volume_data;
 
 uniform float ambient_intensity;
 uniform float directional_intensity;
