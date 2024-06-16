@@ -24,7 +24,11 @@ float data_value_for_sweep(vec3 point, int sweep_index) {
     }
 
     int buff_index = r_count[sweep_index] * az_index + r_index;
-    return texelFetch(volume_data, offset[sweep_index] + buff_index).x;
+    int value = int(texelFetch(volume_data, offset[sweep_index] + buff_index).x);
+    if (value == 0.0) {
+        return -1.0;
+    }
+    return float(value - 1) / 254.0;
 }
 
 float data_value(vec3 point) {
