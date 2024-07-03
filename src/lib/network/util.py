@@ -1,11 +1,11 @@
-from typing import Any, Dict
+from typing import Dict
 
 import requests
 
 
-def makeRequest(  # type: ignore
+def makeRequest(
     url: str,
-    params: Dict[str, Any],
+    params: Dict[str, str],
     timeout: float,
 ) -> requests.Response | None:
     try:

@@ -138,6 +138,8 @@ class AppState:
             )
         )
 
+        self.maptilerKey = self.createField("maptilerKey", "")
+
         self.animationSpeed = self.createField("animationSpeed", 4)
         self.loopDelay = self.createField("loopDelay", 1.0)
 
@@ -145,6 +147,7 @@ class AppState:
         self.playKeybinding = self.createField("playKeybinding", "space")
         self.nextKeybinding = self.createField("nextKeybinding", ".")
         self.prevKeybinding = self.createField("prevKeybinding", ",")
+        self.pasteKeybinding = self.createField("pasteKeybinding", "control-v")
 
         self.dataType = self.createFieldCustomSerialization(
             "dataType",

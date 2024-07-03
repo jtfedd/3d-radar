@@ -60,7 +60,7 @@ class NWSProvider:
             self.HOST + "/alerts/active",
             params={
                 "status": "actual",
-                "limit": 500,
+                "limit": "500",
                 "code": alertType.code(),
             },
             timeout=10,

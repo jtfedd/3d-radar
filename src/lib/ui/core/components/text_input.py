@@ -100,6 +100,14 @@ class TextInput(Focusable, Component):
         self.listener.listen(events.input.leftMouse, lambda _: self.checkFocus())
         self.listener.listen(events.input.rightMouse, lambda _: self.checkFocus())
 
+        self.listener.listen(events.input.paste, self.paste)
+
+    def paste(self, value: str) -> None:
+        if not self.focused():
+            return
+
+        self.entry.enterText(value)
+
     def setValid(self, valid: bool) -> None:
         self.valid = valid
 

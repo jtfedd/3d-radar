@@ -169,6 +169,26 @@ class SettingsPanel(PanelContent):
         self.playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
         self.prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
         self.nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
+        self.pasteKey = self.addKeybindingInput("Paste:", state.pasteKeybinding)
+
+        self.addComponent(TitleComponent(self.root, ctx, "MapTiler API Key"))
+        self.apiKeyInput = self.addComponent(
+            PanelTextInput(
+                root=self.root,
+                ctx=ctx,
+                events=events,
+                label="Key:",
+                initialValue=state.maptilerKey.value,
+                inputWidth=UIConstants.panelContentWidth * 0.75,
+            )
+        )
+
+        self.listener.listen(
+            state.maptilerKey,
+            lambda value: self.apiKeyInput.input.setText(str(value)),
+        )
+
+        self.listener.listen(self.apiKeyInput.onChange, state.maptilerKey.setValue)
 
         self.updateInputsForTimeMode()
         self.listener.listen(state.timeMode, lambda _: self.updateInputsForTimeMode())
@@ -194,6 +214,9 @@ class SettingsPanel(PanelContent):
         focusableItems.append(self.playKey.input)
         focusableItems.append(self.prevKey.input)
         focusableItems.append(self.nextKey.input)
+        focusableItems.append(self.pasteKey.input)
+
+        focusableItems.append(self.apiKeyInput.input)
 
         self.setupFocusLoop(focusableItems)
 

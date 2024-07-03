@@ -13,6 +13,7 @@ class InputEvents:
         self.rightMouse = EventDispatcher[bool]()
         self.tab = EventDispatcher[bool]()
         self.shiftTab = EventDispatcher[bool]()
+        self.paste = EventDispatcher[str]()
 
     def destroy(self) -> None:
         self.onHide.close()
@@ -23,3 +24,4 @@ class InputEvents:
         self.rightMouse.close()
         self.tab.close()
         self.shiftTab.close()
+        self.paste.close()

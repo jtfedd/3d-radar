@@ -1,3 +1,4 @@
+import pyperclip
 from direct.showbase.DirectObject import DirectObject
 
 from lib.app.focus.manager import FocusManager
@@ -26,6 +27,9 @@ class InputManager(DirectObject):
         self.listener.listen(self.state.playKeybinding, lambda _: self.createBindings())
         self.listener.listen(self.state.nextKeybinding, lambda _: self.createBindings())
         self.listener.listen(self.state.prevKeybinding, lambda _: self.createBindings())
+        self.listener.listen(
+            self.state.pasteKeybinding, lambda _: self.createBindings()
+        )
 
     def createBindings(self) -> None:
         self.ignoreAll()
@@ -44,6 +48,11 @@ class InputManager(DirectObject):
 
         self.accept(
             self.state.prevKeybinding.value, lambda: self.send(self.events.prevFrame)
+        )
+
+        self.accept(
+            self.state.pasteKeybinding.value,
+            lambda: self.events.paste.send(pyperclip.paste()),
         )
 
         self.accept("wheel_up-up", lambda: self.events.scroll.send(-1))
