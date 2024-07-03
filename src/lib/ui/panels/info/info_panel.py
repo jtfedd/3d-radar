@@ -56,7 +56,7 @@ class InfoPanel(PanelContent):
         self.addComponent(PanelText(self.root, ctx, "Location Search:", bold=True))
         self.addComponent(SpacerComponent(self.root, UIConstants.labelPadding))
         self.mapTilerButton = self.addComponent(PanelButton(self.root, ctx, "MapTiler"))
-        self.addComponent(SpacerComponent(self.root))
+        self.addComponent(SpacerComponent(self.root, UIConstants.labelPadding))
         self.openStreetMapButton = self.addComponent(
             PanelButton(self.root, ctx, "OpenStreetMap")
         )
