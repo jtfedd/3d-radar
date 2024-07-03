@@ -56,7 +56,7 @@ class App:
 
         scans = {}
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {
                 executor.submit(self.ctx.services.radar.load, record)
                 for record in records

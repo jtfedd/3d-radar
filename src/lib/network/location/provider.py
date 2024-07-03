@@ -1,24 +1,28 @@
 from typing import List
 
+from lib.app.state import AppState
 from lib.model.location import Location
 
 from ..util import makeRequest
 
 
 class LocationProvider:
-    HOST = "https://nominatim.openstreetmap.org"
+    HOST = "https://api.maptiler.com"
+
+    def __init__(self, state: AppState):
+        self.state = state
 
     def search(self, address: str, limit: int = 1) -> List[Location] | None:
         print("Searching", address)
 
         response = makeRequest(
-            self.HOST + "/search",
+            self.HOST + "/geocoding/" + address + ".json",
             params={
-                "q": address,
-                "format": "geocodejson",
-                "addressdetails": 1,
-                "countrycodes": "us",
-                "limit": limit,
+                "key": self.state.maptilerKey.value,
+                "autocomplete": "false",
+                "fuzzyMatch": "false",
+                "country": "us",
+                "limit": str(limit),
             },
             timeout=10,
         )
@@ -29,35 +33,37 @@ class LocationProvider:
 
         locations = []
         for location in responseJson["features"]:
-            details = location["properties"]["geocoding"]
+            context = {}
+            if "context" in location:
+                for c in location["context"]:
+                    t = c["id"].split(".")[0]
+                    context[t] = c["text"]
 
             addressParts = []
             areaParts = []
 
-            if "name" in details:
-                addressParts.append(details["name"])
-            if "housenumber" in details and "street" in details:
-                addressParts.append(f"{details['housenumber']} {details['street']}")
-            elif "street" in details:
-                addressParts.append(details["street"])
-            if "city" in details:
-                areaParts.append(details["city"])
-            if "state" in details:
-                areaParts.append(details["state"])
+            if "address" in location and "text" in location:
+                addressParts.append(f"{location["address"]} {location["text"]}")
+            elif "text" in location:
+                addressParts.append(location["text"])
+            if "municipality" in context:
+                areaParts.append(context["municipality"])
+            if "joint_municipality" in context:
+                areaParts.append(context["joint_municipality"])
+            if "region" in context:
+                areaParts.append(context["region"])
 
             addr = ", ".join(addressParts)
             area = ", ".join(areaParts)
 
-            if "postcode" in details:
-                area = " ".join([area, details["postcode"]])
+            if "postal_code" in context:
+                area = " ".join([area, context["postal_code"]])
 
-            locations.append(
-                Location(
-                    addr,
-                    area,
-                    float(location["geometry"]["coordinates"][1]),
-                    float(location["geometry"]["coordinates"][0]),
-                )
-            )
+            locations.append(Location(
+                addr.upper(),
+                area.upper(),
+                float(location["center"][1]),
+                float(location["center"][0])
+            ))
 
         return locations
