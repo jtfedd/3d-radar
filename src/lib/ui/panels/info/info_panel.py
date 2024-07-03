@@ -55,6 +55,8 @@ class InfoPanel(PanelContent):
 
         self.addComponent(PanelText(self.root, ctx, "Location Search:", bold=True))
         self.addComponent(SpacerComponent(self.root, UIConstants.labelPadding))
+        self.mapTilerButton = self.addComponent(PanelButton(self.root, ctx, "MapTiler"))
+        self.addComponent(SpacerComponent(self.root))
         self.openStreetMapButton = self.addComponent(
             PanelButton(self.root, ctx, "OpenStreetMap")
         )
@@ -91,6 +93,10 @@ class InfoPanel(PanelContent):
             self.censusBureauButton,
             "https://www.census.gov/geographies/mapping-files/time-series/"
             + "geo/cartographic-boundary.html",
+        )
+        self.bind(
+            self.mapTilerButton,
+            "https://www.maptiler.com/",
         )
         self.bind(
             self.openStreetMapButton,

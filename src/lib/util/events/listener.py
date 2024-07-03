@@ -5,6 +5,7 @@ from .event_subscription import EventSubscription
 from .observable import Observable
 
 T = TypeVar("T")
+U = TypeVar("U")
 
 
 class Listener:
@@ -14,7 +15,7 @@ class Listener:
     def listen(
         self,
         dispatcher: EventDispatcher[T],
-        callback: Callable[[T], None],
+        callback: Callable[[T], U],
     ) -> None:
         self.subscriptions.append(dispatcher.listen(callback))
 

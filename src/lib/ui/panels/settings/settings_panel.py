@@ -1,3 +1,4 @@
+import webbrowser
 from typing import List
 from zoneinfo import available_timezones
 
@@ -172,6 +173,28 @@ class SettingsPanel(PanelContent):
         self.pasteKey = self.addKeybindingInput("Paste:", state.pasteKeybinding)
 
         self.addComponent(TitleComponent(self.root, ctx, "MapTiler API Key"))
+        self.addComponent(
+            PanelText(
+                root=self.root,
+                ctx=ctx,
+                text="Location lookups require a MapTiler API\n"
+                + "key. You can create a free account and\n"
+                + "generate a key from the link below.",
+            )
+        )
+        self.addComponent(SpacerComponent(self.root))
+        self.mapTilerButton = self.addComponent(
+            PanelButton(
+                root=self.root,
+                ctx=ctx,
+                text="MapTiler",
+            )
+        )
+        self.listener.listen(
+            self.mapTilerButton.button.onClick,
+            lambda _: webbrowser.open("https://www.maptiler.com/"),
+        )
+        self.addComponent(SpacerComponent(self.root))
         self.apiKeyInput = self.addComponent(
             PanelTextInput(
                 root=self.root,
@@ -182,6 +205,7 @@ class SettingsPanel(PanelContent):
                 inputWidth=UIConstants.panelContentWidth * 0.75,
             )
         )
+        self.addComponent(SpacerComponent(self.root))
 
         self.listener.listen(
             state.maptilerKey,
@@ -261,7 +285,7 @@ class SettingsPanel(PanelContent):
                 self.events,
                 label,
                 observable.value,
-                UIConstants.panelContentWidth / 6,
+                UIConstants.panelContentWidth / 4,
             )
         )
 
