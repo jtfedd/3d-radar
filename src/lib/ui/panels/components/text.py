@@ -40,6 +40,7 @@ class PanelText(PanelComponent):
             hAlign=align,
             vAlign=VAlign.TOP,
             italic=italic,
+            maxWidth=UIConstants.panelContentWidth,
         )
 
     def updateText(self, text: str) -> None:
@@ -48,11 +49,7 @@ class PanelText(PanelComponent):
         self.onHeightChange.send(None)
 
     def getHeight(self) -> float:
-        return (
-            len(self.text.split("\n"))
-            * self.font.getLineHeight()
-            * UIConstants.fontSizeRegular
-        )
+        return self.component.getHeight()
 
     def destroy(self) -> None:
         self.component.destroy()

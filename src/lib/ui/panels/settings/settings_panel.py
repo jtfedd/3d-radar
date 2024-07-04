@@ -8,6 +8,7 @@ from lib.app.state import AppState
 from lib.model.time_mode import TimeMode
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
+from lib.ui.messages import maptiler
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.spacer import SpacerComponent
@@ -177,9 +178,7 @@ class SettingsPanel(PanelContent):
             PanelText(
                 root=self.root,
                 ctx=ctx,
-                text="Location lookups require a MapTiler API\n"
-                + "key. You can create a free account and\n"
-                + "generate a key from the link below.",
+                text=maptiler.LOCATION_LOOKUPS,
             )
         )
         self.addComponent(SpacerComponent(self.root))

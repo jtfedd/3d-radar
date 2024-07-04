@@ -116,6 +116,9 @@ class UIConstants:
     alertModalWidth = 1.2
     alertModalMaxHeight = 1.0
 
+    maptilerModalWidth = 0.8
+    maptilerModalPadding = 0.02
+
     labelPadding = 0.01
 
     # Higher number means slower scrolling

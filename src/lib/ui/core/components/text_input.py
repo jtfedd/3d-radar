@@ -106,7 +106,7 @@ class TextInput(Focusable, Component):
         if not self.focused():
             return
 
-        self.entry.enterText(value)
+        self.setText(value)
 
     def setValid(self, valid: bool) -> None:
         self.valid = valid
