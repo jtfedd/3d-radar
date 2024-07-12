@@ -59,11 +59,13 @@ class LocationProvider:
             if "postal_code" in context:
                 area = " ".join([area, context["postal_code"]])
 
-            locations.append(Location(
-                addr.upper(),
-                area.upper(),
-                float(location["center"][1]),
-                float(location["center"][0])
-            ))
+            locations.append(
+                Location(
+                    addr.upper(),
+                    area.upper(),
+                    float(location["center"][1]),
+                    float(location["center"][0]),
+                )
+            )
 
         return locations
