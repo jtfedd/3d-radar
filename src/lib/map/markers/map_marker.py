@@ -57,7 +57,7 @@ class MapMarker(Listener):
         )
 
         self.model = unwrap(
-            ctx.base.loader.loadModel("assets/models/marker.glb", noCache=True)
+            ctx.base.loader.loadModel("assets/models/marker.bam", noCache=True)
         )
         self.model.reparentTo(ctx.base.render)
         self.model.hide()

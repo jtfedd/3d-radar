@@ -96,3 +96,7 @@ maps: ## Download and generate maps
 .PHONY: shaders
 shaders: ## Compile shaders
 	python tool/scripts/compile_shaders.py
+
+.PHONY: models
+models: ## Convert all models to .bam
+	python tool/scripts/convert_bam.py
