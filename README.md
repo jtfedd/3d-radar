@@ -8,6 +8,11 @@ This is a project to build a 3d rendering program which can visualize full 3d ne
 
 This project requires [Python 3.12](https://www.python.org/).
 
+### MapTiler (Optional)
+
+In order to perform location lookups, you must provide a maptiler
+API key. You can create one for free [here](https://www.maptiler.com/).
+
 ### Set up a virtual environment
 
 For more information on python virual environments, [this](https://realpython.com/python-virtual-environments-a-primer/) is a helpful guide.
