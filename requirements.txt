@@ -1,9 +1,8 @@
-numpy>=1.26.4
 panda3d==1.10.14
 panda3d-gltf>=1.2.0
 platformdirs>=4.2.2
 pyperclip>=1.9.0
-pynexrad==0.0.16
+pynexrad==0.0.18
 requests>=2.32.3
 tzdata>=2024.1
 tzfpy>=0.15.5

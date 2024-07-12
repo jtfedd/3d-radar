@@ -31,7 +31,7 @@ uniform int offset[MAX_SCANS];
 
 uniform float density_params[7];
 
-uniform samplerBuffer volume_data;
+uniform usamplerBuffer volume_data;
 
 uniform float ambient_intensity;
 uniform float directional_intensity;
@@ -150,7 +150,11 @@ float interpolate(float low, float high, float factor) {
 
 float data_value_for_indices(int sweep_index, int az_index, int r_index) {
     int buff_index = r_count[sweep_index] * az_index + r_index;
-    return texelFetch(volume_data, offset[sweep_index] + buff_index).x;
+    int value = int(texelFetch(volume_data, offset[sweep_index] + buff_index).x);
+    if (value == 0.0) {
+        return -1.0;
+    }
+    return (value - 1.0) / 254.0;
 }
 
 float data_value_for_gate(vec3 point, int sweep_index, int r_index) {
