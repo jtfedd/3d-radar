@@ -82,6 +82,8 @@ class AppState:
 
         self.uiScale = self.createField("uiScale", 1.0)
 
+        self.serializationVersion = self.createField("serializationVersion", -1)
+
         self.smooth = self.createField("smooth", True)
         self.volumetricLighting = self.createField("volumetricLighting", False)
 
