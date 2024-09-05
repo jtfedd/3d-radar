@@ -185,7 +185,12 @@ class FileManager(Listener):
         if len(data) > self._maxCacheSize():
             return
 
-        self._reduceCache(len(data))
+        spaceNeeded = len(data) - (
+            self.cacheMeta[filename].size if filename in self.cacheMeta else 0
+        )
+
+        if spaceNeeded > 0:
+            self._reduceCache(spaceNeeded)
 
         self.cacheMeta[filename] = CacheFileInfo(len(data), self._makeTimestamp())
         self._recalculateCacheSize()
