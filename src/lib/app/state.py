@@ -161,7 +161,6 @@ class AppState:
         self.state: List[Observable[Any]] = []  # type: ignore
 
         self.cacheSize = Observable[int](0)
-        self.saveOnExist = True
 
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)

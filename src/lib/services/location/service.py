@@ -76,8 +76,6 @@ class LocationService:
 
         self.reformatCache()
 
-        print("location cache", len(self.cache))
-
     def writeCacheFile(self) -> None:
         raw = []
 

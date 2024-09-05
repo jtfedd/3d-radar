@@ -56,7 +56,7 @@ class App:
 
         scans = {}
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {
                 executor.submit(self.ctx.services.radar.load, record)
                 for record in records
@@ -86,8 +86,10 @@ class App:
         self.volumeRenderer.destroy()
         self.cameraControl.destroy()
         self.ui.destroy()
+
+        self.saveConfig()
+
         self.ctx.destroy()
         self.events.destroy()
 
-        self.saveConfig()
         self.state.destroy()
