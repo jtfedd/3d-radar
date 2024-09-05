@@ -29,7 +29,7 @@ class RadarService:
         return scan
 
     def loadFromCache(self, record: Record) -> Scan | None:
-        compressed = self.fileManager.getCacheFileBytes(record.key())
+        compressed = self.fileManager.readCacheFile(record.key())
         if compressed is None:
             return None
 
@@ -42,4 +42,4 @@ class RadarService:
         decompressed = serializeScan(scan)
         compressed = blosc.compress(decompressed)
 
-        self.fileManager.saveCacheFileBytes(scan.record.key(), compressed)
+        self.fileManager.saveCacheFile(scan.record.key(), compressed)

@@ -69,19 +69,18 @@ class App:
         self.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:
-        configPath = self.ctx.fileManager.getConfigFile()
-        if not configPath.exists():
+        raw = self.ctx.fileManager.readConfigFile()
+        if raw is None:
             return
 
-        with configPath.open("r", encoding="utf-8") as f:
-            jsonStr = f.read()
-            if jsonStr == "":
-                return
-            self.state.fromJson(jsonStr)
+        jsonStr = raw.decode()
+        if jsonStr == "":
+            return
+
+        self.state.fromJson(jsonStr)
 
     def saveConfig(self) -> None:
-        with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
-            f.write(self.state.toJson())
+        self.ctx.fileManager.saveConfigFile(self.state.toJson().encode())
 
     def destroy(self) -> None:
         self.volumeRenderer.destroy()
