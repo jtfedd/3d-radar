@@ -1,5 +1,6 @@
 import atexit
 import concurrent.futures
+import sys
 
 from direct.showbase.ShowBase import ShowBase
 
@@ -37,6 +38,7 @@ class App:
 
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())
+        self.events.clearDataAndExit.listen(lambda _: self.clearDataAndExit())
 
         atexit.register(self.destroy)
 
@@ -81,6 +83,10 @@ class App:
 
     def saveConfig(self) -> None:
         self.ctx.fileManager.saveConfigFile(self.state.toJson().encode())
+
+    def clearDataAndExit(self) -> None:
+        self.ctx.fileManager.clearAllData()
+        sys.exit()
 
     def destroy(self) -> None:
         self.volumeRenderer.destroy()

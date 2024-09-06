@@ -25,7 +25,6 @@ class FileManager(Listener):
         super().__init__()
 
         self.state = state
-        self.events = events
 
         self.lock = threading.Lock()
 
@@ -43,6 +42,10 @@ class FileManager(Listener):
 
         self.init()
         self.listen(self.state.maxCacheSize, lambda _: self.resizeCache())
+        self.listen(
+            self.state.useCache, lambda value: self.clearCache() if not value else None
+        )
+        self.listen(events.clearCache, lambda _: self.clearCache())
 
     def init(self) -> None:
         with self.lock:
@@ -67,6 +70,14 @@ class FileManager(Listener):
     def clearCache(self) -> None:
         with self.lock:
             self._clearCache()
+
+    def clearAllData(self) -> None:
+        with self.lock:
+            self._cachePath.rmdir()
+            self._configPath.rmdir()
+            self.cacheMeta = {}
+            self._recalculateCacheSize()
+            self.allowSave = False
 
     def resizeCache(self) -> None:
         with self.lock:
@@ -237,9 +248,6 @@ class FileManager(Listener):
         self._removeCacheFile(self._getCacheFilePath(oldestFile))
 
     def _readFile(self, filepath: Path) -> bytes | None:
-        if not self.allowSave:
-            print("Saving not allowed")
-
         if not filepath.exists():
             return None
 
@@ -247,5 +255,8 @@ class FileManager(Listener):
             return file.read()
 
     def _writeFile(self, filepath: Path, data: bytes) -> None:
+        if not self.allowSave:
+            print("Saving not allowed")
+
         with open(filepath, "wb") as file:
             file.write(data)

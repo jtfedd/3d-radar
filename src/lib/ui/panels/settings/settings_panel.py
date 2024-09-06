@@ -9,6 +9,7 @@ from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
+from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
@@ -43,6 +44,29 @@ class SettingsPanel(PanelContent):
                 state,
                 events,
             )
+        )
+
+        self.addComponent(TitleComponent(self.root, ctx, "Local Cache"))
+        self.addComponent(
+            CheckboxComponent(self.root, ctx, "Use Cache", state.useCache)
+        )
+        self.addComponent(SpacerComponent(self.root))
+        clearCacheButton = self.addComponent(
+            PanelButton(root=self.root, ctx=ctx, text="Clear Cache")
+        )
+        self.listener.listen(clearCacheButton.button.onClick, events.clearCache.send)
+
+        clearCacheButton.button.setDisabled(not state.useCache.value)
+        self.listener.listen(
+            state.useCache, lambda value: clearCacheButton.button.setDisabled(not value)
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+        clearAllDataButton = self.addComponent(
+            PanelButton(root=self.root, ctx=ctx, text="Clear All Data and Exit")
+        )
+        self.listener.listen(
+            clearAllDataButton.button.onClick, events.clearDataAndExit.send
         )
 
         self.addComponent(TitleComponent(self.root, ctx, "Animation"))
