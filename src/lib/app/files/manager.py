@@ -73,10 +73,17 @@ class FileManager(Listener):
 
     def clearAllData(self) -> None:
         with self.lock:
+            for file in self._cachePath.iterdir():
+                file.unlink()
             self._cachePath.rmdir()
+
+            for file in self._configPath.iterdir():
+                file.unlink()
             self._configPath.rmdir()
+
             self.cacheMeta = {}
             self._recalculateCacheSize()
+
             self.allowSave = False
 
     def resizeCache(self) -> None:
@@ -249,6 +256,7 @@ class FileManager(Listener):
 
     def _readFile(self, filepath: Path) -> bytes | None:
         if not filepath.exists():
+            print("File doesn't exist", str(filepath.name))
             return None
 
         with open(filepath, "rb") as file:
@@ -257,6 +265,7 @@ class FileManager(Listener):
     def _writeFile(self, filepath: Path, data: bytes) -> None:
         if not self.allowSave:
             print("Saving not allowed")
+            return
 
         with open(filepath, "wb") as file:
             file.write(data)

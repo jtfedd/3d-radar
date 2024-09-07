@@ -20,6 +20,7 @@ class SliderComponent(PanelComponent):
         initialValue: float,
         valueRange: Tuple[float, float],
         label: str,
+        leftPadding: float = 0,
     ):
         super().__init__(root)
 
@@ -31,7 +32,7 @@ class SliderComponent(PanelComponent):
             root=self.root,
             x=UIConstants.panelPadding + UIConstants.panelContentWidth,
             y=-UIConstants.panelInputHeight / 2,
-            width=UIConstants.panelSliderWidth,
+            width=UIConstants.panelSliderWidth - leftPadding,
             hAlign=HAlign.RIGHT,
             initialValue=initialValue,
             valueRange=valueRange,

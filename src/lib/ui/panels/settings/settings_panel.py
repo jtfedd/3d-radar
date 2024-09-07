@@ -10,6 +10,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.checkbox import CheckboxComponent
+from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
@@ -50,6 +51,30 @@ class SettingsPanel(PanelContent):
         self.addComponent(
             CheckboxComponent(self.root, ctx, "Use Cache", state.useCache)
         )
+
+        cacheSizeSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                state.maxCacheSize.value,
+                (50, 500),
+                "Max Size:",
+                leftPadding=0.06,
+            )
+        )
+
+        self.listener.listen(
+            cacheSizeSlider.slider.onValueChange,
+            lambda value: state.maxCacheSize.setValue(int(value)),
+        )
+
+        self.listener.bind(
+            state.maxCacheSize,
+            lambda value: cacheSizeSlider.label.label.text.setText(
+                "Max Size: " + str(value) + "mb"
+            ),
+        )
+
         self.addComponent(SpacerComponent(self.root))
         clearCacheButton = self.addComponent(
             PanelButton(root=self.root, ctx=ctx, text="Clear Cache")
