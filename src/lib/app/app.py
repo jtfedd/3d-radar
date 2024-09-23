@@ -4,6 +4,7 @@ import sys
 
 from direct.showbase.ShowBase import ShowBase
 
+from lib.app.files.serialization import SERIALIZATION_VERSION
 from lib.camera.camera_control import CameraControl
 from lib.map.map import Map
 from lib.model.record import Record
@@ -80,6 +81,10 @@ class App:
             return
 
         self.state.fromJson(jsonStr)
+
+        if self.state.serializationVersion.value != SERIALIZATION_VERSION:
+            self.ctx.fileManager.clearCache()
+            self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
 
     def saveConfig(self) -> None:
         self.ctx.fileManager.saveConfigFile(self.state.toJson().encode())

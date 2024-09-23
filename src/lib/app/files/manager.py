@@ -7,7 +7,6 @@ from direct.stdpy import threading
 from platformdirs import user_cache_dir, user_config_dir
 
 from lib.app.events import AppEvents
-from lib.app.files.serialization import SERIALIZATION_VERSION
 from lib.app.state import AppState
 from lib.util.events.listener import Listener
 
@@ -51,9 +50,6 @@ class FileManager(Listener):
     def init(self) -> None:
         with self.lock:
             self._initializeCacheMeta()
-
-            if self.state.serializationVersion.value != SERIALIZATION_VERSION:
-                self._clearCache()
 
     def readConfigFile(self) -> bytes | None:
         with self.lock:
