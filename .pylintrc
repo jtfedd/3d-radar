@@ -300,7 +300,7 @@ ignored-parents=
 max-args=25
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=50
+max-attributes=100
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5
