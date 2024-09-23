@@ -1,8 +1,10 @@
 import atexit
 import concurrent.futures
+import sys
 
 from direct.showbase.ShowBase import ShowBase
 
+from lib.app.files.serialization import SERIALIZATION_VERSION
 from lib.camera.camera_control import CameraControl
 from lib.map.map import Map
 from lib.model.record import Record
@@ -37,6 +39,7 @@ class App:
 
         self.loadData()
         self.events.requestData.listen(lambda _: self.loadData())
+        self.events.clearDataAndExit.listen(lambda _: self.clearDataAndExit())
 
         atexit.register(self.destroy)
 
@@ -56,7 +59,7 @@ class App:
 
         scans = {}
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {
                 executor.submit(self.ctx.services.radar.load, record)
                 for record in records
@@ -69,26 +72,35 @@ class App:
         self.animationManager.setRecords(records)
 
     def loadConfig(self) -> None:
-        configPath = self.ctx.fileManager.getConfigFile()
-        if not configPath.exists():
+        raw = self.ctx.fileManager.readConfigFile()
+        if raw is None:
             return
 
-        with configPath.open("r", encoding="utf-8") as f:
-            jsonStr = f.read()
-            if jsonStr == "":
-                return
-            self.state.fromJson(jsonStr)
+        jsonStr = raw.decode()
+        if jsonStr == "":
+            return
+
+        self.state.fromJson(jsonStr)
+
+        if self.state.serializationVersion.value != SERIALIZATION_VERSION:
+            self.ctx.fileManager.clearCache()
+            self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
 
     def saveConfig(self) -> None:
-        with self.ctx.fileManager.getConfigFile().open("w", encoding="utf-8") as f:
-            f.write(self.state.toJson())
+        self.ctx.fileManager.saveConfigFile(self.state.toJson().encode())
+
+    def clearDataAndExit(self) -> None:
+        self.ctx.fileManager.clearAllData()
+        sys.exit()
 
     def destroy(self) -> None:
         self.volumeRenderer.destroy()
         self.cameraControl.destroy()
         self.ui.destroy()
+
+        self.saveConfig()
+
         self.ctx.destroy()
         self.events.destroy()
 
-        self.saveConfig()
         self.state.destroy()

@@ -60,7 +60,10 @@ class AlertsButton(Listener):
             self.badge.setText("")
             return
 
-        if AlertType.TORNADO_WARNING in alerts.alerts:
+        if (
+            AlertType.TORNADO_WARNING in alerts.alerts
+            and len(alerts.alerts[AlertType.TORNADO_WARNING]) > 0
+        ):
             self.badge.setColor(UIColors.RED)
         else:
             self.badge.setColor(UIColors.ORANGE)

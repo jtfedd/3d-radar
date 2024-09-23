@@ -82,6 +82,10 @@ class AppState:
 
         self.uiScale = self.createField("uiScale", 1.0)
 
+        self.useCache = self.createField("useCache", True)
+        self.maxCacheSize = self.createField("maxCacheSize", 100)
+        self.serializationVersion = self.createField("serializationVersion", -1)
+
         self.smooth = self.createField("smooth", True)
         self.volumetricLighting = self.createField("volumetricLighting", False)
 
@@ -155,6 +159,8 @@ class AppState:
 
         # Ephemeral fields
         self.state: List[Observable[Any]] = []  # type: ignore
+
+        self.cacheSize = Observable[int](0)
 
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)

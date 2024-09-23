@@ -1,7 +1,9 @@
+import math
 from typing import List
 from zoneinfo import available_timezones
 
 from lib.app.events import AppEvents
+from lib.app.files.manager import FileManager
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.model.time_mode import TimeMode
@@ -9,6 +11,9 @@ from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
+from lib.ui.panels.components.checkbox import CheckboxComponent
+from lib.ui.panels.components.progress import ProgressComponent
+from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
 from lib.ui.panels.components.text_input import PanelTextInput
@@ -43,6 +48,73 @@ class SettingsPanel(PanelContent):
                 state,
                 events,
             )
+        )
+
+        self.addComponent(TitleComponent(self.root, ctx, "Local Cache"))
+        self.addComponent(
+            CheckboxComponent(self.root, ctx, "Use Cache", state.useCache)
+        )
+
+        cacheSizeSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                state.maxCacheSize.value,
+                (50, 500),
+                "Max Size:",
+                leftPadding=0.06,
+            )
+        )
+
+        self.listener.listen(
+            cacheSizeSlider.slider.onValueChange,
+            lambda value: state.maxCacheSize.setValue(int(value)),
+        )
+
+        self.listener.bind(
+            state.maxCacheSize,
+            lambda value: cacheSizeSlider.label.label.text.setText(
+                "Max Size: " + str(value) + "mb"
+            ),
+        )
+
+        self.cacheUsage = self.addComponent(
+            ProgressComponent(
+                self.root,
+                ctx,
+                0,
+                "Usage:",
+                leftPadding=0.06,
+            )
+        )
+
+        self.listener.bind(
+            state.maxCacheSize,
+            lambda _: self.updateCacheUsage(),
+        )
+
+        self.listener.bind(
+            state.cacheSize,
+            lambda _: self.updateCacheUsage(),
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+        clearCacheButton = self.addComponent(
+            PanelButton(root=self.root, ctx=ctx, text="Clear Cache")
+        )
+        self.listener.listen(clearCacheButton.button.onClick, events.clearCache.send)
+
+        clearCacheButton.button.setDisabled(not state.useCache.value)
+        self.listener.listen(
+            state.useCache, lambda value: clearCacheButton.button.setDisabled(not value)
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+        clearAllDataButton = self.addComponent(
+            PanelButton(root=self.root, ctx=ctx, text="Clear All Data and Exit")
+        )
+        self.listener.listen(
+            clearAllDataButton.button.onClick, events.clearDataAndExit.send
         )
 
         self.addComponent(TitleComponent(self.root, ctx, "Animation"))
@@ -172,6 +244,15 @@ class SettingsPanel(PanelContent):
 
         self.updateInputsForTimeMode()
         self.listener.listen(state.timeMode, lambda _: self.updateInputsForTimeMode())
+
+    def updateCacheUsage(self) -> None:
+        maxSize = self.state.maxCacheSize.value * FileManager.BYTES_PER_MEGABYTE
+        usage = self.state.cacheSize.value
+
+        usageStr = str(int(math.ceil(usage / FileManager.BYTES_PER_MEGABYTE)))
+
+        self.cacheUsage.label.label.updateText("Usage: " + usageStr + "mb")
+        self.cacheUsage.progressBar.setProgress(usage / maxSize)
 
     def updateInputsForTimeMode(self) -> None:
         timeMode = self.state.timeMode.value

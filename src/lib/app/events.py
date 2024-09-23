@@ -15,6 +15,8 @@ class AppEvents:
 
         self.requestData = EventDispatcher[None]()
         self.timeFormatChanged = EventDispatcher[None]()
+        self.clearCache = EventDispatcher[None]()
+        self.clearDataAndExit = EventDispatcher[None]()
 
     def destroy(self) -> None:
         self.ui.destroy()
@@ -24,3 +26,5 @@ class AppEvents:
 
         self.requestData.close()
         self.timeFormatChanged.close()
+        self.clearCache.close()
+        self.clearDataAndExit.close()

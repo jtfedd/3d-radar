@@ -16,7 +16,7 @@ from .window.manager import WindowManager
 class AppContext:
     def __init__(self, base: ShowBase, events: AppEvents, state: AppState) -> None:
         self.base = base
-        self.fileManager = FileManager()
+        self.fileManager = FileManager(state, events)
         self.focusManager = FocusManager()
         self.inputManager = InputManager(self.focusManager, state, events.input)
         self.windowManager = WindowManager(base, events.window)
@@ -29,3 +29,5 @@ class AppContext:
         self.windowManager.destroy()
 
         self.services.destroy()
+
+        self.fileManager.destroy()

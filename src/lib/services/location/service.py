@@ -1,7 +1,6 @@
 import json
 import time
 from functools import cmp_to_key
-from pathlib import Path
 from typing import List
 
 from lib.app.files.manager import FileManager
@@ -65,45 +64,32 @@ class LocationService:
 
         self.cache.sort(key=cmp_to_key(compareLocationQueries))
 
-    def getCacheFile(self) -> Path:
-        return self.fileManager.getCacheFile("locations.json")
-
     def prepopulateCache(self) -> None:
-        filePath = self.getCacheFile()
+        raw = self.fileManager.readCacheFile("locations.json")
 
-        if not filePath.exists():
+        if raw is None or len(raw) == 0:
             return
 
-        print("Reading", filePath)
-
-        with filePath.open("r", encoding="utf-8") as file:
-            raw = file.read()
-            if len(raw) == 0:
-                return
-
-            locationJson = json.loads(raw)
-            for locationQuery in locationJson:
-                self.cache.append(LocationQuery.fromJson(locationQuery))
+        locationJson = json.loads(raw)
+        for locationQuery in locationJson:
+            self.cache.append(LocationQuery.fromJson(locationQuery))
 
         self.reformatCache()
 
     def writeCacheFile(self) -> None:
-        filePath = self.getCacheFile()
+        raw = []
 
-        print("Writing", filePath)
+        for locationQuery in self.cache:
+            raw.append(locationQuery.toJson())
 
-        with filePath.open("w", encoding="utf-8") as file:
-            raw = []
+        rawJson = json.dumps(
+            raw,
+            indent=4,
+        )
 
-            for locationQuery in self.cache:
-                raw.append(locationQuery.toJson())
+        rawBytes = rawJson.encode()
 
-            rawJson = json.dumps(
-                raw,
-                indent=4,
-            )
-
-            file.write(rawJson)
+        self.fileManager.saveCacheFile("locations.json", rawBytes)
 
     def destroy(self) -> None:
         self.writeCacheFile()
