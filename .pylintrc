@@ -4,6 +4,7 @@ disable=
       C0115, # missing-class-docstring
       C0116, # missing-function-docstring
       E0611, # no-name-in-module
+      R0917, # too-many-positional-arguments
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
