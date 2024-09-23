@@ -34,6 +34,9 @@ class UIConstants:
     sliderHandleWidth = 0.005
     sliderHandleHeight = 0.02
 
+    panelProgressWidth = panelContentWidth * 0.66
+    progressHeight = 0.01
+
     checkboxSize = 0.04
     checkboxPadding = 0.015
 

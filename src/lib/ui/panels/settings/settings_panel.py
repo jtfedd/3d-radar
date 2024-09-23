@@ -1,7 +1,9 @@
+import math
 from typing import List
 from zoneinfo import available_timezones
 
 from lib.app.events import AppEvents
+from lib.app.files.manager import FileManager
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.model.time_mode import TimeMode
@@ -10,6 +12,7 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.checkbox import CheckboxComponent
+from lib.ui.panels.components.progress import ProgressComponent
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.text import PanelText
@@ -73,6 +76,26 @@ class SettingsPanel(PanelContent):
             lambda value: cacheSizeSlider.label.label.text.setText(
                 "Max Size: " + str(value) + "mb"
             ),
+        )
+
+        self.cacheUsage = self.addComponent(
+            ProgressComponent(
+                self.root,
+                ctx,
+                0,
+                "Usage:",
+                leftPadding=0.06,
+            )
+        )
+
+        self.listener.bind(
+            state.maxCacheSize,
+            lambda _: self.updateCacheUsage(),
+        )
+
+        self.listener.bind(
+            state.cacheSize,
+            lambda _: self.updateCacheUsage(),
         )
 
         self.addComponent(SpacerComponent(self.root))
@@ -221,6 +244,15 @@ class SettingsPanel(PanelContent):
 
         self.updateInputsForTimeMode()
         self.listener.listen(state.timeMode, lambda _: self.updateInputsForTimeMode())
+
+    def updateCacheUsage(self) -> None:
+        maxSize = self.state.maxCacheSize.value * FileManager.BYTES_PER_MEGABYTE
+        usage = self.state.cacheSize.value
+
+        usageStr = str(int(math.ceil(usage / FileManager.BYTES_PER_MEGABYTE)))
+
+        self.cacheUsage.label.label.updateText("Usage: " + usageStr + "mb")
+        self.cacheUsage.progressBar.setProgress(usage / maxSize)
 
     def updateInputsForTimeMode(self) -> None:
         timeMode = self.state.timeMode.value
