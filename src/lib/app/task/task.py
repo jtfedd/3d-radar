@@ -21,10 +21,7 @@ class AbstractTask(ABC):
             return
 
         with self.lock:
-            if self._status != TaskStatus.PENDING:
-                raise StateError(
-                    "Task is not pending: Current state " + str(self._status)
-                )
+            self.assertStatus(TaskStatus.PENDING)
             self._status = TaskStatus.PROCESSING_READY
 
     def processing(self) -> None:
@@ -32,11 +29,7 @@ class AbstractTask(ABC):
             return
 
         with self.lock:
-            if self._status != TaskStatus.PROCESSING_READY:
-                raise StateError(
-                    "Task is not ready for processing: Current state "
-                    + str(self._status)
-                )
+            self.assertStatus(TaskStatus.PROCESSING_READY)
             self._status = TaskStatus.PROCESSING
 
     def processingComplete(self) -> None:
@@ -44,22 +37,7 @@ class AbstractTask(ABC):
             return
 
         with self.lock:
-            if self._status != TaskStatus.PROCESSING:
-                raise StateError(
-                    "Task is not currently processing: Current state "
-                    + str(self._status)
-                )
-            self._status = TaskStatus.POSTPROCESSING_READY
-
-    def readyForPostProcessing(self) -> None:
-        if not self.isActive():
-            return
-
-        with self.lock:
-            if self._status != TaskStatus.PROCESSING:
-                raise StateError(
-                    "Task is not processing: Current state " + str(self._status)
-                )
+            self.assertStatus(TaskStatus.PROCESSING)
             self._status = TaskStatus.POSTPROCESSING_READY
 
     def postprocessingComplete(self) -> None:
@@ -67,11 +45,7 @@ class AbstractTask(ABC):
             return
 
         with self.lock:
-            if self._status != TaskStatus.POSTPROCESSING:
-                raise StateError(
-                    "Task is not currently postprocessing: Current state "
-                    + str(self._status)
-                )
+            self.assertStatus(TaskStatus.POSTPROCESSING)
             self._status = TaskStatus.COMPLETE
 
     def cancel(self) -> None:
@@ -93,8 +67,7 @@ class AbstractTask(ABC):
             return
 
         with self.lock:
-            if self._status != TaskStatus.PROCESSING:
-                raise StateError("Task is not processing " + str(self._status))
+            self.assertStatus(TaskStatus.PROCESSING)
 
         self.doProcessing()
 
@@ -105,11 +78,7 @@ class AbstractTask(ABC):
             return
 
         with self.lock:
-            if self._status != TaskStatus.POSTPROCESSING_READY:
-                raise StateError(
-                    "Task is not ready for post-processing: Current state "
-                    + str(self._status)
-                )
+            self.assertStatus(TaskStatus.POSTPROCESSING_READY)
             self._status = TaskStatus.POSTPROCESSING
 
         self.doPostProcessing()
@@ -133,6 +102,16 @@ class AbstractTask(ABC):
                 TaskStatus.POSTPROCESSING_READY,
                 TaskStatus.POSTPROCESSING,
             )
+
+    def assertStatus(self, expectedStatus: TaskStatus) -> None:
+        with self.lock:
+            if self._status != expectedStatus:
+                raise StateError(
+                    "Task should be "
+                    + str(expectedStatus)
+                    + " but is "
+                    + str(self._status)
+                )
 
     @abstractmethod
     def name(self) -> str:
