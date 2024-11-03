@@ -170,7 +170,7 @@ class AppState:
 
         self.animationRecords = Observable[List[Record]]([])
         self.animationData = Observable[DefaultDict[str, Scan | None]](
-            defaultdict(None)
+            defaultdict(lambda: None)
         )
 
         self.alerts = Observable[AlertPayload](

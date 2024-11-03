@@ -14,6 +14,7 @@ class LoadingTask:
         self,
         ctx: AppContext,
         dataQuery: DataQuery,
+        getCachedScan: Callable[[str], Scan | None],
         loadCompleteCallback: Callable[
             [DataQuery, List[Record], Dict[str, Scan]], None
         ],
@@ -21,6 +22,7 @@ class LoadingTask:
         self.cancelled = False
 
         self.ctx = ctx
+        self.getCachedScan = getCachedScan
         self.loadCompleteCallback = loadCompleteCallback
         self.dataQuery = dataQuery
 
@@ -47,12 +49,14 @@ class LoadingTask:
         if self.cancelled:
             return
 
-        print("list records complete")
-
         self.resultRecords = records
 
         for record in records:
-            # TODO don't load if we already have it
+            cachedScan = self.getCachedScan(record.key())
+            if cachedScan is not None:
+                self.resultScans[record.key()] = cachedScan
+                continue
+
             loadDataTask = LoadDataTask(
                 self.ctx.services.radar,
                 record,
@@ -65,8 +69,6 @@ class LoadingTask:
     def onLoadFileComplete(self, scan: Scan) -> None:
         if self.cancelled:
             return
-
-        print("load file complete")
 
         self.resultScans[scan.record.key()] = scan
 

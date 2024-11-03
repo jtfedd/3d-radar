@@ -65,6 +65,7 @@ class DataManager:
         self.loadingTask = LoadingTask(
             self.ctx,
             dataQuery,
+            lambda key: self.state.animationData.value[key],
             self.onDataLoaded,
         )
 
@@ -73,5 +74,5 @@ class DataManager:
     ) -> None:
         self.loadingTask = None
         self.applyDataQueryToState(query)
-        self.state.animationData.setValue(defaultdict(None, scans))
+        self.state.animationData.setValue(defaultdict(lambda: None, scans))
         self.state.animationRecords.setValue(records)

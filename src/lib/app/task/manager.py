@@ -76,5 +76,4 @@ class TaskManager:
                 self.activeThreads -= 1
 
     def destroy(self) -> None:
-        # TODO
-        pass
+        self.updateTask.cancel()
