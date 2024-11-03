@@ -92,7 +92,7 @@ class Label(Listener):
         if not self.state.animationFrame.value:
             return None
 
-        scan = self.ctx.appContext.radarCache.get(self.state.animationFrame.value)
+        scan = self.state.animationData.value[self.state.animationFrame.value]
         if not scan:
             return None
 
@@ -110,7 +110,7 @@ class Label(Listener):
         if not self.state.animationFrame.value:
             return None
 
-        scan = self.ctx.appContext.radarCache.get(self.state.animationFrame.value)
+        scan = self.state.animationData.value[self.state.animationFrame.value]
         if not scan:
             return None
 

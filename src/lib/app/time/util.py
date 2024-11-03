@@ -7,6 +7,7 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.geo_point import GeoPoint
 from lib.model.time_mode import TimeMode
+from lib.model.time_query import TimeQuery
 from lib.services.services import Services
 from lib.util.events.listener import Listener
 
@@ -54,14 +55,11 @@ class TimeUtil(Listener):
 
         raise ValueError("Unknown time mode: " + self.state.timeMode.value)
 
-    def getQueryTime(self) -> datetime.datetime:
-        if self.state.latest.value:
+    def getQueryTime(self, timeQuery: TimeQuery | None) -> datetime.datetime:
+        if timeQuery is None:
             return datetime.datetime.now(tz=datetime.UTC)
 
-        year = self.state.year.value
-        month = self.state.month.value
-        day = self.state.day.value
-        time = self.state.time.value
+        time = timeQuery.time
 
         if not self.state.use24HourTime():
             parts = time.split(" ")
@@ -78,9 +76,9 @@ class TimeUtil(Listener):
                 hour += 12
 
         return datetime.datetime(
-            year=year,
-            month=month,
-            day=day,
+            year=timeQuery.year,
+            month=timeQuery.month,
+            day=timeQuery.day,
             hour=hour,
             minute=minute,
             second=59,
