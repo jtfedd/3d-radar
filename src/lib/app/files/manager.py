@@ -18,11 +18,13 @@ class CacheFileInfo:
 
 
 class FileManager(Listener):
-    appName = "Stormfront"
+    appName = "3DRadar"
     BYTES_PER_MEGABYTE = 1048576
 
     def __init__(self, state: AppState, events: AppEvents) -> None:
         super().__init__()
+
+        self._clearPreviousDirs()
 
         self.state = state
 
@@ -269,3 +271,17 @@ class FileManager(Listener):
 
         with open(filepath, "wb") as file:
             file.write(data)
+
+    def _clearPreviousDirs(self) -> None:
+        previousFolder = "Stormfront"
+        cache = Path(user_cache_dir(previousFolder, False, ensure_exists=False))
+        if cache.exists():
+            for file in cache.iterdir():
+                file.unlink()
+            cache.rmdir()
+
+        config = Path(user_config_dir(previousFolder, False, ensure_exists=False))
+        if config.exists():
+            for file in config.iterdir():
+                file.unlink()
+            config.rmdir()

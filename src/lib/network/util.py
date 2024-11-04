@@ -10,7 +10,7 @@ def makeRequest(  # type: ignore
 ) -> requests.Response | None:
     try:
         headers = {
-            "User-Agent": "Stormfront3DRadar/0.0.0",
+            "User-Agent": "3DRadar/0.0.0",
         }
 
         response = requests.get(

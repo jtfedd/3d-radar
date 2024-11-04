@@ -41,7 +41,7 @@ class Badge(Component):
             x=x,
             y=y,
             size=UIConstants.fontSizeBadge,
-            color=UIColors.CONTENT,
+            color=UIColors.BACKGROUND,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.CENTER,
             layer=UILayer.CONTENT_BADGE_FOREGROUND,
