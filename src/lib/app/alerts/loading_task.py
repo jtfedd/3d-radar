@@ -1,7 +1,6 @@
 from typing import Callable, Dict, List
 
 from lib.app.context import AppContext
-from lib.app.task.task_status import TaskStatus
 from lib.model.alert import Alert
 from lib.model.alert_type import AlertType
 
@@ -41,7 +40,6 @@ class LoadingTask:
         self.cancelled = True
         for task in self.tasks:
             task.cancel()
-        self.loadCompleteCallback(None)
 
     def onAlertsLoaded(self, alertType: AlertType, alerts: List[Alert] | None) -> None:
         if self.cancelled:
@@ -49,19 +47,10 @@ class LoadingTask:
 
         if alerts is None:
             self.cancel()
+            self.loadCompleteCallback(None)
             return
 
         self.results[alertType] = alerts
 
-        complete = True
-        for task in self.tasks:
-            if not task.isActive():
-                if task.getStatus() != TaskStatus.COMPLETE:
-                    self.cancel()
-                    return
-            else:
-                complete = False
-                break
-
-        if complete:
+        if len(self.results) == len(self.tasks):
             self.loadCompleteCallback(self.results)
