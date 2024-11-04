@@ -1,3 +1,4 @@
+from lib.model.data_query import DataQuery
 from lib.ui.events import UIEvents
 from lib.util.events.event_dispatcher import EventDispatcher
 
@@ -13,7 +14,7 @@ class AppEvents:
         self.window = WindowEvents()
         self.animation = AnimationEvents()
 
-        self.requestData = EventDispatcher[None]()
+        self.requestData = EventDispatcher[DataQuery]()
         self.timeFormatChanged = EventDispatcher[None]()
         self.clearCache = EventDispatcher[None]()
         self.clearDataAndExit = EventDispatcher[None]()

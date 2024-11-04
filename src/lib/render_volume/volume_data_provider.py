@@ -19,7 +19,6 @@ class VolumeDataProvider(Listener):
 
     def __init__(self, ctx: AppContext, state: AppState) -> None:
         super().__init__()
-        self.ctx = ctx
         self.state = state
 
         self.nodes: Dict[str, NodePath[PandaNode]] = {}
@@ -174,7 +173,7 @@ class VolumeDataProvider(Listener):
         if not self.state.animationFrame.value:
             return
 
-        scan = self.ctx.radarCache.get(self.state.animationFrame.value)
+        scan = self.state.animationData.value[self.state.animationFrame.value]
         if not scan:
             return
 

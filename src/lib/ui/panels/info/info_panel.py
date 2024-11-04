@@ -20,9 +20,7 @@ class InfoPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        self.addComponent(
-            PanelText(self.root, ctx, "Stormfront 3D Radar Viewer", bold=True)
-        )
+        self.addComponent(PanelText(self.root, ctx, "3D Radar Viewer", bold=True))
         self.addComponent(PanelText(self.root, ctx, "v0.0.0"))
         self.addComponent(SpacerComponent(self.root))
         self.licenseButton = self.addComponent(

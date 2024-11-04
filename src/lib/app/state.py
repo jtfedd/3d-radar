@@ -1,5 +1,6 @@
 import json
-from typing import Any, Callable, Dict, Generic, List, TypeVar
+from collections import defaultdict
+from typing import Any, Callable, DefaultDict, Dict, Generic, List, TypeVar
 
 from panda3d.core import Vec3
 
@@ -7,6 +8,8 @@ from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
 from lib.model.data_type import DataType
 from lib.model.location_marker import LocationMarker
+from lib.model.record import Record
+from lib.model.scan import Scan
 from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
 
@@ -164,6 +167,12 @@ class AppState:
 
         self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)
+
+        self.animationRecords = Observable[List[Record]]([])
+        self.animationData = Observable[DefaultDict[str, Scan | None]](
+            defaultdict(lambda: None)
+        )
+
         self.alerts = Observable[AlertPayload](
             AlertPayload(status=AlertStatus.READY, alerts={})
         )

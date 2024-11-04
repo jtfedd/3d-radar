@@ -4,6 +4,8 @@ from typing import List
 from lib.app.events import AppEvents
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
+from lib.model.data_query import DataQuery
+from lib.model.time_query import TimeQuery
 from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
@@ -282,17 +284,22 @@ class RadarDataPanel(PanelContent):
         if not valid:
             return
 
-        self.state.latest.setValue(self.latestSelected.value)
-        self.state.station.setValue(radar)
-        self.state.frames.setValue(frames)
-
+        timeQuery: TimeQuery | None = None
         if not self.latestSelected.value:
-            self.state.year.setValue(year)
-            self.state.month.setValue(month)
-            self.state.day.setValue(day)
-            self.state.time.setValue(time)
+            timeQuery = TimeQuery(
+                year=year,
+                month=month,
+                day=day,
+                time=time,
+            )
 
-        self.events.requestData.send(None)
+        query = DataQuery(
+            radar=radar,
+            frames=frames,
+            time=timeQuery,
+        )
+
+        self.events.requestData.send(query)
 
     def validateTime(self, time: str) -> None:
         parts = time.split(" ")

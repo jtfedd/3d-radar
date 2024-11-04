@@ -5,7 +5,7 @@ from lib.app.app import App
 
 CONFIG = """
 gl-version 3 2
-window-title Stormfront 3D Radar Viewer
+window-title 3D Radar Viewer
 icon-filename assets/icon/icon.ico
 """
 

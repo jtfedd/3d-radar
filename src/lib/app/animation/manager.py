@@ -1,8 +1,8 @@
 from typing import List
 
+from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
-from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.record import Record
@@ -10,13 +10,15 @@ from lib.util.events.listener import Listener
 
 
 class AnimationManager(Listener):
-    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, base: ShowBase, state: AppState, events: AppEvents) -> None:
         super().__init__()
         self.state = state
         self.events = events
 
         self.records: List[Record] = []
         self.index = 0
+
+        self.bind(state.animationRecords, self.setRecords)
 
         self.listen(
             events.animation.play,
@@ -46,7 +48,7 @@ class AnimationManager(Listener):
 
         self.taskTime = 0.0
         self.animationTimer = 0.0
-        self.updateTask = ctx.base.taskMgr.add(self.update, "animation-update")
+        self.updateTask = base.taskMgr.add(self.update, "animation-update")
         self.listen(state.animationPlaying, lambda _: self.resetAnimationTimer())
 
     def updateLoopDelay(self, value: float) -> None:
@@ -77,6 +79,9 @@ class AnimationManager(Listener):
 
     def setRecords(self, records: List[Record]) -> None:
         self.records = records
+        if len(self.records) == 0:
+            return
+
         self.index = len(records) - 1
         self.setFrame(self.records[self.index].key())
         self.setSliderValue()

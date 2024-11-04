@@ -1,4 +1,4 @@
-# Stormfront 3D Radar Viewer
+# 3D Radar Viewer
 
 This is a project to build a 3d rendering program which can visualize full 3d nexrad level 2 data scans.
 
@@ -53,7 +53,7 @@ Once dependencies have been installed, the program can be run:
 make run
 ```
 
-Several cache and config files may be saved when the program is run. To remove them, run the program and find the option to "Clear All Data and Exit" under Settings. The cache and config directories will also be printed to the console on program startup.
+Several cache and config files may be saved when the program is run. To remove them, run the program and find the option to "Clear All Data and Exit" under Settings. The cache and config directory paths can also be found in the startup logs.
 
 ### Testing
 
