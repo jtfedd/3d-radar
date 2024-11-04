@@ -28,5 +28,5 @@ class NWSService:
 
         raise RuntimeError("Could not load stations")
 
-    def getAlerts(self) -> Dict[AlertType, List[Alert]] | None:
-        return self.network.nws.getAlerts()
+    def getAlerts(self, alertType: AlertType) -> List[Alert] | None:
+        return self.network.nws.getAlerts(alertType)
