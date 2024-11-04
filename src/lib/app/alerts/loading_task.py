@@ -41,6 +41,7 @@ class LoadingTask:
         self.cancelled = True
         for task in self.tasks:
             task.cancel()
+        self.loadCompleteCallback(None)
 
     def onAlertsLoaded(self, alertType: AlertType, alerts: List[Alert] | None) -> None:
         if self.cancelled:
@@ -48,14 +49,17 @@ class LoadingTask:
 
         if alerts is None:
             self.cancel()
-            self.loadCompleteCallback(None)
             return
 
         self.results[alertType] = alerts
 
         complete = True
         for task in self.tasks:
-            if task.getStatus() != TaskStatus.COMPLETE:
+            if not task.isActive():
+                if task.getStatus() != TaskStatus.COMPLETE:
+                    self.cancel()
+                    return
+            else:
                 complete = False
                 break
 
