@@ -1,11 +1,17 @@
+from typing import Dict, List
+
 from direct.task.Task import Task
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.alert import Alert
 from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
+from lib.model.alert_type import AlertType
 from lib.util.events.listener import Listener
+
+from .loading_task import LoadingTask
 
 
 class AlertManager(Listener):
@@ -21,6 +27,8 @@ class AlertManager(Listener):
         self.monitoring = False
         self.nextUpdate = 0.0
         self.lastUpdate = 0.0
+
+        self.loadingTask: LoadingTask | None = None
 
         self.updateTask = ctx.base.taskMgr.add(self.update, "alerts-update")
 
@@ -48,14 +56,23 @@ class AlertManager(Listener):
             )
             return
 
-        alerts = self.ctx.services.nws.getAlerts()
-        if alerts is not None:
+        if self.loadingTask is not None:
+            self.loadingTask.cancel()
+
+        self.loadingTask = LoadingTask(self.ctx, self.onAlertsLoaded)
+
+    def onAlertsLoaded(self, alerts: Dict[AlertType, List[Alert]] | None) -> None:
+        self.loadingTask = None
+
+        if alerts is None:
             self.state.alerts.setValue(
-                AlertPayload(status=AlertStatus.LOADED, alerts=alerts)
+                AlertPayload(status=AlertStatus.ERROR, alerts={})
             )
             return
 
-        self.state.alerts.setValue(AlertPayload(status=AlertStatus.ERROR, alerts={}))
+        self.state.alerts.setValue(
+            AlertPayload(status=AlertStatus.LOADED, alerts=alerts)
+        )
 
     def handleMonitoringChange(self, shouldMonitor: bool) -> None:
         if shouldMonitor == self.monitoring:
