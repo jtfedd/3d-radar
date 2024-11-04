@@ -25,11 +25,9 @@ class LoadDataTask(AbstractTask):
         self.readyForProcessing()
 
     def doProcessing(self) -> None:
-        print(self.record.key() + " processing")
         self.resultData = self.radarService.load(self.record)
 
     def doPostProcessing(self) -> None:
-        print(self.record.key() + " postprocessing")
         self.onDataReceived(unwrap(self.resultData))
 
     def name(self) -> str:
