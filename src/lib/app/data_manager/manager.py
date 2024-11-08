@@ -29,6 +29,7 @@ class DataManager:
 
         self.load(self.dataQueryFromCurrentState())
         events.requestData.listen(self.load)
+        events.refreshData.listen(self.refresh)
 
     def dataQueryFromCurrentState(self) -> DataQuery:
         radar = self.state.station.value
@@ -59,6 +60,8 @@ class DataManager:
             self.state.time.setValue(query.time.time)
 
     def load(self, dataQuery: DataQuery) -> None:
+        self.state.loadingData.setValue(True)
+
         if self.loadingTask is not None:
             self.loadingTask.cancel()
 
@@ -69,9 +72,17 @@ class DataManager:
             self.onDataLoaded,
         )
 
+    def refresh(self, _: None) -> None:
+        if self.loadingTask is not None:
+            return
+
+        self.load(self.dataQueryFromCurrentState())
+
     def onDataLoaded(
         self, query: DataQuery, records: List[Record], scans: Dict[str, Scan]
     ) -> None:
+        self.state.loadingData.setValue(False)
+
         self.loadingTask = None
         self.applyDataQueryToState(query)
         self.state.animationData.setValue(defaultdict(lambda: None, scans))

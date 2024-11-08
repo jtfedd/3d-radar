@@ -24,3 +24,6 @@ class Icons:
     ARROW = "assets/icons/arrow-up.png"
     DASHED_LINE = "assets/icons/dashed-line.png"
     TRASH = "assets/icons/trash.png"
+
+    REFRESH = "assets/icons/refresh.png"
+    LOADING = "assets/icons/loading.png"

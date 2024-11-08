@@ -8,6 +8,7 @@ from lib.ui.core.constants import UIConstants
 
 from .alerts_button import AlertsButton
 from .clock import Clock
+from .refresh_button import RefreshButton
 
 
 class Header:
@@ -22,8 +23,10 @@ class Header:
 
         self.clock = Clock(ctx, events)
         self.alerts = AlertsButton(ctx, state, events)
+        self.refresh = RefreshButton(ctx, state, events)
 
     def destroy(self) -> None:
         self.background.destroy()
         self.clock.destroy()
         self.alerts.destroy()
+        self.refresh.destroy()
