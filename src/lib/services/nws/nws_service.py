@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from lib.app.files.manager import FileManager
+from lib.app.logging import newLogger
 from lib.model.alert import Alert
 from lib.model.alert_type import AlertType
 from lib.model.radar_station import RadarStation
@@ -9,6 +10,8 @@ from lib.network.network import Network
 
 class NWSService:
     def __init__(self, fileManager: FileManager, network: Network) -> None:
+        self.log = newLogger("nws_service")
+
         self.network = network
         self.fileManager = fileManager
 
@@ -21,7 +24,7 @@ class NWSService:
         return self.radarStations[stationID]
 
     def preloadStations(self) -> Dict[str, RadarStation]:
-        print("Loading stations from NWS")
+        self.log.info("Loading stations from NWS")
         stations = self.network.nws.getRadarStations()
         if stations:
             return stations

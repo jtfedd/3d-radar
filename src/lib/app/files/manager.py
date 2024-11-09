@@ -3,11 +3,11 @@ import json
 from pathlib import Path
 from typing import Dict
 
-from direct.directnotify.DirectNotify import DirectNotify
 from direct.stdpy import threading
 from platformdirs import user_cache_dir, user_config_dir
 
 from lib.app.events import AppEvents
+from lib.app.logging import newLogger
 from lib.app.state import AppState
 from lib.util.events.listener import Listener
 
@@ -25,7 +25,7 @@ class FileManager(Listener):
     def __init__(self, state: AppState, events: AppEvents) -> None:
         super().__init__()
 
-        self.log = DirectNotify().newCategory("file_manager")
+        self.log = newLogger("file_manager")
 
         self._clearPreviousDirs()
 

@@ -3,6 +3,7 @@ from typing import List
 
 import pynexrad
 
+from lib.app.logging import newLogger
 from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.model.scan_data import ScanData
@@ -44,10 +45,13 @@ def scanFromLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
 
 
 class RadarProvider:
+    def __init__(self) -> None:
+        self.log = newLogger("radar_provider")
+
     def load(self, record: Record) -> Scan:
         key = record.awsKey()
 
-        print("Fetching from s3:", key)
+        self.log.info(f"Fetching from s3: {key}")
 
         level2File = pynexrad.download_nexrad_file(
             record.station,
@@ -57,7 +61,7 @@ class RadarProvider:
             key,
         )
 
-        print("Post-processing", key)
+        self.log.info(f"Post-processing {key}")
         return scanFromLevel2File(record, level2File)
 
     def search(self, record: Record, count: int) -> List[Record]:
