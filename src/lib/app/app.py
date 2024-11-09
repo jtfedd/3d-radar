@@ -67,6 +67,7 @@ class App:
         sys.exit()
 
     def destroy(self) -> None:
+        self.dataManager.destroy()
         self.volumeRenderer.destroy()
         self.cameraControl.destroy()
         self.ui.destroy()

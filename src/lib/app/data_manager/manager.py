@@ -114,3 +114,5 @@ class DataManager(Listener):
         super().destroy()
 
         self.refreshTask.cancel()
+        if self.loadingTask is not None:
+            self.loadingTask.cancel()
