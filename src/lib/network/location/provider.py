@@ -1,5 +1,6 @@
 from typing import List
 
+from lib.app.logging import newLogger
 from lib.model.location import Location
 
 from ..util import makeRequest
@@ -8,8 +9,11 @@ from ..util import makeRequest
 class LocationProvider:
     HOST = "https://nominatim.openstreetmap.org"
 
+    def __init__(self) -> None:
+        self.log = newLogger("location_provider")
+
     def search(self, address: str, limit: int = 1) -> List[Location] | None:
-        print("Searching", address)
+        self.log.info(f"Searching {address}")
 
         response = makeRequest(
             self.HOST + "/search",

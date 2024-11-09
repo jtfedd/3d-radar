@@ -5,12 +5,16 @@ from direct.showbase.ShowBase import ShowBase
 from direct.stdpy import threading
 from direct.task.Task import Task
 
+from lib.app.logging import newLogger
+
 from .task import AbstractTask
 from .task_status import TaskStatus
 
 
 class TaskManager:
     def __init__(self, base: ShowBase) -> None:
+        self.log = newLogger("task_manager")
+
         self.maxThreads = max(os.cpu_count() or 1, 1)
         self.activeThreads = 0
         self.activeThreadsLock = threading.Lock()
@@ -19,12 +23,12 @@ class TaskManager:
         self.tasks: List[AbstractTask] = []
         self.tasksLock = threading.Lock()
 
-        print("max threads", self.maxThreads)
+        self.log.info(f"max threads {self.maxThreads}")
 
         self.updateTask = base.taskMgr.add(self.update, "task-update")
 
     def addTask(self, task: AbstractTask) -> None:
-        print("add task", task.name())
+        self.log.info(f"add task {task.name()}")
         with self.tasksLock:
             self.tasks.append(task)
 
@@ -62,13 +66,13 @@ class TaskManager:
         return task.cont
 
     def processTask(self, t: AbstractTask) -> None:
-        print("process task", t.name())
+        self.log.info(f"process task {t.name()}")
 
         thread = threading.Thread(target=self.runTask, daemon=True, args=(t,))
         thread.start()
 
     def runTask(self, t: AbstractTask) -> None:
-        print("run task", t.name())
+        self.log.info(f"run task {t.name()}")
         try:
             t.process()
         finally:
