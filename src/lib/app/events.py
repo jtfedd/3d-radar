@@ -15,6 +15,8 @@ class AppEvents:
         self.animation = AnimationEvents()
 
         self.requestData = EventDispatcher[DataQuery]()
+        self.refreshData = EventDispatcher[None]()
+
         self.timeFormatChanged = EventDispatcher[None]()
         self.clearCache = EventDispatcher[None]()
         self.clearDataAndExit = EventDispatcher[None]()
@@ -26,6 +28,8 @@ class AppEvents:
         self.animation.destroy()
 
         self.requestData.close()
+        self.refreshData.close()
+
         self.timeFormatChanged.close()
         self.clearCache.close()
         self.clearDataAndExit.close()

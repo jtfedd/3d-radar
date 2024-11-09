@@ -20,21 +20,23 @@ class AlertsButton(Listener):
         self.state = state
         self.events = events
 
+        self.root = ctx.anchors.topRight.attachNewNode("alerts-button")
+        self.root.setX(-(UIConstants.clockWidth + UIConstants.headerButtonWidth))
+
         self.badge = Badge(
-            root=ctx.anchors.topRight,
+            root=self.root,
             ctx=ctx,
-            x=-(UIConstants.clockWidth + UIConstants.headerButtonWidth / 4),
+            x=-UIConstants.headerButtonWidth / 4,
             y=-UIConstants.headerFooterHeight / 4,
             color=UIColors.RED,
             text="",
         )
 
         self.button = Button(
-            root=ctx.anchors.topRight,
+            root=self.root,
             ctx=ctx,
             width=UIConstants.headerButtonWidth,
             height=UIConstants.headerFooterHeight,
-            x=-UIConstants.clockWidth,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.TOP,
             icon=Icons.WARNING,

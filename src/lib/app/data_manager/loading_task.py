@@ -54,7 +54,7 @@ class LoadingTask:
         for record in records:
             cachedScan = self.getCachedScan(record.key())
             if cachedScan is not None:
-                self.resultScans[record.key()] = cachedScan
+                self.onLoadFileComplete(cachedScan)
                 continue
 
             loadDataTask = LoadDataTask(
@@ -72,7 +72,7 @@ class LoadingTask:
 
         self.resultScans[scan.record.key()] = scan
 
-        if len(self.resultScans) == len(self.loadDataTasks):
+        if len(self.resultScans) == len(self.resultRecords):
             self.onLoadComplete()
 
     def onLoadComplete(self) -> None:

@@ -172,6 +172,7 @@ class AppState:
         self.animationData = Observable[DefaultDict[str, Scan | None]](
             defaultdict(lambda: None)
         )
+        self.loadingData = Observable[bool](False)
 
         self.alerts = Observable[AlertPayload](
             AlertPayload(status=AlertStatus.READY, alerts={})
