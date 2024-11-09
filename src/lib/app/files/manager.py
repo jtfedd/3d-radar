@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from typing import Dict
 
+from direct.directnotify.DirectNotify import DirectNotify
 from direct.stdpy import threading
 from platformdirs import user_cache_dir, user_config_dir
 
@@ -24,6 +25,8 @@ class FileManager(Listener):
     def __init__(self, state: AppState, events: AppEvents) -> None:
         super().__init__()
 
+        self.log = DirectNotify().newCategory("file_manager")
+
         self._clearPreviousDirs()
 
         self.state = state
@@ -35,8 +38,8 @@ class FileManager(Listener):
         )
         self._cachePath = Path(user_cache_dir(self.appName, False, ensure_exists=True))
 
-        print("Config", self._configPath.absolute())
-        print("Cache", self._cachePath.absolute())
+        self.log.info("Config: " + str(self._configPath.absolute()))
+        self.log.info("Cache: " + str(self._cachePath.absolute()))
 
         self.cacheMeta: Dict[str, CacheFileInfo] = {}
 
@@ -176,7 +179,7 @@ class FileManager(Listener):
         if not file.exists():
             return
 
-        print("Removing", str(file))
+        self.log.info("Removing " + str(file))
         file.unlink()
 
         if file.name in self.cacheMeta:
@@ -189,7 +192,7 @@ class FileManager(Listener):
             return None
 
         filepath = self._getCacheFilePath(filename)
-        print("Reading from cache", filename)
+        self.log.info("Reading: " + filename)
 
         if filename in self.cacheMeta:
             self.cacheMeta[filename].lastAccess = self._makeTimestamp()
@@ -200,7 +203,7 @@ class FileManager(Listener):
         if not self.state.useCache.value:
             return
 
-        print("Writing to cache", filename)
+        self.log.info("Writing: " + filename)
 
         if len(data) > self._maxCacheSize():
             return
@@ -219,12 +222,12 @@ class FileManager(Listener):
 
     def _readConfigFile(self) -> bytes | None:
         filepath = self._getConfigFilePath()
-        print("Reading from config")
+        self.log.info("Reading config")
 
         return self._readFile(filepath)
 
     def _saveConfigFile(self, data: bytes) -> None:
-        print("Writing to config")
+        self.log.info("Writing config")
 
         self._writeFile(self._getConfigFilePath(), data)
 
@@ -234,7 +237,7 @@ class FileManager(Listener):
         if self.state.cacheSize.value < newCacheSize:
             return
 
-        print("Reducing cache to", newCacheSize)
+        self.log.info(f"Reducing cache to {newCacheSize}")
 
         while self.state.cacheSize.value > newCacheSize:
             if len(self.cacheMeta) == 0:
@@ -258,7 +261,7 @@ class FileManager(Listener):
 
     def _readFile(self, filepath: Path) -> bytes | None:
         if not filepath.exists():
-            print("File doesn't exist", str(filepath.name))
+            self.log.info(f"File doesn't exist: {str(filepath.name)}")
             return None
 
         with open(filepath, "rb") as file:
@@ -266,7 +269,7 @@ class FileManager(Listener):
 
     def _writeFile(self, filepath: Path, data: bytes) -> None:
         if not self.allowSave:
-            print("Saving not allowed")
+            self.log.info("Saving prevented")
             return
 
         with open(filepath, "wb") as file:
