@@ -119,6 +119,9 @@ class UIConstants:
     alertModalWidth = 1.2
     alertModalMaxHeight = 1.0
 
+    loadingProgressModalWidth = 0.8
+    loadingProgressModalHeight = 0.25
+
     labelPadding = 0.01
 
     # Higher number means slower scrolling
