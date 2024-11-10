@@ -7,6 +7,7 @@ from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_query import DataQuery
+from lib.model.loading_progress_payload import LoadingProgressPayload
 from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.model.time_query import TimeQuery
@@ -34,8 +35,8 @@ class DataManager(Listener):
 
         self.loadingTask: LoadingTask | None = None
 
-        self.load(self.dataQueryFromCurrentState())
-        self.listen(events.requestData, self.load)
+        self.onDataRequested(self.dataQueryFromCurrentState())
+        self.listen(events.requestData, self.onDataRequested)
         self.listen(events.refreshData, lambda _: self.refresh())
 
         self.refreshTimer = 0.0
@@ -79,6 +80,17 @@ class DataManager(Listener):
             self.state.day.setValue(query.time.day)
             self.state.time.setValue(query.time.time)
 
+    def onDataRequested(self, dataQuery: DataQuery) -> None:
+        self.load(dataQuery)
+        if self.loadingTask is not None:
+            self.events.ui.modals.loadingProgress.send(
+                LoadingProgressPayload(
+                    self.loadingTask.progress,
+                    self.loadingTask.onComplete,
+                    self.loadingTask.cancel,
+                )
+            )
+
     def load(self, dataQuery: DataQuery) -> None:
         self.state.loadingData.setValue(True)
         self.refreshTimer = 0
@@ -91,6 +103,7 @@ class DataManager(Listener):
             dataQuery,
             lambda key: self.state.animationData.value[key],
             self.onDataLoaded,
+            self.onLoadCancelled,
         )
 
     def refresh(self) -> None:
@@ -99,13 +112,18 @@ class DataManager(Listener):
 
         self.load(self.dataQueryFromCurrentState())
 
+    def onLoadCancelled(self) -> None:
+        self.refreshTimer = 0
+        self.state.loadingData.setValue(False)
+        self.loadingTask = None
+
     def onDataLoaded(
         self, query: DataQuery, records: List[Record], scans: Dict[str, Scan]
     ) -> None:
         self.refreshTimer = 0
         self.state.loadingData.setValue(False)
-
         self.loadingTask = None
+
         self.applyDataQueryToState(query)
         self.state.animationData.setValue(defaultdict(lambda: None, scans))
         self.state.animationRecords.setValue(records)

@@ -1,6 +1,7 @@
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.context import UIContext
+from lib.ui.modals.loading_progress.modal import LoadingProgressModal
 from lib.util.events.listener import Listener
 
 from .alert.modal import AlertModal
@@ -46,6 +47,11 @@ class ModalManager(Listener):
         self.listen(
             events.ui.modals.alert,
             lambda alert: self.openModal(AlertModal(ctx, events, alert)),
+        )
+
+        self.listen(
+            events.ui.modals.loadingProgress,
+            lambda payload: self.openModal(LoadingProgressModal(ctx, events, payload)),
         )
 
     def openModal(self, modal: Modal) -> None:
