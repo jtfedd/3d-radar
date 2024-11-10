@@ -1,19 +1,26 @@
 #version 330
 
-uniform float clip_z;
 uniform vec2 window_size;
 uniform float thickness;
+
+uniform vec3 world_pos;
+uniform vec3 camera_pos;
 
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 7) out;
 
-in vec4 vpos[4];
+in vec3 vpos[4];
 
-out vec4 gpos;
+out vec3 gpos;
+
+
+bool backface(vec3 pos) {
+    return dot((pos - camera_pos), (pos - world_pos)) > 0;
+}
 
 void main() {
     // Cull segments below the clip plane
-    if (vpos[1].z < clip_z && vpos[2].z < clip_z) {
+    if (backface(vpos[1]) && backface(vpos[2])) {
         return;
     }
 
@@ -41,6 +48,7 @@ void main() {
 
     // Generate a triangle to bridge this segment with the previous
     gpos = vpos[1];
+
     gl_Position = gl_in[1].gl_Position;
     EmitVertex();
 

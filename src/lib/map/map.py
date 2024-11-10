@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 
+from direct.task.Task import Task
 from panda3d.core import (
     GeomNode,
     NodePath,
@@ -61,6 +62,10 @@ class Map(Listener):
 
         self.mapRoot.setShader(mapShader)
         self.mapRoot.setShaderInput("thickness", 1.0)
+        self.mapRoot.setShaderInput("world_pos", self.root.getPos())
+        self.mapRoot.setShaderInput(
+            "camera_pos", ctx.base.camera.getPos(ctx.base.render)
+        )
 
         self.ctx.windowManager.resolutionProvider.addNode(self.mapRoot)
 
@@ -71,6 +76,10 @@ class Map(Listener):
         self.boundary.setZ(clipPlaneOffset)
         self.boundary.setScale(EARTH_RADIUS * math.sin(RADAR_RANGE / EARTH_RADIUS))
         self.boundary.setShader(mapShader)
+        self.boundary.setShaderInput("world_pos", self.root.getPos())
+        self.boundary.setShaderInput(
+            "camera_pos", ctx.base.camera.getPos(ctx.base.render)
+        )
         self.boundary.setShaderInput("thickness", 1.0)
         self.boundary.setShaderInput("clip_z", 2 * clipPlaneOffset)
         self.boundary.setColorScale(UIColors.MAP_BOUNDARIES)
@@ -118,6 +127,14 @@ class Map(Listener):
         self.listen(state.showSevereThunderstormWarnings, lambda _: self.updateLayers())
 
         self.listen(state.warningsOpacity, self.warningsRoot.setAlphaScale)
+
+        self.updateTask = ctx.base.taskMgr.add(self.update, "map-update")
+
+    def update(self, task: Task) -> int:
+        cameraPos = self.ctx.base.camera.getPos(self.ctx.base.render)
+        self.mapRoot.setShaderInput("camera_pos", cameraPos)
+        self.boundary.setShaderInput("camera_pos", cameraPos)
+        return task.cont
 
     def updateLayers(self) -> None:
         self.states.hide()
@@ -175,6 +192,8 @@ class Map(Listener):
 
     def destroy(self) -> None:
         super().destroy()
+
+        self.updateTask.cancel()
 
         self.ctx.windowManager.resolutionProvider.removeNode(self.mapRoot)
 
