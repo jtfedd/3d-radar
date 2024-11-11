@@ -20,6 +20,9 @@ uniform mat4 projection_matrix_inverse;
 uniform vec3 bounds_start;
 uniform vec3 bounds_end;
 
+uniform vec3 earth_center;
+uniform float earth_radius;
+
 uniform int scan_count[1];
 uniform float elevation[MAX_SCANS];
 uniform float az_step[MAX_SCANS];
@@ -54,6 +57,7 @@ $inputs
 
 #include hash.part.glsl
 #include box_intersection.part.glsl
+#include sphere_intersection.part.glsl
 #include color_util.part.glsl
 #include density.part.glsl
 #include resolve_elevation.part.glsl
