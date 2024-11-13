@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Callable
 
 from direct.task.Task import Task
 from panda3d.core import (
@@ -119,12 +120,11 @@ class Map(Listener):
         self.updatePosition(state.station.value)
         self.listen(state.station, self.updatePosition)
 
-        self.updateLayers()
-        self.listen(state.mapStates, lambda _: self.updateLayers())
-        self.listen(state.mapCounties, lambda _: self.updateLayers())
-        self.listen(state.mapRoads, lambda _: self.updateLayers())
-        self.listen(state.showTornadoWarnings, lambda _: self.updateLayers())
-        self.listen(state.showSevereThunderstormWarnings, lambda _: self.updateLayers())
+        self.bind(state.mapStates, self.updateLayer(self.states))
+        self.bind(state.mapCounties, self.updateLayer(self.counties))
+        self.bind(state.mapRoads, self.updateLayer(self.roads))
+        self.bind(state.showTornadoWarnings, self.updateLayer(self.towRoot))
+        self.bind(state.showSevereThunderstormWarnings, self.updateLayer(self.svwRoot))
 
         self.listen(state.warningsOpacity, self.warningsRoot.setAlphaScale)
 
@@ -136,23 +136,8 @@ class Map(Listener):
         self.boundary.setShaderInput("camera_pos", cameraPos)
         return task.cont
 
-    def updateLayers(self) -> None:
-        self.states.hide()
-        self.counties.hide()
-        self.roads.hide()
-        self.towRoot.hide()
-        self.svwRoot.hide()
-
-        if self.state.mapStates.value:
-            self.states.show()
-        if self.state.mapCounties.value:
-            self.counties.show()
-        if self.state.mapRoads.value:
-            self.roads.show()
-        if self.state.showTornadoWarnings.value:
-            self.towRoot.show()
-        if self.state.showSevereThunderstormWarnings.value:
-            self.svwRoot.show()
+    def updateLayer(self, node: NodePath[PandaNode]) -> Callable[[bool], None]:
+        return lambda visible: node.show() if visible else node.hide()
 
     def loadMapLayer(
         self, name: str, layer: UILayer, color: Vec4

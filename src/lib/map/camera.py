@@ -1,4 +1,4 @@
-from direct.task import Task
+from direct.task.Task import Task
 from panda3d.core import Vec3
 
 from lib.app.context import AppContext
@@ -63,30 +63,12 @@ class CameraControl(Listener):
 
         self.updateTask = ctx.base.taskMgr.add(self.update, "camera-update")
 
-    def resetPosition(
-        self,
-        x: float = 0,
-        y: float = 0,
-    ) -> None:
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
+    def resetOrientation(self) -> None:
+        self.pitch = self.DEFAULT_PITCH
+        self.heading = self.DEFAULT_HEADING
+        self.zoom = self.DEFAULT_ZOOM
 
-    def resetOrientation(
-        self,
-        pitch: float = 30,
-        heading: float = 0,
-        zoom: float = 500,
-    ) -> None:
-        if pitch is not None:
-            self.pitch = pitch
-        if heading is not None:
-            self.heading = heading
-        if zoom is not None:
-            self.zoom = zoom
-
-    def update(self, task: Task.Task) -> int:
+    def update(self, task: Task) -> int:
         self.handleMouseUpdate()
         self.updatePositions()
 
@@ -94,7 +76,7 @@ class CameraControl(Listener):
 
     def updatePositions(self) -> None:
         self.pitch = min(self.pitch, 90)
-        self.pitch = max(self.pitch, -90)
+        self.pitch = max(self.pitch, 0)
 
         self.slider.setX(self.x)
         self.slider.setY(self.y)

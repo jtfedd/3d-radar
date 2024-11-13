@@ -5,7 +5,7 @@ from direct.showbase.ShowBase import ShowBase
 
 from lib.app.data_manager.manager import DataManager
 from lib.app.files.serialization import SERIALIZATION_VERSION
-from lib.camera.camera_control import CameraControl
+from lib.map.camera import CameraControl
 from lib.map.map import Map
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
