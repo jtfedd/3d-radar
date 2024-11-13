@@ -25,6 +25,7 @@ from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
 from .alert_renderer import AlertRenderer
+from .camera import CameraControl
 from .constants import EARTH_RADIUS, RADAR_RANGE
 from .lighting import LightingManager
 from .markers.markers_manager import MarkersManager
@@ -39,7 +40,6 @@ class Map(Listener):
         self.state = state
 
         self.lightingManager = LightingManager(ctx, state)
-
         self.markersManager = MarkersManager(ctx, state, events)
 
         self.root = ctx.base.render.attachNewNode("map-root")
@@ -53,6 +53,8 @@ class Map(Listener):
 
         self.mapRoot = self.longRoot.attachNewNode("map-layers")
         self.mapRoot.setH(90)
+
+        self.cameraControl = CameraControl(ctx, state, events, self.mapRoot)
 
         mapShader = Shader.load(
             Shader.SL_GLSL,
@@ -180,6 +182,7 @@ class Map(Listener):
 
         self.updateTask.cancel()
 
+        self.cameraControl.destroy()
         self.ctx.windowManager.resolutionProvider.removeNode(self.mapRoot)
 
         self.lightingManager.destroy()
