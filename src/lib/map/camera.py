@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode
 
@@ -12,11 +14,11 @@ from lib.util.events.listener import Listener
 
 class CameraControl(Listener):
     DEFAULT_PITCH = 30
-    DEFAULT_HEADING = 180
+    DEFAULT_HEADING = 0
     DEFAULT_ZOOM = 500
 
     MIN_ZOOM = 10
-    MAX_ZOOM = 5000
+    MAX_ZOOM = 8000
 
     def __init__(
         self,
@@ -67,6 +69,7 @@ class CameraControl(Listener):
 
         self.cameraBase.setY(EARTH_RADIUS)
         self.cameraBase.setP(-90)
+        self.cameraBase.setH(self.cameraBase, 180)
 
         self.updatePositions()
 
@@ -118,10 +121,15 @@ class CameraControl(Listener):
             moveDX = -deltaX * self.movementFactor * self.zoom / EARTH_RADIUS
             moveDY = -deltaY * self.movementFactor * self.zoom / EARTH_RADIUS
 
-            # TODO move direction
+            headingRad = math.radians(self.heading)
+            headingCos = math.cos(headingRad)
+            headingSin = math.sin(headingRad)
 
-            self.lat += moveDY
-            self.lon += moveDX
+            dLon = moveDX * headingCos - moveDY * headingSin
+            dLat = moveDY * headingCos + moveDX * headingSin
+
+            self.lat += dLat
+            self.lon += dLon
 
             self.lat = min(self.lat, 90)
             self.lat = max(self.lat, -90)
