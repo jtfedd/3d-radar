@@ -56,8 +56,6 @@ class CameraControl(Listener):
 
         # Set up nodes
         self.root = root.attachNewNode("camera-root")
-        self.root.setScale(1 / EARTH_RADIUS)  # TODO
-
         self.cameraLon = self.root.attachNewNode("camera-lon")
         self.cameraLat = self.cameraLon.attachNewNode("camera-lat")
         self.cameraBase = self.cameraLat.attachNewNode("camera-position-base")
