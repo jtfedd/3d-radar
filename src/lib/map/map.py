@@ -9,6 +9,7 @@ from panda3d.core import NodePath, PandaNode, Shader, TransparencyAttrib, Vec4
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.map.lat_lon_lines import LatLonLines
 from lib.map.radar_boundary import RadarBoundary
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
@@ -70,6 +71,8 @@ class Map(Listener):
 
         self.boundary = RadarBoundary(ctx, state, self.mapRoot)
 
+        self.latlonLines = LatLonLines(self.mapRoot)
+
         self.states = self.loadMapLayer(
             "states", UILayer.MAP_STATES, UIColors.MAP_BOUNDARIES
         )
@@ -99,8 +102,7 @@ class Map(Listener):
         self.markersRoot = self.mapRoot.attachNewNode("map-markers")
         self.markersRenderer = MarkersRenderer(ctx, state, self.markersRoot)
 
-        self.updatePosition(state.station.value)
-        self.listen(state.station, self.updatePosition)
+        self.bind(state.station, self.updatePosition)
 
         self.bind(state.mapStates, self.updateLayer(self.states))
         self.bind(state.mapCounties, self.updateLayer(self.counties))
@@ -108,7 +110,7 @@ class Map(Listener):
         self.bind(state.showTornadoWarnings, self.updateLayer(self.towRoot))
         self.bind(state.showSevereThunderstormWarnings, self.updateLayer(self.svwRoot))
 
-        self.listen(state.warningsOpacity, self.warningsRoot.setAlphaScale)
+        self.bind(state.warningsOpacity, self.warningsRoot.setAlphaScale)
 
         self.updateTask = ctx.base.taskMgr.add(self.update, "map-update")
 
