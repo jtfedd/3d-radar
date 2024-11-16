@@ -79,5 +79,6 @@ class UIColors:
 
     MAP_BOUNDARIES = PALETTE_3
     MAP_DETAILS = PALETTE_1
+    MAP_LAT_LON = PALETTE_1
 
     MODAL_SHADOW = withAlpha(BLACK, 0.7)

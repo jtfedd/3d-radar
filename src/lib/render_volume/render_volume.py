@@ -1,10 +1,10 @@
 from direct.filter.FilterManager import FilterManager
 from direct.task import Task
-from panda3d.core import Shader, Texture
+from panda3d.core import Shader, Texture, Vec3
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
-from lib.map.constants import RADAR_RANGE
+from lib.map.constants import EARTH_RADIUS, RADAR_RANGE
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
@@ -45,6 +45,8 @@ class VolumeRenderer(Listener):
         self.plane.setShaderInput("depth", depth)
         self.plane.setShaderInput("bounds_start", (-RADAR_RANGE, -RADAR_RANGE, 0))
         self.plane.setShaderInput("bounds_end", (RADAR_RANGE, RADAR_RANGE, 15))
+        self.plane.setShaderInput("earth_center", Vec3(0, 0, -EARTH_RADIUS))
+        self.plane.setShaderInput("earth_radius", EARTH_RADIUS)
         self.plane.setShaderInput("camera", self.ctx.base.camera)
         self.plane.setShaderInput("time", 0)
 

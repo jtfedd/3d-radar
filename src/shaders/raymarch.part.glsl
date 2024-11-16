@@ -15,6 +15,7 @@ void gen_ray(
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
 vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
+    // Calculate the intersection of the ray with the render bounds
     vec2 tRange;
     bool no_intersection;
     box_intersection(bounds_start, bounds_end, ro, rd, tRange, no_intersection);
@@ -22,6 +23,15 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     vec4 color = vec4(0.0);
     if (no_intersection) {
         return color;
+    }
+
+    // Calculate the intersection of the ray with the earth sphere
+    vec2 tEarth;
+    sphere_intersection(earth_center, earth_radius, ro, rd, tEarth, no_intersection);
+
+    if (!no_intersection && tEarth.t > 0) {
+        // Don't cast the ray into the earth
+        tRange.t = min(tEarth.s, tRange.t);
     }
 
     // Make sure the range does not start behind the camera

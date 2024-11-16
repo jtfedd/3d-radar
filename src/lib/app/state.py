@@ -127,6 +127,7 @@ class AppState:
         self.time = self.createField("time", "11:24 AM")
         self.frames = self.createField("frames", 5)
 
+        self.mapLatLon = self.createField("mapLatLon", True)
         self.mapStates = self.createField("mapStates", True)
         self.mapCounties = self.createField("mapCounties", True)
         self.mapRoads = self.createField("mapRoads", True)

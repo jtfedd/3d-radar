@@ -5,7 +5,6 @@ from direct.showbase.ShowBase import ShowBase
 
 from lib.app.data_manager.manager import DataManager
 from lib.app.files.serialization import SERIALIZATION_VERSION
-from lib.camera.camera_control import CameraControl
 from lib.map.map import Map
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
@@ -27,8 +26,8 @@ class App:
         self.loadConfig()
 
         self.ui = UI(self.ctx, self.state, self.events)
+        self.map = Map(self.ctx, self.state, self.events)
 
-        self.cameraControl = CameraControl(self.ctx, self.events)
         self.volumeRenderer = VolumeRenderer(self.ctx, self.state)
         self.alertManager = AlertManager(self.ctx, self.state, self.events)
 
@@ -37,8 +36,6 @@ class App:
             self.state,
             self.events,
         )
-
-        self.map = Map(self.ctx, self.state, self.events)
 
         self.events.clearDataAndExit.listen(lambda _: self.clearDataAndExit())
 
@@ -69,7 +66,6 @@ class App:
     def destroy(self) -> None:
         self.dataManager.destroy()
         self.volumeRenderer.destroy()
-        self.cameraControl.destroy()
         self.ui.destroy()
 
         self.saveConfig()

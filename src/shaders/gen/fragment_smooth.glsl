@@ -20,6 +20,9 @@ uniform mat4 projection_matrix_inverse;
 uniform vec3 bounds_start;
 uniform vec3 bounds_end;
 
+uniform vec3 earth_center;
+uniform float earth_radius;
+
 uniform int scan_count[1];
 uniform float elevation[MAX_SCANS];
 uniform float az_step[MAX_SCANS];
@@ -89,6 +92,28 @@ void box_intersection(
     );
 
     no_intersection = tRange.t < tRange.s;
+}
+void sphere_intersection(
+    in vec3 center, in float r,
+    in vec3 p, in vec3 v,
+    out vec2 tRange, out bool no_intersection
+) {
+    vec3 CX = normalize(v);
+    vec3 CS = center - p;
+
+    float a = dot(CX, CX);
+    float b = -2.0 * dot(CX, CS);
+    float c = dot(CS, CS) - r * r;
+
+    float discriminant = b * b - 4.0 * a * c;
+
+    no_intersection = discriminant < 0.0;
+    if (no_intersection) return;
+
+    tRange = vec2(
+        (-b - sqrt(discriminant)) / (2.0 * a),
+        (-b + sqrt(discriminant)) / (2.0 * a)
+    );
 }
 
 vec4 blend_onto(vec4 front, vec4 behind) {
@@ -270,6 +295,7 @@ void gen_ray(
 
 // Ray marching loop based on https://www.shadertoy.com/view/tdjBR1
 vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
+    // Calculate the intersection of the ray with the render bounds
     vec2 tRange;
     bool no_intersection;
     box_intersection(bounds_start, bounds_end, ro, rd, tRange, no_intersection);
@@ -277,6 +303,15 @@ vec4 ray_march(in vec3 ro, in vec3 rd, in float d) {
     vec4 color = vec4(0.0);
     if (no_intersection) {
         return color;
+    }
+
+    // Calculate the intersection of the ray with the earth sphere
+    vec2 tEarth;
+    sphere_intersection(earth_center, earth_radius, ro, rd, tEarth, no_intersection);
+
+    if (!no_intersection && tEarth.t > 0) {
+        // Don't cast the ray into the earth
+        tRange.t = min(tEarth.s, tRange.t);
     }
 
     // Make sure the range does not start behind the camera

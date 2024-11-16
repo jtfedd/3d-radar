@@ -3,6 +3,7 @@ from enum import Enum
 
 class UILayer(Enum):
     # 3D Layers
+    MAP_LAT_LON = 0
     MAP_ROADS = 0
     MAP_COUNTIES = 1
     MAP_STATES = 2
