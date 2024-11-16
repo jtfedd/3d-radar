@@ -18,7 +18,6 @@ from lib.util.events.listener import Listener
 from lib.util.map_3d_to_2d import map3dToAspect2d
 from lib.util.optional import unwrap
 
-from ..constants import RADAR_RANGE
 from ..util import toGlobe
 
 
@@ -37,7 +36,6 @@ class MapMarker(Listener):
 
         self.marker = marker
 
-        self.inRadarRange = False
         self.visible = marker.visible
 
         self.posRoot = root.attachNewNode(marker.id + "-pos-root")
@@ -71,19 +69,8 @@ class MapMarker(Listener):
             )
         )
 
-        self.updateInRadarRange()
-        self.listen(state.station, lambda _: self.updateInRadarRange())
         self.listen(state.uiScale, self.iconRoot.setScale)
         self.updateTask = ctx.base.taskMgr.add(self.update, marker.id + "-update")
-
-    def updateInRadarRange(self) -> None:
-        station = self.ctx.services.nws.getStation(self.state.station.value)
-        if not station:
-            return
-
-        self.inRadarRange = (
-            station.geoPoint.dist(self.marker.location.geoPoint) < RADAR_RANGE
-        )
 
     def updateVisiblity(self, visible: bool) -> None:
         self.visible = visible
@@ -93,12 +80,8 @@ class MapMarker(Listener):
             self.ctx, self.ctx.base.render, self.posRoot.getPos(self.ctx.base.render)
         )
 
-        show2dMarker = (
-            self.visible and self.inRadarRange and not self.state.show3dMarkers.value
-        )
-        show3dMarker = (
-            self.visible and self.inRadarRange and self.state.show3dMarkers.value
-        )
+        show2dMarker = self.visible and not self.state.show3dMarkers.value
+        show3dMarker = self.visible and self.state.show3dMarkers.value
 
         if markerOnscreenPos is None or not show2dMarker:
             self.iconRoot.hide()
