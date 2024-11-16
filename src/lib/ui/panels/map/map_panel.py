@@ -21,6 +21,7 @@ class MapPanel(PanelContent):
         self.listener = Listener()
 
         self.addComponent(TitleComponent(self.root, ctx, "Layers"))
+        self.addComponent(CheckboxComponent(self.root, ctx, "Lat/Lon", state.mapLatLon))
         self.addComponent(CheckboxComponent(self.root, ctx, "States", state.mapStates))
         self.addComponent(
             CheckboxComponent(self.root, ctx, "Counties", state.mapCounties)

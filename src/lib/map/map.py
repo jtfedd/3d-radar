@@ -71,7 +71,7 @@ class Map(Listener):
 
         self.boundary = RadarBoundary(ctx, state, self.mapRoot)
 
-        self.latlonLines = LatLonLines(self.mapRoot)
+        self.latlonLines = LatLonLines(state, self.mapRoot)
 
         self.states = self.loadMapLayer(
             "states", UILayer.MAP_STATES, UIColors.MAP_BOUNDARIES
@@ -149,6 +149,8 @@ class Map(Listener):
         self.ctx.windowManager.resolutionProvider.removeNode(self.mapRoot)
 
         self.boundary.destroy()
+
+        self.latlonLines.destroy()
 
         self.lightingManager.destroy()
         self.markersManager.destroy()
