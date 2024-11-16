@@ -15,10 +15,9 @@ from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
-from lib.util.map_3d_to_2d import map3dToAspect2d
 from lib.util.optional import unwrap
 
-from ..util import toGlobe
+from ..util import toGlobe, toScreen
 
 
 class MapMarker(Listener):
@@ -76,8 +75,8 @@ class MapMarker(Listener):
         self.visible = visible
 
     def update(self, task: Task) -> int:
-        markerOnscreenPos = map3dToAspect2d(
-            self.ctx, self.ctx.base.render, self.posRoot.getPos(self.ctx.base.render)
+        markerOnscreenPos = toScreen(
+            self.ctx, self.posRoot.getPos(self.ctx.base.render)
         )
 
         show2dMarker = self.visible and not self.state.show3dMarkers.value
