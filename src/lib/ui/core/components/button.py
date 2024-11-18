@@ -5,7 +5,7 @@ from typing import Callable
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectButton import DirectButton
 from direct.task.Task import Task
-from panda3d.core import NodePath, PandaNode, TransparencyAttrib, Vec4
+from panda3d.core import DynamicTextFont, NodePath, PandaNode, TransparencyAttrib, Vec4
 
 from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign, VAlign
@@ -114,6 +114,7 @@ class Button(Component):
         interactionLayer: UILayer = UILayer.CONTENT_INTERACTION,
         toggleState: bool = False,
         text: str | None = None,
+        font: DynamicTextFont | None = None,
         textSize: float = UIConstants.fontSizeRegular,
         icon: str | None = None,
         toggleIcon: str | None = None,
@@ -157,7 +158,7 @@ class Button(Component):
 
         self.textContentFactory: Callable[[str], Text] = lambda t: Text(
             root=root,
-            font=ctx.fonts.medium,
+            font=font or ctx.fonts.medium,
             text=t,
             x=xPos,
             y=yPos,

@@ -6,7 +6,7 @@ from panda3d.core import NodePath, PandaNode
 from lib.app.context import AppContext
 from lib.app.state import AppState
 from lib.model.radar_station import RadarStation
-from lib.ui.core.components.button import Button
+from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
@@ -45,6 +45,7 @@ class StationButton(Listener):
             contentLayer=UILayer.STATIONS_BUTTON_CONTENT,
             interactionLayer=UILayer.STATIONS_BUTTON_INTERACTION,
             text=station.stationID,
+            skin=ButtonSkin.ACCENT,
         )
 
         self.bind(state.uiScale, self.root.setScale)
