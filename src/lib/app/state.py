@@ -153,6 +153,9 @@ class AppState:
         self.playKeybinding = self.createField("playKeybinding", "space")
         self.nextKeybinding = self.createField("nextKeybinding", ".")
         self.prevKeybinding = self.createField("prevKeybinding", ",")
+        self.stationsButtonKeybinding = self.createField(
+            "stationButtonsKeybinding", "s"
+        )
 
         self.dataType = self.createFieldCustomSerialization(
             "dataType",

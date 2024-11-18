@@ -4,10 +4,10 @@ from typing import Dict, List
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.model.location import Location
 from lib.model.radar_station import RadarStation
-from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
 
@@ -19,7 +19,7 @@ from .radar_button import RadarButton
 class RadarStationsResult(AddressResultsComponent, Listener):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         root: NodePath[PandaNode],
         events: AppEvents,
         top: float,

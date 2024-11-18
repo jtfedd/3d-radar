@@ -5,9 +5,9 @@ from typing import Callable
 import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectButton import DirectButton
 from direct.task.Task import Task
-from panda3d.core import NodePath, PandaNode, TransparencyAttrib, Vec4
+from panda3d.core import DynamicTextFont, NodePath, PandaNode, TransparencyAttrib, Vec4
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -102,7 +102,7 @@ class Button(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         width: float,
         height: float,
         x: float = 0,
@@ -114,6 +114,7 @@ class Button(Component):
         interactionLayer: UILayer = UILayer.CONTENT_INTERACTION,
         toggleState: bool = False,
         text: str | None = None,
+        font: DynamicTextFont | None = None,
         textSize: float = UIConstants.fontSizeRegular,
         icon: str | None = None,
         toggleIcon: str | None = None,
@@ -157,7 +158,7 @@ class Button(Component):
 
         self.textContentFactory: Callable[[str], Text] = lambda t: Text(
             root=root,
-            font=ctx.fonts.medium,
+            font=font or ctx.fonts.medium,
             text=t,
             x=xPos,
             y=yPos,
@@ -197,9 +198,7 @@ class Button(Component):
 
         self.onClick = EventDispatcher[None]()
 
-        self.updateTask = ctx.appContext.base.addTask(
-            lambda _: self.update(), "button-update"
-        )
+        self.updateTask = ctx.base.addTask(lambda _: self.update(), "button-update")
 
     def getState(self) -> str:
         if self.disabled:

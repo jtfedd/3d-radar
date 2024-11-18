@@ -4,7 +4,7 @@ from typing import Tuple
 
 from panda3d.core import NodePath, PandaNode
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign
 from lib.ui.core.components.slider import Slider
 from lib.ui.core.constants import UIConstants
@@ -16,7 +16,7 @@ class SliderComponent(PanelComponent):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         initialValue: float,
         valueRange: Tuple[float, float],
         label: str,

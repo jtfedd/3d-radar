@@ -5,8 +5,8 @@ from direct.gui.DirectScrolledFrame import DirectScrolledFrame
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.constants import UIConstants
@@ -21,7 +21,7 @@ class ScrollablePanel:
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         events: AppEvents,
         x: float = 0,
         y: float = 0,
@@ -63,7 +63,7 @@ class ScrollablePanel:
 
         self.scrollbarAlpha = 0.0
         self.lastScrollbarUpdate = 0.0
-        self.updateTask = self.ctx.appContext.base.addTask(self.updateScrollbar)
+        self.updateTask = self.ctx.base.addTask(self.updateScrollbar)
 
         self.updateFrame(height, canvasHeight)
 

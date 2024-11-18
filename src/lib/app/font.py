@@ -1,7 +1,7 @@
 from panda3d.core import DynamicTextFont
 
 
-class UIFonts:
+class Fonts:
     def __init__(self) -> None:
         # https://fonts.google.com/specimen/Inter
         self.thin = DynamicTextFont("assets/font/Inter/Inter-Thin.ttf")

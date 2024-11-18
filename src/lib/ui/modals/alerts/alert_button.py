@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.model.alert import Alert
 from lib.model.alert_type import AlertType
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -19,7 +19,7 @@ from lib.util.events.listener import Listener
 class AlertButton(Listener):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         root: NodePath[PandaNode],
         alert: Alert,
         top: float,

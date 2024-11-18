@@ -1,4 +1,4 @@
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -13,7 +13,7 @@ from lib.util.events.listener import Listener
 
 
 class PanelHeader(Listener):
-    def __init__(self, ctx: UIContext, events: PanelEvents, text: str) -> None:
+    def __init__(self, ctx: AppContext, events: PanelEvents, text: str) -> None:
         super().__init__()
 
         self.root = ctx.anchors.topLeft.attachNewNode("panel-header")

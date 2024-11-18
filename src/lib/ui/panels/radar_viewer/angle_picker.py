@@ -6,7 +6,7 @@ import direct.gui.DirectGuiGlobals as DGG
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.button import Button, ButtonSkin
@@ -22,7 +22,7 @@ class AnglePicker(Listener):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         observable: Observable[float],
         scale: float,
         offset: float,
@@ -117,27 +117,27 @@ class AnglePicker(Listener):
             lambda value: self.arrowRoot.setR((self.scale * value) + self.offset),
         )
 
-        self.updateTask = ctx.appContext.base.taskMgr.add(self.update, "angle-update")
+        self.updateTask = ctx.base.taskMgr.add(self.update, "angle-update")
 
     def update(self, task: Task) -> int:
         buttonState = self.button.button.guiItem.getState()  # type:ignore
         if buttonState != DGG.BUTTON_DEPRESSED_STATE:
             return task.cont
 
-        mouseWatcher = self.ctx.appContext.base.mouseWatcherNode
+        mouseWatcher = self.ctx.base.mouseWatcherNode
         if not mouseWatcher.hasMouse():
             return task.cont
 
         mouseX = mouseWatcher.getMouseX()
         mouseY = mouseWatcher.getMouseY()
 
-        aspectRatio = self.ctx.appContext.base.getAspectRatio()
+        aspectRatio = self.ctx.base.getAspectRatio()
         if aspectRatio >= 1:
             mouseX *= aspectRatio
         else:
             mouseY /= aspectRatio
 
-        pivot = self.arrowRoot.getPos(self.ctx.appContext.base.aspect2dp)
+        pivot = self.arrowRoot.getPos(self.ctx.base.aspect2dp)
         dx = mouseX - pivot.getX()
         dy = mouseY - pivot.getZ()
 

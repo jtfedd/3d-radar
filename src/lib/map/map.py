@@ -11,6 +11,7 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.map.lat_lon_lines import LatLonLines
 from lib.map.radar_boundary import RadarBoundary
+from lib.map.stations.stations_renderer import StationsRenderer
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
 from lib.ui.core.layers import UILayer
@@ -101,6 +102,9 @@ class Map(Listener):
 
         self.markersRoot = self.mapRoot.attachNewNode("map-markers")
         self.markersRenderer = MarkersRenderer(ctx, state, self.markersRoot)
+
+        self.stationsRoot = self.mapRoot.attachNewNode("map-stations")
+        self.stationsRenderer = StationsRenderer(ctx, state, events, self.stationsRoot)
 
         self.bind(state.station, self.updatePosition)
 

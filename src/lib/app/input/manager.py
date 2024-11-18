@@ -46,6 +46,15 @@ class InputManager(DirectObject):
             self.state.prevKeybinding.value, lambda: self.send(self.events.prevFrame)
         )
 
+        self.accept(
+            self.state.stationsButtonKeybinding.value,
+            lambda: self.send(self.events.showStationsButtons),
+        )
+        self.accept(
+            self.state.stationsButtonKeybinding.value + "-up",
+            lambda: self.events.hideStationsButtons.send(None),
+        )
+
         self.accept("wheel_up-up", lambda: self.events.scroll.send(-1))
         self.accept("wheel_down-up", lambda: self.events.scroll.send(1))
 

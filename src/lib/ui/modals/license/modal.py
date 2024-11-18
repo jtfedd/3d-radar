@@ -1,5 +1,5 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 
 from ..core.footer_button import FooterButton
@@ -9,7 +9,7 @@ from .license import LICENSE_TEXT
 
 
 class LicenseModal(Modal):
-    def __init__(self, ctx: UIContext, events: AppEvents):
+    def __init__(self, ctx: AppContext, events: AppEvents):
         super().__init__(
             ctx,
             events,

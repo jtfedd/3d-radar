@@ -2,12 +2,12 @@ import math
 from typing import List
 from zoneinfo import available_timezones
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.files.manager import FileManager
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.model.time_mode import TimeMode
-from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
@@ -31,7 +31,7 @@ class SettingsPanel(PanelContent):
 
     MAX_LOOP_DELAY = 10.0
 
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
         self.ctx = ctx
         self.events = events

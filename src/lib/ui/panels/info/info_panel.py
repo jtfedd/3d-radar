@@ -1,8 +1,8 @@
 import webbrowser
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.spacer import SpacerComponent
@@ -13,7 +13,7 @@ from lib.util.events.listener import Listener
 
 
 class InfoPanel(PanelContent):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
         self.listener = Listener()

@@ -1,7 +1,7 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_type import DataType
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -12,7 +12,7 @@ from lib.util.events.listener import Listener
 
 
 class Label(Listener):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents):
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.ctx = ctx
@@ -114,7 +114,7 @@ class Label(Listener):
         if not scan:
             return None
 
-        return self.ctx.appContext.timeUtil.formatTime(
+        return self.ctx.timeUtil.formatTime(
             scan.record.time,
             capitalizeMonth=True,
         )

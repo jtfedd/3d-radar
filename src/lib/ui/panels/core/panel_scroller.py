@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.constants import UIConstants
@@ -14,7 +14,7 @@ from lib.ui.panels.core.panel_component_manager import PanelComponentManager
 class PanelScroller:
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         components: PanelComponentManager,
         state: AppState,
         events: AppEvents,

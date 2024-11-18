@@ -1,8 +1,8 @@
 from typing import List
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.model.location import Location
-from lib.ui.context import UIContext
 
 from ..address_search.modal import AddressSearchModal
 from ..address_search.results_component import AddressResultsComponent
@@ -10,7 +10,7 @@ from .result_component import MarkerResult
 
 
 class MarkerSearchModal(AddressSearchModal):
-    def __init__(self, ctx: UIContext, events: AppEvents):
+    def __init__(self, ctx: AppContext, events: AppEvents):
         super().__init__(
             ctx,
             events,

@@ -1,6 +1,6 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.panels.core.panel_buttons import PanelButtons
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.ui.panels.info.info_panel import InfoPanel
@@ -13,7 +13,7 @@ from lib.util.errors import InvalidArgumentException
 
 
 class PanelModule:
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         self.events = events
         self.state = state
 

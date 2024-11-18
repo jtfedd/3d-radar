@@ -4,9 +4,9 @@ from typing import List
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.model.location import Location
-from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
 
@@ -17,7 +17,7 @@ from .address_button import AddressButton
 class MarkerResult(AddressResultsComponent, Listener):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         root: NodePath[PandaNode],
         events: AppEvents,
         top: float,

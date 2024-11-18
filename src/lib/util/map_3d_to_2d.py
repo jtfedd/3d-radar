@@ -1,13 +1,10 @@
-from __future__ import annotations
-
-from panda3d.core import NodePath, PandaNode, Point2, Point3
+from panda3d.core import Point2, Point3
 
 from lib.app.context import AppContext
 
 
 def map3dToAspect2d(
     ctx: AppContext,
-    node: NodePath[PandaNode],
     point: Point3,
 ) -> Point3 | None:
     """Maps the indicated 3-d point (a Point3), which is relative to
@@ -16,7 +13,7 @@ def map3dToAspect2d(
     Returns None if the point is not onscreen."""
 
     # Convert the point to the 3-d space of the camera
-    p3 = ctx.base.cam.getRelativePoint(node, point)
+    p3 = ctx.base.cam.getRelativePoint(ctx.base.render, point)
     # Convert it through the lens to render2d coordinates
     p2 = Point2()
     if not ctx.base.camLens.project(p3, p2):
