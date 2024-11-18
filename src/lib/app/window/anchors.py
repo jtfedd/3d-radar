@@ -1,27 +1,27 @@
 from __future__ import annotations
 
+from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 from panda3d.core import PythonTask
 
-from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.core.constants import UIConstants
 from lib.util.events.listener import Listener
 
 
-class UIAnchors(Listener):
+class Anchors(Listener):
     ANIMATION_TIME = 0.1
 
     def __init__(
         self,
-        ctx: AppContext,
+        base: ShowBase,
         state: AppState,
         events: AppEvents,
     ):
         super().__init__()
 
-        self.ctx = ctx
+        self.base = base
         self.state = state
         self.events = events
 
@@ -32,7 +32,7 @@ class UIAnchors(Listener):
         self.width = 1.0
         self.height = 1.0
 
-        root = self.ctx.base.aspect2dp
+        root = self.base.aspect2dp
 
         self.center = root.attachNewNode("center")
 
@@ -60,9 +60,9 @@ class UIAnchors(Listener):
         self.animating = True
 
         if self.hidden:
-            self.hideTask = self.ctx.base.addTask(self.show, "show-anchors")
+            self.hideTask = self.base.addTask(self.show, "show-anchors")
         else:
-            self.hideTask = self.ctx.base.addTask(self.hide, "hide-anchors")
+            self.hideTask = self.base.addTask(self.hide, "hide-anchors")
 
     def hide(self, task: Task) -> int:
         progress = task.time / self.ANIMATION_TIME
@@ -95,7 +95,7 @@ class UIAnchors(Listener):
         return task.cont
 
     def update(self) -> None:
-        aspectRatio = self.ctx.base.getAspectRatio()
+        aspectRatio = self.base.getAspectRatio()
 
         width = aspectRatio
         height = 1.0

@@ -1,6 +1,6 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.modals.loading_progress.modal import LoadingProgressModal
 from lib.util.events.listener import Listener
 
@@ -14,7 +14,7 @@ from .timezone_search.modal import TimezoneSearchModal
 
 
 class ModalManager(Listener):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents):
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.currentModal: Modal | None = None

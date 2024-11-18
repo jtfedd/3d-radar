@@ -1,11 +1,11 @@
 from typing import List
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.alert import Alert
 from lib.model.alert_status import AlertStatus
 from lib.model.alert_type import AlertType
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.components.text import Text
@@ -21,7 +21,7 @@ from .alert_button import AlertButton
 
 
 class AlertsModal(Modal):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents):
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__(
             ctx,
             events,
@@ -107,7 +107,7 @@ class AlertsModal(Modal):
         torWarnings = alerts.alerts[AlertType.TORNADO_WARNING]
         svrWarnings = alerts.alerts[AlertType.SEVERE_THUNDERSTORM_WARNING]
 
-        station = self.ctx.appContext.services.nws.getStation(self.state.station.value)
+        station = self.ctx.services.nws.getStation(self.state.station.value)
         if station:
             torWarnings.sort(key=lambda a: a.center().dist(unwrap(station).geoPoint))
             svrWarnings.sort(key=lambda a: a.center().dist(unwrap(station).geoPoint))

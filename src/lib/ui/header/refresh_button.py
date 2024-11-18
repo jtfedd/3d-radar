@@ -2,9 +2,9 @@ import math
 
 from direct.task.Task import Task
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.button import Button
@@ -16,7 +16,7 @@ from lib.util.events.listener import Listener
 
 
 class RefreshButton(Listener):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         super().__init__()
 
         self.root = ctx.anchors.topRight.attachNewNode("refresh-button")
@@ -72,7 +72,7 @@ class RefreshButton(Listener):
         self.listen(self.button.onClick, events.refreshData.send)
         self.bind(state.loadingData, self.updateLoading)
 
-        self.spinnerTask = ctx.appContext.base.taskMgr.add(self.updateSpinner, "spin")
+        self.spinnerTask = ctx.base.taskMgr.add(self.updateSpinner, "spin")
 
     def updateLoading(self, loading: bool) -> None:
         if loading:

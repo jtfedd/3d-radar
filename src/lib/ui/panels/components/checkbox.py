@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign
 from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.constants import UIConstants
@@ -17,7 +17,7 @@ class CheckboxComponent(PanelComponent):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         label: str,
         observable: Observable[bool],
     ):

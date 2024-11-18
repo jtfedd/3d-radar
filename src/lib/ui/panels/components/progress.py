@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign
 from lib.ui.core.components.progress_bar import ProgressBar
 from lib.ui.core.constants import UIConstants
@@ -14,7 +14,7 @@ class ProgressComponent(PanelComponent):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         progress: float,
         label: str,
         leftPadding: float = 0,

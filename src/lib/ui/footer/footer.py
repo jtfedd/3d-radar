@@ -1,6 +1,6 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -12,7 +12,7 @@ from .animation_controls.animation_controls import AnimationControls
 
 
 class Footer(Listener):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents):
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents):
         super().__init__()
 
         self.background = BackgroundCard(

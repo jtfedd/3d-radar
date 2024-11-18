@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 
 from ..core.text import ModalText
 from .results_component import AddressResultsComponent
@@ -11,7 +11,7 @@ from .results_component import AddressResultsComponent
 class ErrorResultComponent(AddressResultsComponent):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         root: NodePath[PandaNode],
         top: float,
         message: str,

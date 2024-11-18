@@ -4,9 +4,9 @@ import direct.gui.DirectGuiGlobals as DGG
 from direct.gui.DirectEntry import DirectEntry
 from panda3d.core import DynamicTextFont, NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.focus.focusable import Focusable
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -26,7 +26,7 @@ from .component import Component
 class TextInput(Focusable, Component):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         events: AppEvents,
         root: NodePath[PandaNode],
         font: DynamicTextFont,
@@ -40,7 +40,7 @@ class TextInput(Focusable, Component):
         initialText: str = "",
         valid: bool = True,
     ):
-        super().__init__(ctx.appContext.focusManager, events.input)
+        super().__init__(ctx.focusManager, events.input)
         self.listener = Listener()
 
         self.valid = valid

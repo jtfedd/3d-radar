@@ -1,6 +1,6 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.model.loading_progress_payload import LoadingProgressPayload
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign
 from lib.ui.core.components.progress_bar import ProgressBar
 from lib.ui.core.constants import UIConstants
@@ -15,7 +15,7 @@ from ..core.title import ModalTitle
 class LoadingProgressModal(Modal):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         events: AppEvents,
         payload: LoadingProgressPayload,
     ):

@@ -1,9 +1,9 @@
 from typing import List
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.map.constants import RADAR_RANGE
 from lib.model.location import Location
-from lib.ui.context import UIContext
 
 from ..address_search.error_result_component import ErrorResultComponent
 from ..address_search.modal import AddressSearchModal
@@ -15,7 +15,7 @@ class StationSearchModal(AddressSearchModal):
     TITLE = "Find Radar Station"
     DESC = "Search for an address or location to locate\nnearby radar stations."
 
-    def __init__(self, ctx: UIContext, events: AppEvents):
+    def __init__(self, ctx: AppContext, events: AppEvents):
         super().__init__(
             ctx,
             events,
@@ -35,7 +35,7 @@ class StationSearchModal(AddressSearchModal):
         distances = {}
         stationsInRange = []
 
-        for radarStation in self.ctx.appContext.services.nws.radarStations.values():
+        for radarStation in self.ctx.services.nws.radarStations.values():
             dist = location.geoPoint.dist(radarStation.geoPoint)
             if dist < RADAR_RANGE:
                 distances[radarStation.stationID] = dist

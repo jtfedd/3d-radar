@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, TypeVar
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -21,7 +21,7 @@ T = TypeVar("T", bound=PanelComponent)
 class PanelContent(ABC):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         state: AppState,
         events: AppEvents,
     ) -> None:

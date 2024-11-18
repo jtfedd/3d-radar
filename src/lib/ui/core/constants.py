@@ -88,6 +88,9 @@ class UIConstants:
 
     mapMarkerSize = 0.07
 
+    stationMapButtonWidth = 0.1
+    stationMapButtonHeight = 0.04
+
     modalPadding = 0.05
     modalTitleHeight = 0.08
     modalScrollbarPadding = modalPadding / 2

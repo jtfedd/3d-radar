@@ -1,12 +1,12 @@
 import datetime
 from typing import List
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
 from lib.model.data_query import DataQuery
 from lib.model.time_query import TimeQuery
-from lib.ui.context import UIContext
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
 from lib.ui.panels.components.button_group import PanelButtonGroup
@@ -20,7 +20,7 @@ from lib.util.events.observable import Observable
 
 
 class RadarDataPanel(PanelContent):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
         self.listener = Listener()
@@ -200,7 +200,7 @@ class RadarDataPanel(PanelContent):
         self.setupFocusLoop(focusableItems)
 
     def updateRadarName(self, radar: str) -> None:
-        radarStation = self.ctx.appContext.services.nws.getStation(radar)
+        radarStation = self.ctx.services.nws.getStation(radar)
 
         if not radarStation:
             self.radarName.setHidden(True)
@@ -269,7 +269,7 @@ class RadarDataPanel(PanelContent):
             valid = True
 
         radar = self.radarInput.input.entry.get()
-        if radar not in self.ctx.appContext.services.nws.radarStations:
+        if radar not in self.ctx.services.nws.radarStations:
             valid = False
             self.radarInput.setValid(False)
 

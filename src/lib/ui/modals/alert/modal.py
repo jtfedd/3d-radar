@@ -1,6 +1,6 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.model.alert import Alert
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.components.text import Text
@@ -13,7 +13,7 @@ from ..core.title import ModalTitle
 
 
 class AlertModal(Modal):
-    def __init__(self, ctx: UIContext, events: AppEvents, alert: Alert):
+    def __init__(self, ctx: AppContext, events: AppEvents, alert: Alert):
         super().__init__(
             ctx,
             events,

@@ -4,9 +4,9 @@ from typing import List
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.state import AppState
 from lib.model.data_type import DataType
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -19,7 +19,7 @@ from lib.util.events.listener import Listener
 
 
 class Scale(Listener):
-    def __init__(self, ctx: UIContext, state: AppState):
+    def __init__(self, ctx: AppContext, state: AppState):
         super().__init__()
 
         self.ctx = ctx

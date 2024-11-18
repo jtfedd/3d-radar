@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.model.location import Location
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text_input import TextInput
 from lib.ui.core.constants import UIConstants
@@ -19,7 +19,9 @@ from .results_component import AddressResultsComponent
 
 
 class AddressSearchModal(Modal, ABC):
-    def __init__(self, ctx: UIContext, events: AppEvents, title: str, description: str):
+    def __init__(
+        self, ctx: AppContext, events: AppEvents, title: str, description: str
+    ):
         super().__init__(ctx, events, UIConstants.addressModalWidth, 0)
 
         self.listener = Listener()
@@ -86,7 +88,7 @@ class AddressSearchModal(Modal, ABC):
             self.resultsComponent.destroy()
             self.resultsComponent = None
 
-        results = self.ctx.appContext.services.locations.search(
+        results = self.ctx.services.locations.search(
             address=address,
             limit=self.resultsLimit(),
         )

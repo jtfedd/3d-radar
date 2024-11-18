@@ -7,10 +7,12 @@ from lib.services.services import Services
 from .events import AppEvents
 from .files.manager import FileManager
 from .focus.manager import FocusManager
+from .font import Fonts
 from .input.manager import InputManager
 from .state import AppState
 from .task.manager import TaskManager
 from .time.util import TimeUtil
+from .window.anchors import Anchors
 from .window.manager import WindowManager
 
 
@@ -25,6 +27,8 @@ class AppContext:
         self.animationManager = AnimationManager(base, state, events)
         self.services = Services(self.fileManager, Network())
         self.timeUtil = TimeUtil(state, events, self.services)
+        self.anchors = Anchors(base, state, events)
+        self.fonts = Fonts()
 
     def destroy(self) -> None:
         self.animationManager.destroy()
@@ -33,3 +37,4 @@ class AppContext:
         self.services.destroy()
         self.taskManager.destroy()
         self.fileManager.destroy()
+        self.anchors.destroy()

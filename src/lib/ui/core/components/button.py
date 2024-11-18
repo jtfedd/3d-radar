@@ -7,7 +7,7 @@ from direct.gui.DirectButton import DirectButton
 from direct.task.Task import Task
 from panda3d.core import NodePath, PandaNode, TransparencyAttrib, Vec4
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -102,7 +102,7 @@ class Button(Component):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         width: float,
         height: float,
         x: float = 0,
@@ -197,9 +197,7 @@ class Button(Component):
 
         self.onClick = EventDispatcher[None]()
 
-        self.updateTask = ctx.appContext.base.addTask(
-            lambda _: self.update(), "button-update"
-        )
+        self.updateTask = ctx.base.addTask(lambda _: self.update(), "button-update")
 
     def getState(self) -> str:
         if self.disabled:

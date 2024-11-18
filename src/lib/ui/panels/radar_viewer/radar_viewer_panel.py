@@ -1,7 +1,7 @@
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_type import DataType
-from lib.ui.context import UIContext
 from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.title import TitleComponent
@@ -14,7 +14,7 @@ from .lighting_direction import LightingDirection
 
 
 class RadarViewerPanel(PanelContent):
-    def __init__(self, ctx: UIContext, state: AppState, events: AppEvents) -> None:
+    def __init__(self, ctx: AppContext, state: AppState, events: AppEvents) -> None:
         super().__init__(ctx, state, events)
 
         self.ctx = ctx

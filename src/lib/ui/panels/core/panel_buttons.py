@@ -1,6 +1,6 @@
 from typing import Callable, List, Tuple
 
-from lib.ui.context import UIContext
+from lib.app.context import AppContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.button import Button
 from lib.ui.core.constants import UIConstants
@@ -19,7 +19,7 @@ class PanelButtons(Listener):
         (PanelType.ABOUT, Icons.INFO),
     ]
 
-    def __init__(self, ctx: UIContext, events: PanelEvents) -> None:
+    def __init__(self, ctx: AppContext, events: PanelEvents) -> None:
         super().__init__()
         self.events = events
 

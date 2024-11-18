@@ -5,8 +5,8 @@ from typing import Tuple
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.constants import UIConstants
@@ -24,7 +24,7 @@ class AddressResultsComponent(ABC):
 
     def setupButtonRoot(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         events: AppEvents,
         top: float,
         contentHeight: float,

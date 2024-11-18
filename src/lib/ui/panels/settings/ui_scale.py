@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
@@ -19,7 +19,7 @@ class UIScaleInput(PanelComponent):
     def __init__(
         self,
         root: NodePath[PandaNode],
-        ctx: UIContext,
+        ctx: AppContext,
         state: AppState,
         events: AppEvents,
     ):

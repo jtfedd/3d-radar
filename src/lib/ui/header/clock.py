@@ -2,8 +2,8 @@ import datetime
 
 from direct.task.Task import Task
 
+from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -14,7 +14,7 @@ from lib.util.events.listener import Listener
 
 
 class Clock(Listener):
-    def __init__(self, ctx: UIContext, events: AppEvents):
+    def __init__(self, ctx: AppContext, events: AppEvents):
         super().__init__()
 
         self.ctx = ctx
@@ -39,9 +39,7 @@ class Clock(Listener):
             layer=UILayer.BACKGROUND_DECORATION,
         )
 
-        self.updateTask = ctx.appContext.base.addTask(
-            self.update, "update-clock", delay=1
-        )
+        self.updateTask = ctx.base.addTask(self.update, "update-clock", delay=1)
 
         self.listen(
             events.timeFormatChanged,
@@ -54,7 +52,7 @@ class Clock(Listener):
         return task.again
 
     def getClockStr(self) -> str:
-        return self.ctx.appContext.timeUtil.formatTime(
+        return self.ctx.timeUtil.formatTime(
             datetime.datetime.now(),
             sep="\n",
         )

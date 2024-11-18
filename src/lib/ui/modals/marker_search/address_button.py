@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from panda3d.core import NodePath, PandaNode
 
+from lib.app.context import AppContext
 from lib.model.location import Location
-from lib.ui.context import UIContext
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.components.text import Text
@@ -16,7 +16,7 @@ from lib.util.events.listener import Listener
 class AddressButton(Listener):
     def __init__(
         self,
-        ctx: UIContext,
+        ctx: AppContext,
         root: NodePath[PandaNode],
         top: float,
         contentWidth: float,
