@@ -24,7 +24,7 @@ class StationsRenderer(Listener):
         self.buttons: List[StationButton] = []
 
         for station in ctx.services.nws.radarStations.values():
-            self.buttons.append(StationButton(ctx, state, root, station))
+            self.buttons.append(StationButton(ctx, state, events, root, station))
 
         self.listen(
             events.input.showStationsButtons, lambda _: self.showStationButtons(True)

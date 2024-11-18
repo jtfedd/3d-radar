@@ -10,8 +10,8 @@ from lib.model.data_query import DataQuery
 from lib.model.loading_progress_payload import LoadingProgressPayload
 from lib.model.record import Record
 from lib.model.scan import Scan
-from lib.model.time_query import TimeQuery
 from lib.util.events.listener import Listener
+from lib.util.state import applyDataQueryToState, dataQueryFromState
 
 from .loading_task import LoadingTask
 
@@ -35,7 +35,7 @@ class DataManager(Listener):
 
         self.loadingTask: LoadingTask | None = None
 
-        self.onDataRequested(self.dataQueryFromCurrentState())
+        self.onDataRequested(dataQueryFromState(state))
         self.listen(events.requestData, self.onDataRequested)
         self.listen(events.refreshData, lambda _: self.refresh())
 
@@ -51,34 +51,6 @@ class DataManager(Listener):
             self.refresh()
 
         return task.cont
-
-    def dataQueryFromCurrentState(self) -> DataQuery:
-        radar = self.state.station.value
-        frames = self.state.frames.value
-        time: TimeQuery | None = None
-        if not self.state.latest.value:
-            time = TimeQuery(
-                year=self.state.year.value,
-                month=self.state.month.value,
-                day=self.state.day.value,
-                time=self.state.time.value,
-            )
-
-        return DataQuery(
-            radar=radar,
-            frames=frames,
-            time=time,
-        )
-
-    def applyDataQueryToState(self, query: DataQuery) -> None:
-        self.state.station.setValue(query.radar)
-        self.state.frames.setValue(query.frames)
-        self.state.latest.setValue(query.time is None)
-        if query.time is not None:
-            self.state.year.setValue(query.time.year)
-            self.state.month.setValue(query.time.month)
-            self.state.day.setValue(query.time.day)
-            self.state.time.setValue(query.time.time)
 
     def onDataRequested(self, dataQuery: DataQuery) -> None:
         self.load(dataQuery)
@@ -110,7 +82,7 @@ class DataManager(Listener):
         if not self.state.latest.value or self.loadingTask is not None:
             return
 
-        self.load(self.dataQueryFromCurrentState())
+        self.load(dataQueryFromState(self.state))
 
     def onLoadCancelled(self) -> None:
         self.refreshTimer = 0
@@ -124,7 +96,7 @@ class DataManager(Listener):
         self.state.loadingData.setValue(False)
         self.loadingTask = None
 
-        self.applyDataQueryToState(query)
+        applyDataQueryToState(self.state, query)
         self.state.animationData.setValue(defaultdict(lambda: None, scans))
         self.state.animationRecords.setValue(records)
 
