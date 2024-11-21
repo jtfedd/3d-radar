@@ -107,7 +107,7 @@ class Map(Listener):
         self.stationsRoot = self.mapRoot.attachNewNode("map-stations")
         self.stationsRenderer = StationsRenderer(ctx, state, events, self.stationsRoot)
 
-        self.selectionManager = SelectionManager(ctx, events)
+        self.selectionManager = SelectionManager(ctx, events, self.mapRoot)
 
         self.bind(state.station, self.updatePosition)
 

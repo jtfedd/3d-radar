@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 
 from panda3d.core import (
@@ -7,19 +9,25 @@ from panda3d.core import (
     CollisionSphere,
     CollisionTraverser,
     LPoint2,
+    NodePath,
+    PandaNode,
 )
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.map.constants import EARTH_RADIUS
+from lib.map.util import fromGlobe
 from lib.util.events.listener import Listener
 
 
 class SelectionManager(Listener):
-    def __init__(self, ctx: AppContext, events: AppEvents) -> None:
+    def __init__(
+        self, ctx: AppContext, events: AppEvents, root: NodePath[PandaNode]
+    ) -> None:
         super().__init__()
 
         self.ctx = ctx
+        self.root = root
 
         self.savedMousePos: LPoint2 | None = None
 
@@ -64,4 +72,15 @@ class SelectionManager(Listener):
         self.traverser.traverse(self.cnodePath)
         if self.handler.getNumEntries() > 0:
             self.handler.sortEntries()
-            # TODO calculate geopoint
+            mapPos = self.handler.getEntry(0).getSurfacePoint(self.root)
+            geoPoint = fromGlobe(mapPos)
+
+            screenPos = LPoint2(mpos.x, mpos.y)
+            aspectRatio = self.ctx.base.getAspectRatio()
+            if aspectRatio > 1:
+                screenPos.x = screenPos.x * aspectRatio
+            else:
+                screenPos.y = screenPos.y * (1 / aspectRatio)
+
+            print(geoPoint.lat, geoPoint.lon)
+            print(screenPos.x, screenPos.y)
