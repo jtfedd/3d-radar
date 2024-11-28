@@ -41,6 +41,7 @@ class ContextMenuManager(Listener):
         if len(groups) > 0:
             self.contextMenu = ContextMenu(
                 self.ctx,
+                self.state,
                 self.events,
                 payload.screenPoint,
                 groups,
