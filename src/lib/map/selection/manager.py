@@ -8,15 +8,16 @@ from panda3d.core import (
     CollisionRay,
     CollisionSphere,
     CollisionTraverser,
-    LPoint2,
     NodePath,
     PandaNode,
+    Point2,
 )
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.map.constants import EARTH_RADIUS
 from lib.map.util import fromGlobe
+from lib.model.context_menu_payload import ContextMenuPayload
 from lib.util.events.listener import Listener
 
 
@@ -28,8 +29,9 @@ class SelectionManager(Listener):
 
         self.ctx = ctx
         self.root = root
+        self.events = events
 
-        self.savedMousePos: LPoint2 | None = None
+        self.savedMousePos: Point2 | None = None
 
         self.cs = CollisionSphere(0, 0, 0, EARTH_RADIUS)
         self.cnodePath = ctx.base.render.attachNewNode(CollisionNode("cnode"))
@@ -46,6 +48,7 @@ class SelectionManager(Listener):
         self.traverser.addCollider(self.rnodePath, self.handler)
 
         # Debug
+        # TODO remove
         self.cnodePath.show()
         self.traverser.showCollisions(ctx.base.render)
 
@@ -75,12 +78,13 @@ class SelectionManager(Listener):
             mapPos = self.handler.getEntry(0).getSurfacePoint(self.root)
             geoPoint = fromGlobe(mapPos)
 
-            screenPos = LPoint2(mpos.x, mpos.y)
+            screenPos = Point2(mpos.x, mpos.y)
             aspectRatio = self.ctx.base.getAspectRatio()
             if aspectRatio > 1:
                 screenPos.x = screenPos.x * aspectRatio
             else:
                 screenPos.y = screenPos.y * (1 / aspectRatio)
 
-            print(geoPoint.lat, geoPoint.lon)
-            print(screenPos.x, screenPos.y)
+            self.events.ui.requestContextMenu.send(
+                ContextMenuPayload(screenPos, geoPoint)
+            )

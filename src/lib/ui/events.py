@@ -1,3 +1,4 @@
+from lib.model.context_menu_payload import ContextMenuPayload
 from lib.util.events.event_dispatcher import EventDispatcher
 
 from .modals.events import ModalEvents
@@ -10,9 +11,13 @@ class UIEvents:
         self.modals = ModalEvents()
 
         self.onAnchorUpdate = EventDispatcher[None]()
+        self.requestContextMenu = EventDispatcher[ContextMenuPayload]()
+        self.closeContextMenu = EventDispatcher[None]()
 
     def destroy(self) -> None:
         self.panels.destroy()
         self.modals.destroy()
 
         self.onAnchorUpdate.close()
+        self.requestContextMenu.close()
+        self.closeContextMenu.close()
