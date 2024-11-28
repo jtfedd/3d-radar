@@ -47,11 +47,6 @@ class SelectionManager(Listener):
         self.traverser = CollisionTraverser("mouse picker")
         self.traverser.addCollider(self.rnodePath, self.handler)
 
-        # Debug
-        # TODO remove
-        self.cnodePath.show()
-        self.traverser.showCollisions(ctx.base.render)
-
         self.listen(events.input.rightMouse, self.onSelect)
 
     def onSelect(self, isDown: bool) -> None:
