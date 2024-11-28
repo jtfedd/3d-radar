@@ -39,7 +39,12 @@ class ContextMenuManager(Listener):
 
         groups = self.getContextMenuGroupsForPoint(payload.geoPoint)
         if len(groups) > 0:
-            self.contextMenu = ContextMenu(self.ctx, payload.screenPoint, groups)
+            self.contextMenu = ContextMenu(
+                self.ctx,
+                self.events,
+                payload.screenPoint,
+                groups,
+            )
 
     def closeContextMenu(self) -> None:
         if self.contextMenu is not None:

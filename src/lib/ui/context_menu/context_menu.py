@@ -3,6 +3,7 @@ from typing import List
 from panda3d.core import Point2
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.ui.context_menu.components.context_menu_component import ContextMenuComponent
 from lib.ui.context_menu.context_menu_group import ContextMenuGroup
 from lib.ui.core.alignment import HAlign, VAlign
@@ -14,7 +15,11 @@ from lib.ui.core.layers import UILayer
 
 class ContextMenu:
     def __init__(
-        self, ctx: AppContext, screenPoint: Point2, groups: List[ContextMenuGroup]
+        self,
+        ctx: AppContext,
+        events: AppEvents,
+        screenPoint: Point2,
+        groups: List[ContextMenuGroup],
     ) -> None:
         self.root = ctx.base.aspect2dp.attachNewNode("context-menu")
         self.root.setX(screenPoint.x)
@@ -24,7 +29,7 @@ class ContextMenu:
         height = UIConstants.contextMenuPadding
 
         for group in groups:
-            groupComponents = group.render(ctx, self.root, height)
+            groupComponents = group.render(ctx, events, self.root, height)
             for component in groupComponents:
                 self.components.append(component)
                 height += component.height()

@@ -3,6 +3,7 @@ from __future__ import annotations
 from panda3d.core import NodePath, PandaNode
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.ui.context_menu.components.context_menu_component import ContextMenuComponent
 from lib.ui.context_menu.context_menu_item import ContextMenuItem
 from lib.ui.core.alignment import HAlign, VAlign
@@ -16,6 +17,7 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
     def __init__(
         self,
         ctx: AppContext,
+        events: AppEvents,
         root: NodePath[PandaNode],
         offset: float,
         item: ContextMenuItem,
@@ -40,6 +42,7 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
         self.leftCap = item.renderLeftCap(self.root)
 
         self.listen(self.button.onClick, lambda _: item.onClick())
+        self.listen(self.button.onClick, events.ui.closeContextMenu.send)
 
     def destroy(self) -> None:
         Listener.destroy(self)

@@ -5,6 +5,7 @@ from typing import List
 from panda3d.core import NodePath, PandaNode
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.ui.context_menu.components.context_menu_component import ContextMenuComponent
 from lib.ui.context_menu.components.context_menu_header_component import (
     ContextMenuHeaderComponent,
@@ -26,6 +27,7 @@ class ContextMenuGroup:
     def render(
         self,
         ctx: AppContext,
+        events: AppEvents,
         root: NodePath[PandaNode],
         offset: float,
     ) -> List[ContextMenuComponent]:
@@ -37,7 +39,7 @@ class ContextMenuGroup:
             components.append(header)
 
         for item in self.items:
-            itemComponent = ContextMenuItemComponent(ctx, root, offset, item)
+            itemComponent = ContextMenuItemComponent(ctx, events, root, offset, item)
             offset += itemComponent.height()
             components.append(itemComponent)
 
