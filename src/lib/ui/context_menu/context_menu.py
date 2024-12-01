@@ -25,6 +25,7 @@ class ContextMenu(Listener):
         groups: List[ContextMenuGroup],
     ) -> None:
         super().__init__()
+        self.ctx = ctx
 
         self.root = ctx.base.aspect2dp.attachNewNode("context-menu-root")
         self.root.setX(screenPoint.x)
@@ -52,7 +53,7 @@ class ContextMenu(Listener):
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
             layer=UILayer.CONTEXT_MENU_BACKGROUND,
-            color=UIColors.BACKGROUND,
+            color=UIColors.ACCENT,
         )
 
         # TODO adjust content root position to keep on screen

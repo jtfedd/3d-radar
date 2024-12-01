@@ -32,6 +32,14 @@ class ContextMenuManager(Listener):
             events.input.rightMouse,
             lambda down: self.closeContextMenu() if down else None,
         )
+        self.listen(
+            events.input.leftMouseRaw,
+            lambda down: self.closeContextMenu() if down else None,
+        )
+        self.listen(
+            events.input.rightMouseRaw,
+            lambda down: self.closeContextMenu() if down else None,
+        )
 
     def openContextMenu(self, payload: ContextMenuPayload) -> None:
         if self.contextMenu is not None:

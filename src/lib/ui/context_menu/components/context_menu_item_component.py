@@ -7,7 +7,7 @@ from lib.app.events import AppEvents
 from lib.ui.context_menu.components.context_menu_component import ContextMenuComponent
 from lib.ui.context_menu.context_menu_item import ContextMenuItem
 from lib.ui.core.alignment import HAlign, VAlign
-from lib.ui.core.components.button import Button
+from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
@@ -35,6 +35,7 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
             bgLayer=UILayer.CONTEXT_MENU_CONTENT_BACKGROUND,
             contentLayer=UILayer.CONTEXT_MENU_CONTENT,
             interactionLayer=UILayer.CONTEXT_MENU_CONTENT_INTERACTION,
+            skin=ButtonSkin.ACCENT,
         )
 
         self.texts = item.renderText(ctx, self.root)
