@@ -1,6 +1,6 @@
 from typing import List
 
-from panda3d.core import Point2
+from panda3d.core import Point2, Point3
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
@@ -35,28 +35,56 @@ class ContextMenu(Listener):
         self.contentRoot = self.root.attachNewNode("context-menu")
 
         self.components: List[ContextMenuComponent] = []
-        height = UIConstants.contextMenuPadding
+        self.height = UIConstants.contextMenuPadding
+        self.width = UIConstants.contextMenuWidth
+        # TODO calculate width from items as well
 
         for group in groups:
-            groupComponents = group.render(ctx, events, self.contentRoot, height)
+            groupComponents = group.render(ctx, events, self.contentRoot, self.height)
             for component in groupComponents:
                 self.components.append(component)
-                height += component.height()
+                self.height += component.height()
             # TODO render divider between groups
 
-        height += UIConstants.contextMenuPadding
+        self.height += UIConstants.contextMenuPadding
 
         self.bg = BackgroundCard(
             root=self.contentRoot,
             width=UIConstants.contextMenuWidth,
-            height=height,
+            height=self.height,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
             layer=UILayer.CONTEXT_MENU_BACKGROUND,
             color=UIColors.ACCENT,
         )
 
-        # TODO adjust content root position to keep on screen
+        bottomRight = self.ctx.base.render2d.getRelativePoint(
+            self.contentRoot, Point3(self.width, 0, -self.height)
+        )
+        if bottomRight.getX() > 1:
+            self.contentRoot.setX(-self.width)
+        if bottomRight.getZ() < -1:
+            self.contentRoot.setZ(self.height)
+
+    def checkMouseInBounds(self) -> bool:
+        if not self.ctx.base.mouseWatcherNode.hasMouse():
+            return False
+
+        mouse = self.ctx.base.mouseWatcherNode.getMouse()
+
+        topLeft = self.ctx.base.render2d.getRelativePoint(
+            self.contentRoot, Point3(0, 0, 0)
+        )
+        bottomRight = self.ctx.base.render2d.getRelativePoint(
+            self.contentRoot, Point3(self.width, 0, -self.height)
+        )
+
+        return (
+            topLeft.getX() <= mouse.getX()
+            and mouse.getX() <= bottomRight.getX()
+            and topLeft.getZ() >= mouse.getY()
+            and mouse.getY() >= bottomRight.getZ()
+        )
 
     def destroy(self) -> None:
         super().destroy()

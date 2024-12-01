@@ -34,11 +34,11 @@ class ContextMenuManager(Listener):
         )
         self.listen(
             events.input.leftMouseRaw,
-            lambda down: self.closeContextMenu() if down else None,
+            lambda down: self.closeContextMenu(checkBounds=True) if down else None,
         )
         self.listen(
             events.input.rightMouseRaw,
-            lambda down: self.closeContextMenu() if down else None,
+            lambda down: self.closeContextMenu(checkBounds=True) if down else None,
         )
 
     def openContextMenu(self, payload: ContextMenuPayload) -> None:
@@ -55,8 +55,11 @@ class ContextMenuManager(Listener):
                 groups,
             )
 
-    def closeContextMenu(self) -> None:
+    def closeContextMenu(self, checkBounds: bool = False) -> None:
         if self.contextMenu is not None:
+            if checkBounds and self.contextMenu.checkMouseInBounds():
+                return
+
             self.contextMenu.destroy()
             self.contextMenu = None
 
