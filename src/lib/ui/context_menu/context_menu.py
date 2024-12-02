@@ -37,20 +37,24 @@ class ContextMenu(Listener):
         self.components: List[ContextMenuComponent] = []
         self.height = UIConstants.contextMenuPadding
         self.width = UIConstants.contextMenuWidth
-        # TODO calculate width from items as well
 
         for group in groups:
             groupComponents = group.render(ctx, events, self.contentRoot, self.height)
             for component in groupComponents:
                 self.components.append(component)
                 self.height += component.height()
+                self.width = max(self.width, component.width())
             # TODO render divider between groups
 
+        for component in self.components:
+            component.setContextMenuWidth(self.width)
+
+        self.width += 2 * UIConstants.contextMenuPadding
         self.height += UIConstants.contextMenuPadding
 
         self.bg = BackgroundCard(
             root=self.contentRoot,
-            width=UIConstants.contextMenuWidth,
+            width=self.width,
             height=self.height,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,

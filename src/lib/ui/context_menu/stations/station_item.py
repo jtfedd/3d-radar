@@ -23,9 +23,9 @@ class StationItem(ContextMenuItem):
         self.station = station
 
     def renderText(self, ctx: AppContext, root: NodePath[PandaNode]) -> List[Text]:
-        text = Text(
+        stationId = Text(
             root=root,
-            font=ctx.fonts.regular,
+            font=ctx.fonts.mono,
             text=self.station.stationID,
             y=-UIConstants.contextMenuItemHeight / 2,
             hAlign=HAlign.LEFT,
@@ -33,7 +33,18 @@ class StationItem(ContextMenuItem):
             layer=UILayer.CONTEXT_MENU_CONTENT,
         )
 
-        return [text]
+        stationName = Text(
+            root=root,
+            font=ctx.fonts.regular,
+            text=self.station.name,
+            y=-UIConstants.contextMenuItemHeight / 2,
+            x=stationId.getWidth() + UIConstants.contextMenuPadding,
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.CENTER,
+            layer=UILayer.CONTEXT_MENU_CONTENT,
+        )
+
+        return [stationId, stationName]
 
     def onClick(self) -> None:
         query = dataQueryFromState(self.state)

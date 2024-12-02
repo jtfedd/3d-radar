@@ -25,10 +25,24 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
         Listener.__init__(self)
         ContextMenuComponent.__init__(self, root, offset)
 
-        self.button = Button(
+        self.ctx = ctx
+
+        self.button = self.buildButton(UIConstants.contextMenuItemWidth)
+        self.texts = item.renderText(ctx, self.root)
+        self.leftCap = item.renderLeftCap(self.root)
+
+        self.listen(self.button.onClick, lambda _: item.onClick())
+        self.listen(self.button.onClick, events.ui.closeContextMenu.send)
+
+    def setContextMenuWidth(self, width: float) -> None:
+        self.button.destroy()
+        self.button = self.buildButton(width)
+
+    def buildButton(self, width: float) -> Button:
+        return Button(
             root=self.root,
-            ctx=ctx,
-            width=UIConstants.contextMenuItemWidth,
+            ctx=self.ctx,
+            width=width,
             height=UIConstants.contextMenuItemHeight,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.TOP,
@@ -37,13 +51,6 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
             interactionLayer=UILayer.CONTEXT_MENU_CONTENT_INTERACTION,
             skin=ButtonSkin.ACCENT,
         )
-
-        self.texts = item.renderText(ctx, self.root)
-
-        self.leftCap = item.renderLeftCap(self.root)
-
-        self.listen(self.button.onClick, lambda _: item.onClick())
-        self.listen(self.button.onClick, events.ui.closeContextMenu.send)
 
     def destroy(self) -> None:
         Listener.destroy(self)

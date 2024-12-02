@@ -127,9 +127,10 @@ class UIConstants:
 
     labelPadding = 0.01
 
-    contextMenuItemWidth = 0.5
-    contextMenuItemHeight = 0.1
-    contextMenuPadding = 0.05
+    contextMenuItemWidth = 0.3
+    contextMenuItemHeight = 0.05
+    contextMenuPadding = 0.02
+    contextMenuItemPadding = contextMenuPadding / 2
     contextMenuWidth = contextMenuItemWidth + 2 * contextMenuPadding
     contextMenuDividerWidth = contextMenuItemWidth * 0.8
 

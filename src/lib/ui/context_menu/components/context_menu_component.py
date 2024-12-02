@@ -16,5 +16,11 @@ class ContextMenuComponent(ABC):
     def height(self) -> float:
         return UIConstants.contextMenuItemHeight
 
+    def width(self) -> float:
+        return UIConstants.contextMenuItemWidth
+
+    def setContextMenuWidth(self, width: float) -> None:
+        pass
+
     def destroy(self) -> None:
         self.root.removeNode()

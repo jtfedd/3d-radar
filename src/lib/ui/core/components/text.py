@@ -66,5 +66,8 @@ class Text(Component):
     def getHeight(self) -> float:
         return self.text.getHeight() * self.size
 
+    def getWidth(self) -> float:
+        return self.text.getWidth() * self.size
+
     def destroy(self) -> None:
         self.textNP.removeNode()

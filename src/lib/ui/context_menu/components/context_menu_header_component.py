@@ -22,13 +22,19 @@ class ContextMenuHeaderComponent(ContextMenuComponent):
 
         self.header = Text(
             root=self.root,
-            font=ctx.fonts.regular,
+            font=ctx.fonts.bold,
             text=text,
             y=-UIConstants.contextMenuItemHeight / 2,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.CENTER,
             layer=UILayer.CONTEXT_MENU_CONTENT,
         )
+
+    def height(self) -> float:
+        return UIConstants.contextMenuItemHeight + UIConstants.contextMenuItemPadding
+
+    def width(self) -> float:
+        return self.header.getWidth()
 
     def destroy(self) -> None:
         ContextMenuComponent.destroy(self)
