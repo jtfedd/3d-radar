@@ -132,7 +132,9 @@ class UIConstants:
     contextMenuPadding = 0.02
     contextMenuItemPadding = contextMenuPadding / 2
     contextMenuWidth = contextMenuItemWidth + 2 * contextMenuPadding
-    contextMenuDividerWidth = contextMenuItemWidth * 0.8
+
+    contextMenuItemLeftCapWidth = 0.01
+    contextMenuItemLeftCapHeight = 0.05
 
     # Higher number means slower scrolling
     scrollSensitivity = 10

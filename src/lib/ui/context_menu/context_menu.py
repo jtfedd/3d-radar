@@ -6,6 +6,9 @@ from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.ui.context_menu.components.context_menu_component import ContextMenuComponent
+from lib.ui.context_menu.components.context_menu_divider_component import (
+    ContextMenuDividerComponent,
+)
 from lib.ui.context_menu.context_menu_group import ContextMenuGroup
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -38,13 +41,15 @@ class ContextMenu(Listener):
         self.height = UIConstants.contextMenuPadding
         self.width = UIConstants.contextMenuWidth
 
-        for group in groups:
+        for i, group in enumerate(groups):
+            if i > 0:
+                self.addComponent(
+                    ContextMenuDividerComponent(self.contentRoot, self.height)
+                )
+
             groupComponents = group.render(ctx, events, self.contentRoot, self.height)
             for component in groupComponents:
-                self.components.append(component)
-                self.height += component.height()
-                self.width = max(self.width, component.width())
-            # TODO render divider between groups
+                self.addComponent(component)
 
         for component in self.components:
             component.setContextMenuWidth(self.width)
@@ -69,6 +74,11 @@ class ContextMenu(Listener):
             self.contentRoot.setX(-self.width)
         if bottomRight.getZ() < -1:
             self.contentRoot.setZ(self.height)
+
+    def addComponent(self, component: ContextMenuComponent) -> None:
+        self.components.append(component)
+        self.height += component.height()
+        self.width = max(self.width, component.width())
 
     def checkMouseInBounds(self) -> bool:
         if not self.ctx.base.mouseWatcherNode.hasMouse():

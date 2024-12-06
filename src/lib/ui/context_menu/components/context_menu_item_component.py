@@ -26,20 +26,25 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
         ContextMenuComponent.__init__(self, root, offset)
 
         self.ctx = ctx
+        self.events = events
+        self.item = item
+
+        self.leftRoot = self.root.attachNewNode("left-text")
+        self.rightRoot = self.root.attachNewNode("right-text")
 
         self.button = self.buildButton(UIConstants.contextMenuItemWidth)
-        self.texts = item.renderText(ctx, self.root)
+        self.texts = item.renderText(ctx, self.leftRoot, self.rightRoot)
         self.leftCap = item.renderLeftCap(self.root)
-
-        self.listen(self.button.onClick, lambda _: item.onClick())
-        self.listen(self.button.onClick, events.ui.closeContextMenu.send)
+        if self.leftCap is not None:
+            self.leftRoot.setX(UIConstants.contextMenuPadding)
 
     def setContextMenuWidth(self, width: float) -> None:
         self.button.destroy()
         self.button = self.buildButton(width)
+        self.rightRoot.setX(width)
 
     def buildButton(self, width: float) -> Button:
-        return Button(
+        btn = Button(
             root=self.root,
             ctx=self.ctx,
             width=width,
@@ -51,6 +56,23 @@ class ContextMenuItemComponent(ContextMenuComponent, Listener):
             interactionLayer=UILayer.CONTEXT_MENU_CONTENT_INTERACTION,
             skin=ButtonSkin.ACCENT,
         )
+
+        self.listen(btn.onClick, lambda _: self.item.onClick())
+        self.listen(btn.onClick, self.events.ui.closeContextMenu.send)
+
+        return btn
+
+    def width(self) -> float:
+        width = 0.0
+        if self.leftCap is not None:
+            width += UIConstants.contextMenuPadding
+        for text in self.texts:
+            width += text.getWidth()
+
+        if len(self.texts) > 1:
+            width += UIConstants.contextMenuPadding * (len(self.texts) - 1)
+
+        return width
 
     def destroy(self) -> None:
         Listener.destroy(self)

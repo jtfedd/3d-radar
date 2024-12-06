@@ -10,6 +10,7 @@ from lib.ui.context_menu.context_menu import ContextMenu
 from lib.ui.context_menu.context_menu_group import ContextMenuGroup
 from lib.ui.context_menu.context_menu_item import ContextMenuItem
 from lib.ui.context_menu.stations.station_item import StationItem
+from lib.ui.context_menu.warnings.warning_item import WarningItem
 from lib.util.events.listener import Listener
 
 
@@ -80,7 +81,16 @@ class ContextMenuManager(Listener):
 
     def getWarningsGroupForPoint(self, geoPoint: GeoPoint) -> ContextMenuGroup | None:
         # TODO implement
-        return None
+
+        return ContextMenuGroup(
+            header="Active Warnings",
+            items=[
+                WarningItem("Tornado Warning"),
+                WarningItem("Tornado Warning"),
+                WarningItem("Tornado Warning"),
+                WarningItem("Tornado Warning"),
+            ],
+        )
 
     def getStationsGroupForPoint(self, geoPoint: GeoPoint) -> ContextMenuGroup | None:
         stations = list(self.ctx.services.nws.radarStations.values())
@@ -99,6 +109,7 @@ class ContextMenuManager(Listener):
                     self.events,
                     self.state,
                     stations[i],
+                    geoPoint,
                 )
             )
             i += 1

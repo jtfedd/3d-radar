@@ -12,7 +12,12 @@ from lib.ui.core.components.text import Text
 
 class ContextMenuItem(ABC):
     @abstractmethod
-    def renderText(self, ctx: AppContext, root: NodePath[PandaNode]) -> List[Text]:
+    def renderText(
+        self,
+        ctx: AppContext,
+        leftRoot: NodePath[PandaNode],
+        rightRoot: NodePath[PandaNode],
+    ) -> List[Text]:
         pass
 
     def renderLeftCap(self, _: NodePath[PandaNode]) -> BackgroundCard | None:
