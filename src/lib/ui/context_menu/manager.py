@@ -3,7 +3,11 @@ from typing import List
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.geometry.polygon_contains import polygonContains
 from lib.map.constants import RADAR_RANGE
+from lib.model.alert import Alert
+from lib.model.alert_status import AlertStatus
+from lib.model.alert_type import AlertType
 from lib.model.context_menu_payload import ContextMenuPayload
 from lib.model.geo_point import GeoPoint
 from lib.ui.context_menu.context_menu import ContextMenu
@@ -80,17 +84,39 @@ class ContextMenuManager(Listener):
         return groups
 
     def getWarningsGroupForPoint(self, geoPoint: GeoPoint) -> ContextMenuGroup | None:
-        # TODO implement
+        items: List[ContextMenuItem] = []
 
-        return ContextMenuGroup(
-            header="Active Warnings",
-            items=[
-                WarningItem("Tornado Warning"),
-                WarningItem("Tornado Warning"),
-                WarningItem("Tornado Warning"),
-                WarningItem("Tornado Warning"),
-            ],
-        )
+        alerts = self.state.alerts.getValue()
+        if alerts.status == AlertStatus.LOADED:
+            if AlertType.TORNADO_WARNING in alerts.alerts:
+                items += self.getWarningItems(
+                    geoPoint, alerts.alerts[AlertType.TORNADO_WARNING]
+                )
+            if AlertType.SEVERE_THUNDERSTORM_WARNING in alerts.alerts:
+                items += self.getWarningItems(
+                    geoPoint, alerts.alerts[AlertType.SEVERE_THUNDERSTORM_WARNING]
+                )
+
+        if len(items) > 0:
+            return ContextMenuGroup(header="Active Warnings", items=items)
+
+        return None
+
+    def getWarningItems(
+        self, geoPoint: GeoPoint, alerts: List[Alert]
+    ) -> List[WarningItem]:
+        if alerts is None or len(alerts) == 0:
+            return []
+
+        items: List[WarningItem] = []
+
+        for alert in alerts:
+            for ring in alert.boundary:
+                if polygonContains(ring, geoPoint):
+                    items.append(WarningItem(alert))
+                    break
+
+        return items
 
     def getStationsGroupForPoint(self, geoPoint: GeoPoint) -> ContextMenuGroup | None:
         stations = list(self.ctx.services.nws.radarStations.values())
