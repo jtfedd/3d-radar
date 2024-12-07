@@ -51,6 +51,25 @@ class NWSProvider:
 
         alerts = []
 
+        alerts.append(
+            Alert(
+                alertType,
+                "Test Event",
+                "Test Area",
+                [
+                    [
+                        GeoPoint(42.1, -93.8),
+                        GeoPoint(41.9, -93.4),
+                        GeoPoint(41.7, -93.6),
+                        GeoPoint(41.7, -93.9),
+                        GeoPoint(42.1, -93.8),
+                    ]
+                ],
+                "Test Headline",
+                "Test Description",
+            )
+        )
+
         for feature in features:
             geometry = feature["geometry"]
             if geometry is None:

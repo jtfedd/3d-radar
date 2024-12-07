@@ -46,7 +46,7 @@ class ModalManager(Listener):
 
         self.listen(
             events.ui.modals.alert,
-            lambda alert: self.openModal(AlertModal(ctx, events, alert)),
+            lambda payload: self.openModal(AlertModal(ctx, events, payload)),
         )
 
         self.listen(

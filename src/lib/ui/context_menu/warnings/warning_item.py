@@ -5,7 +5,9 @@ from typing import List
 from panda3d.core import NodePath, PandaNode
 
 from lib.app.context import AppContext
+from lib.app.events import AppEvents
 from lib.model.alert import Alert
+from lib.model.alert_modal_payload import AlertModalPayload
 from lib.model.alert_type import AlertType
 from lib.ui.context_menu.context_menu_item import ContextMenuItem
 from lib.ui.core.alignment import HAlign, VAlign
@@ -17,8 +19,9 @@ from lib.ui.core.layers import UILayer
 
 
 class WarningItem(ContextMenuItem):
-    def __init__(self, alert: Alert):
+    def __init__(self, events: AppEvents, alert: Alert):
         self.alert = alert
+        self.events = events
 
     def renderText(
         self,
@@ -57,4 +60,4 @@ class WarningItem(ContextMenuItem):
         )
 
     def onClick(self) -> None:
-        pass
+        self.events.ui.modals.alert.send(AlertModalPayload(self.alert, back=False))

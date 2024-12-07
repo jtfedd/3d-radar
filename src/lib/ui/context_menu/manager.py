@@ -113,7 +113,7 @@ class ContextMenuManager(Listener):
         for alert in alerts:
             for ring in alert.boundary:
                 if polygonContains(ring, geoPoint):
-                    items.append(WarningItem(alert))
+                    items.append(WarningItem(self.events, alert))
                     break
 
         return items

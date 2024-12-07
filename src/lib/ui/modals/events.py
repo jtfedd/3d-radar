@@ -1,4 +1,4 @@
-from lib.model.alert import Alert
+from lib.model.alert_modal_payload import AlertModalPayload
 from lib.model.loading_progress_payload import LoadingProgressPayload
 from lib.model.location import Location
 from lib.util.events.event_dispatcher import EventDispatcher
@@ -18,7 +18,7 @@ class ModalEvents:
         self.license = EventDispatcher[None]()
 
         self.alerts = EventDispatcher[None]()
-        self.alert = EventDispatcher[Alert]()
+        self.alert = EventDispatcher[AlertModalPayload]()
 
         self.loadingProgress = EventDispatcher[LoadingProgressPayload]()
 

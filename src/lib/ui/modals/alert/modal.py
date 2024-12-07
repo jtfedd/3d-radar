@@ -1,6 +1,6 @@
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
-from lib.model.alert import Alert
+from lib.model.alert_modal_payload import AlertModalPayload
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.components.scrollable_panel import ScrollablePanel
 from lib.ui.core.components.text import Text
@@ -13,7 +13,7 @@ from ..core.title import ModalTitle
 
 
 class AlertModal(Modal):
-    def __init__(self, ctx: AppContext, events: AppEvents, alert: Alert):
+    def __init__(self, ctx: AppContext, events: AppEvents, payload: AlertModalPayload):
         super().__init__(
             ctx,
             events,
@@ -21,6 +21,8 @@ class AlertModal(Modal):
             UIConstants.alertModalMaxHeight,
             closeButton=True,
         )
+
+        alert = payload.alert
 
         self.title = ModalTitle(
             ctx,
@@ -64,16 +66,28 @@ class AlertModal(Modal):
             maxWidth=UIConstants.alertModalWidth,
         )
 
-        self.backButton = FooterButton(
-            ctx,
-            self.bottomLeft,
-            UIConstants.alertModalWidth,
-            "Back",
-        )
+        if payload.back:
+            self.footerButton = FooterButton(
+                ctx,
+                self.bottomLeft,
+                UIConstants.alertModalWidth,
+                "Back",
+            )
 
-        self.backSub = self.backButton.button.onClick.listen(
-            events.ui.modals.alerts.send
-        )
+            self.footerSub = self.footerButton.button.onClick.listen(
+                events.ui.modals.alerts.send
+            )
+        else:
+            self.footerButton = FooterButton(
+                ctx,
+                self.bottomLeft,
+                UIConstants.alertModalWidth,
+                "Close",
+            )
+
+            self.footerSub = self.footerButton.button.onClick.listen(
+                lambda _: self.destroy()
+            )
 
         contentHeight = (
             self.headline.getHeight()
@@ -100,10 +114,10 @@ class AlertModal(Modal):
 
     def destroy(self) -> None:
         super().destroy()
-        self.backSub.cancel()
+        self.footerSub.cancel()
 
         self.title.destroy()
         self.headline.destroy()
         self.description.destroy()
         self.scroll.destroy()
-        self.backButton.destroy()
+        self.footerButton.destroy()
