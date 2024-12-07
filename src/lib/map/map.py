@@ -11,6 +11,7 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.map.lat_lon_lines import LatLonLines
 from lib.map.radar_boundary import RadarBoundary
+from lib.map.selection.manager import SelectionManager
 from lib.map.stations.stations_renderer import StationsRenderer
 from lib.model.alert_type import AlertType
 from lib.ui.core.colors import UIColors
@@ -106,6 +107,8 @@ class Map(Listener):
         self.stationsRoot = self.mapRoot.attachNewNode("map-stations")
         self.stationsRenderer = StationsRenderer(ctx, state, events, self.stationsRoot)
 
+        self.selectionManager = SelectionManager(ctx, events, self.mapRoot)
+
         self.bind(state.station, self.updatePosition)
 
         self.bind(state.mapStates, self.updateLayer(self.states))
@@ -156,6 +159,7 @@ class Map(Listener):
 
         self.latlonLines.destroy()
 
+        self.selectionManager.destroy()
         self.lightingManager.destroy()
         self.markersManager.destroy()
         self.markersRenderer.destroy()

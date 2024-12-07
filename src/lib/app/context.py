@@ -22,7 +22,7 @@ class AppContext:
         self.fileManager = FileManager(state, events)
         self.taskManager = TaskManager(base)
         self.focusManager = FocusManager()
-        self.inputManager = InputManager(self.focusManager, state, events.input)
+        self.inputManager = InputManager(base, self.focusManager, state, events.input)
         self.windowManager = WindowManager(base, events.window)
         self.animationManager = AnimationManager(base, state, events)
         self.services = Services(self.fileManager, Network())

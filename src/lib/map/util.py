@@ -24,6 +24,13 @@ def toGlobe(point: GeoPoint) -> Vec3:
     return Vec3(x, y, z)
 
 
+def fromGlobe(point: Point3) -> GeoPoint:
+    lat = math.degrees(math.atan2(point.z, math.dist((point.x, point.y), (0, 0))))
+    lon = math.degrees(math.atan2(point.y, point.x))
+
+    return GeoPoint(lat=lat, lon=lon)
+
+
 def toScreen(ctx: AppContext, point: Point3) -> Point3 | None:
     worldCenter = Vec3(0, 0, -EARTH_RADIUS)
     worldToPoint = point - worldCenter

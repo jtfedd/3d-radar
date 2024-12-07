@@ -1,6 +1,7 @@
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.ui.context_menu.manager import ContextMenuManager
 from lib.ui.footer.footer import Footer
 from lib.ui.header.header import Header
 from lib.ui.legend.label import Label
@@ -15,11 +16,14 @@ class UI:
         self.footer = Footer(ctx, state, events)
         self.panels = PanelModule(ctx, state, events)
         self.modals = ModalManager(ctx, state, events)
+        self.contextMenu = ContextMenuManager(ctx, state, events)
 
         self.label = Label(ctx, state, events)
         self.scale = Scale(ctx, state)
 
     def destroy(self) -> None:
+        self.modals.destroy()
+        self.contextMenu.destroy()
         self.header.destroy()
         self.footer.destroy()
         self.panels.destroy()

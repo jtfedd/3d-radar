@@ -4,6 +4,7 @@ from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.alert import Alert
+from lib.model.alert_modal_payload import AlertModalPayload
 from lib.model.alert_status import AlertStatus
 from lib.model.alert_type import AlertType
 from lib.ui.core.alignment import HAlign, VAlign
@@ -138,7 +139,7 @@ class AlertsModal(Modal):
         )
 
         sub = button.onClick.listen(
-            lambda _: self.appEvents.ui.modals.alert.send(alert)
+            lambda _: self.appEvents.ui.modals.alert.send(AlertModalPayload(alert))
         )
 
         self.alertButtons.append(button)
