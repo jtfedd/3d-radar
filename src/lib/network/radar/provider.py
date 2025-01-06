@@ -23,24 +23,24 @@ def sweepMetaFromSweep(sweep: pynexrad.Sweep, offset: int) -> SweepMeta:
     )
 
 
-def scanDataFromScan(scan: pynexrad.Scan) -> ScanData:
+def scanDataFromSweeps(sweeps: List[pynexrad.Sweep]) -> ScanData:
     data = bytearray()
 
-    sweeps = []
+    result = []
     offset = 0
-    for meta in scan.sweeps:
-        sweeps.append(sweepMetaFromSweep(meta, offset))
+    for meta in sweeps:
+        result.append(sweepMetaFromSweep(meta, offset))
         data += bytearray(meta.data)
         offset += len(meta.data)
 
-    return ScanData(sweeps, data)
+    return ScanData(result, data)
 
 
 def scanFromLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
     return Scan(
         record,
-        scanDataFromScan(file.reflectivity),
-        scanDataFromScan(file.velocity),
+        scanDataFromSweeps(file.reflectivity),
+        scanDataFromSweeps(file.velocity),
     )
 
 
@@ -53,13 +53,7 @@ class RadarProvider:
 
         self.log.info(f"Fetching from s3: {key}")
 
-        level2File = pynexrad.download_nexrad_file(
-            record.station,
-            record.time.year,
-            record.time.month,
-            record.time.day,
-            key,
-        )
+        level2File = pynexrad.download_nexrad_file(key)
 
         self.log.info(f"Post-processing {key}")
         return scanFromLevel2File(record, level2File)
