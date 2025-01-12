@@ -31,6 +31,8 @@ def newTestSweepMeta() -> SweepMeta:
         random.random(),
         random.random(),
         random.randint(0, 1000),
+        random.randint(0, 100000),
+        random.randint(0, 100000),
         random.randint(0, 1000),
     )
 

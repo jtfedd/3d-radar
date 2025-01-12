@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 import blosc
@@ -14,8 +15,19 @@ class RadarService:
         self.network = network
         self.fileManager = fileManager
 
-    def search(self, record: Record, count: int) -> List[Record]:
-        return self.network.radar.search(record, count)
+    def search(
+        self,
+        radar: str,
+        loopStart: datetime.datetime,
+        loopEnd: datetime.datetime,
+        priorRecords: int,
+    ) -> List[Record]:
+        return self.network.radar.search(
+            radar,
+            loopStart,
+            loopEnd,
+            priorRecords=priorRecords,
+        )
 
     def load(self, record: Record) -> Scan:
         scan = self.loadFromCache(record)

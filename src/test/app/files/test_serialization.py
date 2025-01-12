@@ -18,6 +18,8 @@ def testSweepMeta() -> SweepMeta:
         rngFirst=random.random(),
         rngStep=random.random(),
         rngCount=random.randint(0, 100),
+        startTime=random.randint(0, 100000),
+        endTime=random.randint(0, 100000),
         offset=random.randint(0, 100),
     )
 
@@ -30,6 +32,8 @@ def assertSweepMetaEqual(t: unittest.TestCase, a: SweepMeta, b: SweepMeta) -> No
     t.assertAlmostEqual(a.rngFirst, b.rngFirst)
     t.assertAlmostEqual(a.rngStep, b.rngStep)
     t.assertEqual(a.rngCount, b.rngCount)
+    t.assertEqual(a.startTime, b.startTime)
+    t.assertEqual(a.endTime, b.endTime)
     t.assertEqual(a.offset, b.offset)
 
 
@@ -100,7 +104,7 @@ class TestSerialization(unittest.TestCase):
         newMeta, offset = serialization.deserializeSweepMeta(b, 0)
 
         self.assertEqual(offset, len(b))
-        self.assertEqual(offset, 32)
+        self.assertEqual(offset, 40)
 
         assertSweepMetaEqual(self, meta, newMeta)
 
@@ -111,7 +115,7 @@ class TestSerialization(unittest.TestCase):
         newData, offset = serialization.deserializeScanData(b, 0)
 
         self.assertEqual(offset, len(b))
-        self.assertEqual(offset, 268)
+        self.assertEqual(offset, 308)
 
         assertScanDataEqual(self, data, newData)
 
@@ -122,7 +126,7 @@ class TestSerialization(unittest.TestCase):
         newScan, offset = serialization.deserializeScan(b, 0)
 
         self.assertEqual(offset, len(b))
-        self.assertEqual(offset, 558)
+        self.assertEqual(offset, 638)
 
         assertRecordEqual(self, scan.record, newScan.record)
         assertScanDataEqual(self, scan.reflectivity, newScan.reflectivity)

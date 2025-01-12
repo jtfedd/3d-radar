@@ -7,9 +7,9 @@ from lib.model.scan import Scan
 from lib.model.scan_data import ScanData
 from lib.model.sweep_meta import SweepMeta
 
-SERIALIZATION_VERSION = 0
+SERIALIZATION_VERSION = 1
 
-SWEEPMETA_FORMAT = "<5f3I"
+SWEEPMETA_FORMAT = "<5f5I"
 SWEEPMETA_FORMAT_SIZE = struct.calcsize(SWEEPMETA_FORMAT)
 
 
@@ -59,6 +59,8 @@ def serializeSweepMeta(meta: SweepMeta) -> bytes:
         meta.rngStep,
         meta.azCount,
         meta.rngCount,
+        int(round(meta.startTime.timestamp())),
+        int(round(meta.endTime.timestamp())),
         meta.offset,
     )
 
@@ -72,6 +74,8 @@ def deserializeSweepMeta(buffer: bytes, buffOffset: int) -> Tuple[SweepMeta, int
         rngStep,
         azCount,
         rngCount,
+        startTime,
+        endTime,
         offset,
     ) = struct.unpack_from(SWEEPMETA_FORMAT, buffer, offset=buffOffset)
 
@@ -84,6 +88,8 @@ def deserializeSweepMeta(buffer: bytes, buffOffset: int) -> Tuple[SweepMeta, int
             rngFirst=rngFirst,
             rngStep=rngStep,
             rngCount=rngCount,
+            startTime=startTime,
+            endTime=endTime,
             offset=offset,
         ),
         buffOffset + SWEEPMETA_FORMAT_SIZE,

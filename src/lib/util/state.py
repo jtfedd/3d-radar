@@ -5,7 +5,7 @@ from lib.model.time_query import TimeQuery
 
 def dataQueryFromState(state: AppState) -> DataQuery:
     radar = state.station.value
-    frames = state.frames.value
+    minutes = state.loopMinutes.value
     time: TimeQuery | None = None
     if not state.latest.value:
         time = TimeQuery(
@@ -17,14 +17,14 @@ def dataQueryFromState(state: AppState) -> DataQuery:
 
     return DataQuery(
         radar=radar,
-        frames=frames,
+        minutes=minutes,
         time=time,
     )
 
 
 def applyDataQueryToState(state: AppState, query: DataQuery) -> None:
     state.station.setValue(query.radar)
-    state.frames.setValue(query.frames)
+    state.loopMinutes.setValue(query.minutes)
     state.latest.setValue(query.time is None)
     if query.time is not None:
         state.year.setValue(query.time.year)

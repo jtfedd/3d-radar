@@ -19,6 +19,8 @@ def sweepMetaFromSweep(sweep: pynexrad.Sweep, offset: int) -> SweepMeta:
         sweep.range_first,
         sweep.range_step,
         sweep.range_count,
+        sweep.start_time,
+        sweep.end_time,
         offset,
     )
 
@@ -58,35 +60,67 @@ class RadarProvider:
         self.log.info(f"Post-processing {key}")
         return scanFromLevel2File(record, level2File)
 
-    def search(self, record: Record, count: int) -> List[Record]:
-        searchTime = record.time.astimezone(datetime.timezone.utc)
+    def search(
+        self,
+        radar: str,
+        loopStart: datetime.datetime,
+        loopEnd: datetime.datetime,
+        priorRecords: int = 0,
+    ) -> List[Record]:
+        searchStart = loopStart
 
+        # Search a maximum of one hour before to find prior records
+        if priorRecords > 0:
+            searchStart = loopStart - datetime.timedelta(hours=1)
+
+        searchStart = searchStart.astimezone(datetime.timezone.utc)
+        loopStart = loopStart.astimezone(datetime.timezone.utc)
+        searchTime = loopEnd.astimezone(datetime.timezone.utc)
+
+        # Get records from the day of the search end
         records = self.getScans(
-            record.station,
+            radar,
             searchTime.year,
             searchTime.month,
             searchTime.day,
         )
 
-        if len(records) < count:
-            previousDay = searchTime - datetime.timedelta(days=1)
-
+        # If the search start is on the previous day, load records from that day as well
+        if searchStart.day != searchTime.day:
             records.extend(
                 self.getScans(
-                    record.station,
-                    previousDay.year,
-                    previousDay.month,
-                    previousDay.day,
+                    radar,
+                    searchStart.year,
+                    searchStart.month,
+                    searchStart.day,
                 )
             )
 
-        records = list(filter(lambda r: r.time <= searchTime, records))
+        # Records between the search start and the start of the loop
+        preceedingRecords = list(
+            filter(lambda r: r.time >= searchStart and r.time < loopStart, records)
+        )
+
+        # Records in the animation loop
+        records = list(
+            filter(lambda r: r.time >= loopStart and r.time <= searchTime, records)
+        )
+
+        # If we should include some prior records, include up to that many from the end
+        # of the list of preceeding records
+        if priorRecords > 0:
+            preceedingRecords.sort(key=lambda r: r.time)
+
+            preceedingRecords = (
+                preceedingRecords[-priorRecords:]
+                if len(preceedingRecords) >= priorRecords
+                else preceedingRecords
+            )
+            records = preceedingRecords + records
+
         records.sort(key=lambda r: r.time)
 
-        if len(records) <= count:
-            return records
-
-        return records[-count:]
+        return records
 
     def getScans(self, radar: str, year: int, month: int, day: int) -> List[Record]:
         resp = pynexrad.list_records(radar, year, month, day)

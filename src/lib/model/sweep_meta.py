@@ -1,3 +1,6 @@
+import datetime
+
+
 class SweepMeta:
     def __init__(
         self,
@@ -8,6 +11,8 @@ class SweepMeta:
         rngFirst: float,
         rngStep: float,
         rngCount: int,
+        startTime: int,
+        endTime: int,
         offset: int,
     ):
         self.elevation = elevation
@@ -17,4 +22,12 @@ class SweepMeta:
         self.rngFirst = rngFirst
         self.rngStep = rngStep
         self.rngCount = rngCount
+        self.startTime = datetime.datetime.fromtimestamp(
+            startTime,
+            datetime.timezone.utc,
+        )
+        self.endTime = datetime.datetime.fromtimestamp(
+            endTime,
+            datetime.timezone.utc,
+        )
         self.offset = offset

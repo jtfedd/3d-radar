@@ -125,7 +125,7 @@ class AppState:
         self.month = self.createField("month", 11)
         self.day = self.createField("day", 27)
         self.time = self.createField("time", "11:24 AM")
-        self.frames = self.createField("frames", 5)
+        self.loopMinutes = self.createField("loopMinutes", 30)
 
         self.mapLatLon = self.createField("mapLatLon", True)
         self.mapStates = self.createField("mapStates", True)
