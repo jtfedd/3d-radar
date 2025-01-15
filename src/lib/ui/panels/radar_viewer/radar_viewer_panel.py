@@ -2,8 +2,11 @@ from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_type import DataType
+from lib.ui.core.constants import UIConstants
+from lib.ui.panels.components.button_group import PanelButtonGroup
 from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
+from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.title import TitleComponent
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
@@ -21,6 +24,23 @@ class RadarViewerPanel(PanelContent):
         self.state = state
 
         self.listener = Listener()
+
+        self.addComponent(SpacerComponent(self.root))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                state.dataType,
+                [
+                    ("Reflectivity", DataType.REFLECTIVITY),
+                    ("Velocity", DataType.VELOCITY),
+                ],
+                height=UIConstants.panelInputHeight,
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
 
         self.addComponent(TitleComponent(self.root, ctx, "Rendering Mode"))
 

@@ -1,7 +1,6 @@
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.model.data_type import DataType
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
@@ -26,36 +25,6 @@ class AnimationControls(Listener):
             color=UIColors.INSET,
             vAlign=VAlign.BOTTOM,
             layer=UILayer.BACKGROUND_DECORATION,
-        )
-
-        self.refButton = Button(
-            ctx.anchors.bottom,
-            ctx,
-            UIConstants.animationButtonGroupWidth,
-            UIConstants.headerFooterHeight / 2,
-            UIConstants.animationControlsWidth / 2,
-            UIConstants.headerFooterHeight / 2,
-            hAlign=HAlign.RIGHT,
-            vAlign=VAlign.BOTTOM,
-            text="Reflectivity",
-            skin=ButtonSkin.INSET,
-            toggleSkin=ButtonSkin.LIGHT,
-            toggleState=state.dataType.value == DataType.REFLECTIVITY,
-        )
-
-        self.velButton = Button(
-            ctx.anchors.bottom,
-            ctx,
-            UIConstants.animationButtonGroupWidth,
-            UIConstants.headerFooterHeight / 2,
-            UIConstants.animationControlsWidth / 2,
-            0,
-            hAlign=HAlign.RIGHT,
-            vAlign=VAlign.BOTTOM,
-            text="Velocity",
-            skin=ButtonSkin.INSET,
-            toggleSkin=ButtonSkin.LIGHT,
-            toggleState=state.dataType.value == DataType.VELOCITY,
         )
 
         self.play = Button(
@@ -114,26 +83,6 @@ class AnimationControls(Listener):
             valueRange=(0, 1),
         )
 
-        self.listen(
-            self.refButton.onClick,
-            lambda _: state.dataType.setValue(DataType.REFLECTIVITY),
-        )
-
-        self.listen(
-            self.velButton.onClick,
-            lambda _: state.dataType.setValue(DataType.VELOCITY),
-        )
-
-        self.listen(
-            state.dataType,
-            lambda dt: self.refButton.setToggleState(dt == DataType.REFLECTIVITY),
-        )
-
-        self.listen(
-            state.dataType,
-            lambda dt: self.velButton.setToggleState(dt == DataType.VELOCITY),
-        )
-
         self.listen(self.play.onClick, events.animation.play.send)
         self.listen(self.next.onClick, events.animation.next.send)
         self.listen(self.previous.onClick, events.animation.previous.send)
@@ -153,8 +102,6 @@ class AnimationControls(Listener):
         super().destroy()
 
         self.background.destroy()
-        self.refButton.destroy()
-        self.velButton.destroy()
         self.play.destroy()
         self.previous.destroy()
         self.next.destroy()
