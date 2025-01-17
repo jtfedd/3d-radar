@@ -58,14 +58,14 @@ class AnimationManager(Listener):
             return task.cont
 
         start, stop = self.state.animationBounds.getValue()
+        animationTime = self.state.animationTime.getValue()
 
-        if self.delayTime > 0:
+        if self.delayTime > 0 or animationTime >= stop:
             self.delayTime -= dt
             if self.delayTime < 0:
                 self.state.animationTime.setValue(start)
             return task.cont
 
-        animationTime = self.state.animationTime.getValue()
         animationStep = self.state.animationSpeed.getValue() * 60 * dt
 
         animationTime += animationStep
@@ -88,16 +88,22 @@ class AnimationManager(Listener):
         for scan in scans:
             frames.append(AnimationFrame(scan.reflectivity))
 
+        frames.sort(key=self.getValidTime)
         self.state.animationFrames.setValue(frames)
 
     def updateFrame(self, time: float) -> None:
+        validFrame: str | None = None
         for frame in self.state.animationFrames.getValue():
             if self.getValidTime(frame) <= time:
-                self.state.animationFrame.setValue(frame.id)
-                return
-        self.state.animationFrame.setValue(None)
+                validFrame = frame.id
+            else:
+                break
+
+        self.state.animationFrame.setValue(validFrame)
 
     def handleNext(self, forward: bool = True) -> None:
+        self.state.animationPlaying.setValue(False)
+
         currentFrame = self.state.animationFrame.getValue()
         if currentFrame is None:
             return

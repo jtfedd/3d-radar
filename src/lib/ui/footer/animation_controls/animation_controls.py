@@ -125,8 +125,12 @@ class AnimationControls(Listener):
     def handleSliderChange(self, value: float) -> None:
         animationStart, animationEnd = self.state.animationBounds.value
         animationTime = animationStart + value * (animationEnd - animationStart)
-        self.state.animationTime.setValue(animationTime)
-        self.state.animationPlaying.setValue(False)
+
+        # To avoid programmatic updates causing the slider to think it moved, only
+        # send events when the value difference is greater than 1 tenth of a second
+        if abs(animationTime - self.state.animationTime.getValue()) > 0.1:
+            self.state.animationTime.setValue(animationTime)
+            self.state.animationPlaying.setValue(False)
 
     def handleAnimationUpdate(self, value: float) -> None:
         animationStart, animationEnd = self.state.animationBounds.value
