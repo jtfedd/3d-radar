@@ -7,6 +7,7 @@ from panda3d.core import Vec3
 from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
 from lib.model.animation_frame import AnimationFrame
+from lib.model.animation_type import AnimationType
 from lib.model.data_type import DataType
 from lib.model.location_marker import LocationMarker
 from lib.model.scan import Scan
@@ -78,6 +79,24 @@ def deserializeTimeMode(timeMode: int) -> TimeMode:
     raise ValueError("Unrecognized time mode", timeMode)
 
 
+def serializeAnimationType(animationType: AnimationType) -> int:
+    if animationType == AnimationType.VOLUME:
+        return 0
+    if animationType == AnimationType.SWEEP:
+        return 1
+
+    raise ValueError("Unrecognized animation type")
+
+
+def deserializeAnimationType(animationType: int) -> AnimationType:
+    if animationType == 0:
+        return AnimationType.VOLUME
+    if animationType == 1:
+        return AnimationType.SWEEP
+
+    raise ValueError("Unrecognized animation type", animationType)
+
+
 class AppState:
     def __init__(self) -> None:
         # Persisted fields
@@ -146,6 +165,12 @@ class AppState:
             )
         )
 
+        self.animationType = self.createFieldCustomSerialization(
+            "animationType",
+            AnimationType.SWEEP,
+            serializeAnimationType,
+            deserializeAnimationType,
+        )
         self.animationSpeed = self.createField("animationSpeed", 10)
         self.loopDelay = self.createField("loopDelay", 1.0)
 

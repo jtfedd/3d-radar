@@ -6,7 +6,7 @@ from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.model.sweep import Sweep
 
-SERIALIZATION_VERSION = 2
+SERIALIZATION_VERSION = 1
 
 SWEEP_FORMAT = "<5f4I"
 SWEEP_FORMAT_SIZE = struct.calcsize(SWEEP_FORMAT)
