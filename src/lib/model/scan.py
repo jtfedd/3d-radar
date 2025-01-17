@@ -1,13 +1,15 @@
+from typing import List
+
 from lib.model.record import Record
-from lib.model.scan_data import ScanData
+from lib.model.sweep import Sweep
 
 
 class Scan:
     def __init__(
         self,
         record: Record,
-        reflectivity: ScanData,
-        velocity: ScanData,
+        reflectivity: List[Sweep],
+        velocity: List[Sweep],
     ):
         self.record = record
 

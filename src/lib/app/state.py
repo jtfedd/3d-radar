@@ -1,14 +1,14 @@
 import json
 from collections import defaultdict
-from typing import Any, Callable, DefaultDict, Dict, Generic, List, TypeVar
+from typing import Any, Callable, DefaultDict, Dict, Generic, List, Tuple, TypeVar
 
 from panda3d.core import Vec3
 
 from lib.model.alert_payload import AlertPayload
 from lib.model.alert_status import AlertStatus
+from lib.model.animation_frame import AnimationFrame
 from lib.model.data_type import DataType
 from lib.model.location_marker import LocationMarker
-from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.model.time_mode import TimeMode
 from lib.util.events.observable import Observable
@@ -146,7 +146,7 @@ class AppState:
             )
         )
 
-        self.animationSpeed = self.createField("animationSpeed", 4)
+        self.animationSpeed = self.createField("animationSpeed", 10)
         self.loopDelay = self.createField("loopDelay", 1.0)
 
         self.hideKeybinding = self.createField("hideKeybinding", "h")
@@ -169,13 +169,16 @@ class AppState:
 
         self.cacheSize = Observable[int](0)
 
-        self.animationPlaying = Observable[bool](False)
         self.animationFrame = Observable[str | None](None)
-
-        self.animationRecords = Observable[List[Record]]([])
+        self.animationFrames = Observable[List[AnimationFrame]]([])
         self.animationData = Observable[DefaultDict[str, Scan | None]](
             defaultdict(lambda: None)
         )
+
+        self.animationPlaying = Observable[bool](False)
+        self.animationBounds = Observable[Tuple[int, int]]((0, 0))
+        self.animationTime = Observable[float](0.0)
+
         self.loadingData = Observable[bool](False)
 
         self.alerts = Observable[AlertPayload](

@@ -35,7 +35,9 @@ class DataManager(Listener):
 
         self.loadingTask: LoadingTask | None = None
 
-        self.onDataRequested(dataQueryFromState(state))
+        initialQuery = dataQueryFromState(state)
+        self.onDataLoaded(initialQuery, [], {})
+        self.onDataRequested(initialQuery)
         self.listen(events.requestData, self.onDataRequested)
         self.listen(events.refreshData, lambda _: self.refresh())
 
@@ -97,8 +99,19 @@ class DataManager(Listener):
         self.loadingTask = None
 
         applyDataQueryToState(self.state, query)
-        self.state.animationData.setValue(defaultdict(lambda: None, scans))
-        self.state.animationRecords.setValue(records)
+        self.state.animationData.setValue(
+            defaultdict(lambda: None, scans),
+            forceSend=True,
+        )
+
+        # TODO for latest this could be different than when the data was loaded
+        animationTimestamp = int(
+            round(self.ctx.timeUtil.getQueryTime(query.time).timestamp())
+        )
+        self.state.animationBounds.setValue(
+            (animationTimestamp - (60 * query.minutes), animationTimestamp)
+        )
+        self.state.animationTime.setValue(animationTimestamp)
 
     def destroy(self) -> None:
         super().destroy()

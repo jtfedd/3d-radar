@@ -1,11 +1,13 @@
-from typing import List
+from typing import Dict, List
 
 from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.animation_frame import AnimationFrame
 from lib.model.record import Record
+from lib.model.scan import Scan
 from lib.util.events.listener import Listener
 
 
@@ -18,7 +20,7 @@ class AnimationManager(Listener):
         self.records: List[Record] = []
         self.index = 0
 
-        self.bind(state.animationRecords, self.setRecords)
+        self.bind(state.animationData, self.createFrames)
 
         self.listen(
             events.animation.play,
@@ -30,35 +32,23 @@ class AnimationManager(Listener):
             lambda _: state.animationPlaying.setValue(not state.animationPlaying.value),
         )
 
-        self.listen(events.input.nextFrame, lambda _: self.handleNext(False))
-        self.listen(events.input.prevFrame, lambda _: self.handlePrev())
+        self.listen(events.input.nextFrame, lambda _: self.handleNext(forward=True))
+        self.listen(events.input.prevFrame, lambda _: self.handleNext(forward=False))
 
-        self.listen(events.animation.next, lambda _: self.handleNext(False))
-        self.listen(events.animation.previous, lambda _: self.handlePrev())
-        self.listen(events.animation.slider, self.handleSlider)
+        self.listen(events.animation.next, lambda _: self.handleNext(forward=True))
+        self.listen(events.animation.previous, lambda _: self.handleNext(forward=False))
         self.listen(
             events.requestData, lambda _: state.animationPlaying.setValue(False)
         )
-
-        self.loopDelay = state.loopDelay.value
-        self.frameDelay = 1 / state.animationSpeed.value
-
-        self.listen(state.loopDelay, self.updateLoopDelay)
-        self.listen(state.animationSpeed, self.updateFrameDelay)
+        self.listen(state.animationPlaying, lambda _: self.resetDelayTimer())
+        self.bind(self.state.animationTime, self.updateFrame)
 
         self.taskTime = 0.0
-        self.animationTimer = 0.0
+        self.delayTime = 0.0
         self.updateTask = base.taskMgr.add(self.update, "animation-update")
-        self.listen(state.animationPlaying, lambda _: self.resetAnimationTimer())
 
-    def updateLoopDelay(self, value: float) -> None:
-        self.loopDelay = value
-
-    def updateFrameDelay(self, value: int) -> None:
-        self.frameDelay = 1 / value
-
-    def resetAnimationTimer(self) -> None:
-        self.animationTimer = 0
+    def resetDelayTimer(self) -> None:
+        self.delayTime = 0
 
     def update(self, task: Task) -> int:
         dt = task.time - self.taskTime
@@ -67,73 +57,73 @@ class AnimationManager(Listener):
         if not self.state.animationPlaying.value:
             return task.cont
 
-        self.animationTimer -= dt
-        if self.animationTimer < 0:
-            self.handleNext(True)
-            if self.index == len(self.records) - 1:
-                self.animationTimer = max(self.loopDelay, self.frameDelay)
-            else:
-                self.animationTimer = self.frameDelay
+        start, stop = self.state.animationBounds.getValue()
 
+        if self.delayTime > 0:
+            self.delayTime -= dt
+            if self.delayTime < 0:
+                self.state.animationTime.setValue(start)
+            return task.cont
+
+        animationTime = self.state.animationTime.getValue()
+        animationStep = self.state.animationSpeed.getValue() * 60 * dt
+
+        animationTime += animationStep
+        if animationTime < stop:
+            self.state.animationTime.setValue(animationTime)
+            return task.cont
+
+        animationTime = stop
+        self.state.animationTime.setValue(animationTime)
+        self.delayTime = self.state.loopDelay.getValue()
         return task.cont
 
-    def setRecords(self, records: List[Record]) -> None:
-        self.records = records
-        if len(self.records) == 0:
+    def createFrames(self, data: Dict[str, Scan | None]) -> None:
+        scans: List[Scan] = []
+        for _, scan in data.items():
+            if scan is not None:
+                scans.append(scan)
+
+        frames = []
+        for scan in scans:
+            frames.append(AnimationFrame(scan.reflectivity))
+
+        self.state.animationFrames.setValue(frames)
+
+    def updateFrame(self, time: float) -> None:
+        for frame in self.state.animationFrames.getValue():
+            if self.getValidTime(frame) <= time:
+                self.state.animationFrame.setValue(frame.id)
+                return
+        self.state.animationFrame.setValue(None)
+
+    def handleNext(self, forward: bool = True) -> None:
+        currentFrame = self.state.animationFrame.getValue()
+        if currentFrame is None:
             return
 
-        self.index = len(records) - 1
-        self.setFrame(self.records[self.index].key())
-        self.setSliderValue()
-
-    def setFrame(self, frame: str | None) -> None:
-        self.state.animationFrame.setValue(frame)
-
-    def setSliderValue(self) -> None:
-        if len(self.records) < 2:
-            self.events.animation.animationProgress.send(1)
-        else:
-            self.events.animation.animationProgress.send(
-                self.index / (len(self.records) - 1)
-            )
-
-    def handleNext(self, continuePlaying: bool) -> None:
-        if not continuePlaying:
-            self.state.animationPlaying.setValue(False)
-
-        if len(self.records) == 0:
-            self.setFrame(None)
+        frames = self.state.animationFrames.getValue()
+        if len(frames) < 2:
             return
 
-        self.index += 1
-        if self.index == len(self.records):
-            self.index = 0
+        currentIndex = -1
+        for i, frame in enumerate(frames):
+            if frame.id == currentFrame:
+                currentIndex = i
+                break
 
-        self.setFrame(self.records[self.index].key())
-        self.setSliderValue()
-
-    def handlePrev(self) -> None:
-        self.state.animationPlaying.setValue(False)
-
-        if len(self.records) == 0:
-            self.setFrame(None)
+        if currentIndex < 0:
             return
 
-        self.index -= 1
-        if self.index < 0:
-            self.index = len(self.records) - 1
+        delta = 1 if forward else -1
+        nextFrame = frames[(currentIndex + delta) % len(frames)]
+        time = self.getValidTime(nextFrame)
+        start, stop = self.state.animationBounds.getValue()
+        time = min(stop, max(start, time))
+        self.state.animationTime.setValue(time)
 
-        self.setFrame(self.records[self.index].key())
-        self.setSliderValue()
-
-    def handleSlider(self, value: float) -> None:
-        if len(self.records) == 0:
-            self.setFrame(None)
-            return
-
-        value *= len(self.records) - 1
-        self.index = int(round(value))
-        self.setFrame(self.records[self.index].key())
+    def getValidTime(self, frame: AnimationFrame) -> int:
+        return frame.endTime
 
     def destroy(self) -> None:
         self.updateTask.cancel()

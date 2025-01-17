@@ -1,7 +1,7 @@
-import datetime
+from typing import Self
 
 
-class SweepMeta:
+class Sweep:
     def __init__(
         self,
         elevation: float,
@@ -13,7 +13,7 @@ class SweepMeta:
         rngCount: int,
         startTime: int,
         endTime: int,
-        offset: int,
+        data: bytes,
     ):
         self.elevation = elevation
         self.azFirst = azFirst
@@ -22,12 +22,21 @@ class SweepMeta:
         self.rngFirst = rngFirst
         self.rngStep = rngStep
         self.rngCount = rngCount
-        self.startTime = datetime.datetime.fromtimestamp(
-            startTime,
-            datetime.timezone.utc,
+        self.startTime = startTime
+        self.endTime = endTime
+        self.data = data
+
+    @classmethod
+    def empty(cls, elevation: float) -> Self:
+        return cls(
+            elevation=elevation,
+            azFirst=0,
+            azStep=0,
+            azCount=0,
+            rngFirst=0,
+            rngStep=0,
+            rngCount=0,
+            startTime=0,
+            endTime=0,
+            data=bytes(),
         )
-        self.endTime = datetime.datetime.fromtimestamp(
-            endTime,
-            datetime.timezone.utc,
-        )
-        self.offset = offset

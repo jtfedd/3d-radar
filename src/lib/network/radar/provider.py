@@ -6,12 +6,11 @@ import pynexrad
 from lib.app.logging import newLogger
 from lib.model.record import Record
 from lib.model.scan import Scan
-from lib.model.scan_data import ScanData
-from lib.model.sweep_meta import SweepMeta
+from lib.model.sweep import Sweep
 
 
-def sweepMetaFromSweep(sweep: pynexrad.Sweep, offset: int) -> SweepMeta:
-    return SweepMeta(
+def convertSweep(sweep: pynexrad.Sweep) -> Sweep:
+    return Sweep(
         sweep.elevation,
         sweep.az_first,
         sweep.az_step,
@@ -21,28 +20,19 @@ def sweepMetaFromSweep(sweep: pynexrad.Sweep, offset: int) -> SweepMeta:
         sweep.range_count,
         sweep.start_time,
         sweep.end_time,
-        offset,
+        bytearray(sweep.data),
     )
 
 
-def scanDataFromSweeps(sweeps: List[pynexrad.Sweep]) -> ScanData:
-    data = bytearray()
-
-    result = []
-    offset = 0
-    for meta in sweeps:
-        result.append(sweepMetaFromSweep(meta, offset))
-        data += bytearray(meta.data)
-        offset += len(meta.data)
-
-    return ScanData(result, data)
+def convertSweeps(sweeps: List[pynexrad.Sweep]) -> List[Sweep]:
+    return [convertSweep(sweep) for sweep in sweeps]
 
 
-def scanFromLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
+def convertLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
     return Scan(
         record,
-        scanDataFromSweeps(file.reflectivity),
-        scanDataFromSweeps(file.velocity),
+        convertSweeps(file.reflectivity),
+        convertSweeps(file.velocity),
     )
 
 
@@ -58,7 +48,7 @@ class RadarProvider:
         level2File = pynexrad.download_nexrad_file(key)
 
         self.log.info(f"Post-processing {key}")
-        return scanFromLevel2File(record, level2File)
+        return convertLevel2File(record, level2File)
 
     def search(
         self,

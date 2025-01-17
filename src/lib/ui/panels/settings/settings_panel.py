@@ -27,7 +27,7 @@ from .ui_scale import UIScaleInput
 
 class SettingsPanel(PanelContent):
     MIN_ANIMATION_SPEED = 1
-    MAX_ANIMATION_SPEED = 30
+    MAX_ANIMATION_SPEED = 60
 
     MAX_LOOP_DELAY = 10.0
 
@@ -124,7 +124,7 @@ class SettingsPanel(PanelContent):
                 self.root,
                 self.ctx,
                 self.events,
-                "Animation Speed (fps):",
+                "Animation Speed (minutes/second):",
                 str(state.animationSpeed.value),
                 UIConstants.panelContentWidth / 6,
             )
@@ -144,7 +144,7 @@ class SettingsPanel(PanelContent):
                 self.root,
                 self.ctx,
                 self.events,
-                "Loop Delay (s):",
+                "Loop Delay (seconds):",
                 str(state.loopDelay.value),
                 UIConstants.panelContentWidth / 6,
             )

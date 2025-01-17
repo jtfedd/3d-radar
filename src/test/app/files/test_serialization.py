@@ -1,52 +1,15 @@
 import datetime
 import random
 import unittest
+from test.testutils.models import (
+    assertScansEqual,
+    assertSweepsEqual,
+    newTestScan,
+    newTestSweep,
+)
 
 from lib.app.files import serialization
 from lib.model.record import Record
-from lib.model.scan import Scan
-from lib.model.scan_data import ScanData
-from lib.model.sweep_meta import SweepMeta
-
-
-def testSweepMeta() -> SweepMeta:
-    return SweepMeta(
-        elevation=random.random(),
-        azFirst=random.random(),
-        azStep=random.random(),
-        azCount=random.randint(0, 100),
-        rngFirst=random.random(),
-        rngStep=random.random(),
-        rngCount=random.randint(0, 100),
-        startTime=random.randint(0, 100000),
-        endTime=random.randint(0, 100000),
-        offset=random.randint(0, 100),
-    )
-
-
-def assertSweepMetaEqual(t: unittest.TestCase, a: SweepMeta, b: SweepMeta) -> None:
-    t.assertAlmostEqual(a.elevation, b.elevation)
-    t.assertAlmostEqual(a.azFirst, b.azFirst)
-    t.assertAlmostEqual(a.azStep, b.azStep)
-    t.assertEqual(a.azCount, b.azCount)
-    t.assertAlmostEqual(a.rngFirst, b.rngFirst)
-    t.assertAlmostEqual(a.rngStep, b.rngStep)
-    t.assertEqual(a.rngCount, b.rngCount)
-    t.assertEqual(a.startTime, b.startTime)
-    t.assertEqual(a.endTime, b.endTime)
-    t.assertEqual(a.offset, b.offset)
-
-
-def testScanData() -> ScanData:
-    return ScanData([testSweepMeta() for _ in range(5)], random.randbytes(100))
-
-
-def assertScanDataEqual(t: unittest.TestCase, a: ScanData, b: ScanData) -> None:
-    t.assertEqual(len(a.metas), len(b.metas))
-    for meta, newMeta in zip(a.metas, b.metas):
-        assertSweepMetaEqual(t, meta, newMeta)
-
-    t.assertEqual(a.data, b.data)
 
 
 def testRecord() -> Record:
@@ -97,37 +60,24 @@ class TestSerialization(unittest.TestCase):
 
         assertRecordEqual(self, record, newRecord)
 
-    def testSerializeSweepMeta(self) -> None:
-        meta = testSweepMeta()
+    def testSerializeSweep(self) -> None:
+        sweep = newTestSweep()
 
-        b = serialization.serializeSweepMeta(meta)
-        newMeta, offset = serialization.deserializeSweepMeta(b, 0)
-
-        self.assertEqual(offset, len(b))
-        self.assertEqual(offset, 40)
-
-        assertSweepMetaEqual(self, meta, newMeta)
-
-    def testSerializeScanData(self) -> None:
-        data = testScanData()
-
-        b = serialization.serializeScanData(data)
-        newData, offset = serialization.deserializeScanData(b, 0)
+        b = serialization.serializeSweep(sweep)
+        newSweep, offset = serialization.deserializeSweep(b, 0)
 
         self.assertEqual(offset, len(b))
-        self.assertEqual(offset, 308)
+        self.assertEqual(offset, 1040)
 
-        assertScanDataEqual(self, data, newData)
+        assertSweepsEqual(self, sweep, newSweep)
 
     def testSerializeScan(self) -> None:
-        scan = Scan(testRecord(), testScanData(), testScanData())
+        scan = newTestScan()
 
         b = serialization.serializeScan(scan)
         newScan, offset = serialization.deserializeScan(b, 0)
 
         self.assertEqual(offset, len(b))
-        self.assertEqual(offset, 638)
+        self.assertEqual(offset, 20827)
 
-        assertRecordEqual(self, scan.record, newScan.record)
-        assertScanDataEqual(self, scan.reflectivity, newScan.reflectivity)
-        assertScanDataEqual(self, scan.velocity, newScan.velocity)
+        assertScansEqual(self, scan, newScan)

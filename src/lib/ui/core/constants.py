@@ -70,7 +70,7 @@ class UIConstants:
     animationSliderWidth = 0.6
     animationSliderPadding = headerFooterHeight / 2
     animationButtonWidth = headerFooterHeight
-    animationButtonGroupWidth = 3 * animationButtonWidth
+    animationButtonGroupWidth = 4 * animationButtonWidth
     animationControlsWidth = (
         animationSliderWidth
         + 2 * animationSliderPadding
