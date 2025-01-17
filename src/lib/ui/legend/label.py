@@ -1,6 +1,9 @@
+import datetime
+
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
+from lib.model.animation_frame import AnimationFrame
 from lib.model.data_type import DataType
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
@@ -70,33 +73,30 @@ class Label(Listener):
         self.listen(state.animationFrame, lambda _: self.updateLabel())
         self.listen(state.dataType, lambda _: self.updateLabel())
         self.listen(events.timeFormatChanged, lambda _: self.updateLabel())
+        self.listen(state.station, lambda _: self.updateLabel())
 
     def updateLabel(self) -> None:
-        productText = self.getProductText()
-        timeText = self.getTimeText()
+        frame: AnimationFrame | None = None
+        frames = self.state.animationFrames.getValue()
+        for f in frames:
+            if f.id == self.state.animationFrame.value:
+                frame = f
 
-        if not productText or not timeText:
+        if frame is None:
             self.product.hide()
             self.time.hide()
             self.unknown.show()
             return
 
+        self.product.updateText(self.getProductText())
+        self.time.updateText(self.getTimeText(frame))
+
         self.product.show()
         self.time.show()
         self.unknown.hide()
 
-        self.product.updateText(productText)
-        self.time.updateText(timeText)
-
-    def getProductText(self) -> str | None:
-        if not self.state.animationFrame.value:
-            return None
-
-        scan = self.state.animationData.value[self.state.animationFrame.value]
-        if not scan:
-            return None
-
-        radar = scan.record.station
+    def getProductText(self) -> str:
+        radar = self.state.station.getValue()
         if self.state.dataType.value == DataType.REFLECTIVITY:
             product = "REFLECTIVITY"
         elif self.state.dataType.value == DataType.VELOCITY:
@@ -106,16 +106,12 @@ class Label(Listener):
 
         return radar + " " + product
 
-    def getTimeText(self) -> str | None:
-        if not self.state.animationFrame.value:
-            return None
-
-        scan = self.state.animationData.value[self.state.animationFrame.value]
-        if not scan:
-            return None
-
+    def getTimeText(self, frame: AnimationFrame) -> str:
         return self.ctx.timeUtil.formatTime(
-            scan.record.time,
+            datetime.datetime.fromtimestamp(
+                frame.endTime,
+                datetime.timezone.utc,
+            ),
             capitalizeMonth=True,
         )
 
