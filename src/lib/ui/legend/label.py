@@ -39,7 +39,7 @@ class Label(Listener):
             y=UIConstants.headerFooterHeight
             + UIConstants.legendPadding
             + (UIConstants.legendLabelHeight / 2),
-            vAlign=VAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
             hAlign=HAlign.LEFT,
             layer=UILayer.LABEL_CONTENT,
         )
@@ -64,7 +64,7 @@ class Label(Listener):
             y=UIConstants.headerFooterHeight
             + UIConstants.legendPadding
             + (UIConstants.legendLabelHeight / 2),
-            vAlign=VAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
             hAlign=HAlign.RIGHT,
             layer=UILayer.LABEL_CONTENT,
         )
@@ -104,12 +104,19 @@ class Label(Listener):
         else:
             return None
 
-        return radar + " " + product
+        return radar + "\n" + product
 
     def getTimeText(self, frame: AnimationFrame) -> str:
+        return (
+            self.formatTimestamp(frame.startTime)
+            + "\n"
+            + self.formatTimestamp(frame.endTime)
+        )
+
+    def formatTimestamp(self, timestamp: int) -> str:
         return self.ctx.timeUtil.formatTime(
             datetime.datetime.fromtimestamp(
-                frame.endTime,
+                timestamp,
                 datetime.timezone.utc,
             ),
             capitalizeMonth=True,
