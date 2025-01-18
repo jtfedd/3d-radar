@@ -170,11 +170,11 @@ class VolumeDataProvider(Listener):
             self.offsets.setElement(i, offsets[i])
 
     def updateFrame(self) -> None:
-        if not self.state.animationFrame.value:
-            return
-
         frames = self.state.animationFrames.getValue()
-        for frame in frames:
-            if frame.id == self.state.animationFrame.value:
-                self.updateVolumeData(frame)
-                return
+        frameId = self.state.animationFrame.getValue()
+        if frameId is not None:
+            for frame in frames:
+                if frame.id == frameId:
+                    self.updateVolumeData(frame)
+                    return
+        self.updateVolumeData(AnimationFrame([]))

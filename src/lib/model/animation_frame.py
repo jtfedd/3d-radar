@@ -9,11 +9,16 @@ class AnimationFrame:
         self,
         sweeps: List[Sweep],
     ) -> None:
-        self.startTime = min(sweep.startTime for sweep in sweeps)
-        self.endTime = max(sweep.endTime for sweep in sweeps)
-
         self.id = uuid()
         self.sweeps = [Sweep.empty(0)]
+        self.startTime = 0
+        self.endTime = 0
+
+        if len(sweeps) == 0:
+            return
+
+        self.startTime = min(sweep.startTime for sweep in sweeps)
+        self.endTime = max(sweep.endTime for sweep in sweeps)
         self.sweeps.extend(sweeps)
 
         if len(self.sweeps) > 1:

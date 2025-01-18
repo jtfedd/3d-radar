@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List
 
 from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
@@ -6,6 +6,8 @@ from direct.task.Task import Task
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.animation_frame import AnimationFrame
+from lib.model.animation_type import AnimationType
+from lib.model.data_type import DataType
 from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.util.events.listener import Listener
@@ -20,7 +22,10 @@ class AnimationManager(Listener):
         self.records: List[Record] = []
         self.index = 0
 
-        self.bind(state.animationData, self.createFrames)
+        self.createFrames()
+        self.listen(state.animationData, lambda _: self.createFrames())
+        self.listen(state.animationType, lambda _: self.createFrames())
+        self.listen(state.dataType, lambda _: self.createFrames())
 
         self.listen(
             events.animation.play,
@@ -41,7 +46,10 @@ class AnimationManager(Listener):
             events.requestData, lambda _: state.animationPlaying.setValue(False)
         )
         self.listen(state.animationPlaying, lambda _: self.resetDelayTimer())
-        self.bind(self.state.animationTime, self.updateFrame)
+
+        self.updateFrame()
+        self.listen(self.state.animationTime, lambda _: self.updateFrame())
+        self.listen(self.state.animationFrames, lambda _: self.updateFrame())
 
         self.taskTime = 0.0
         self.delayTime = 0.0
@@ -78,7 +86,9 @@ class AnimationManager(Listener):
         self.delayTime = self.state.loopDelay.getValue()
         return task.cont
 
-    def createFrames(self, data: Dict[str, Scan | None]) -> None:
+    def createFrames(self) -> None:
+        data = self.state.animationData.getValue()
+
         scans: List[Scan] = []
         for _, scan in data.items():
             if scan is not None:
@@ -86,12 +96,20 @@ class AnimationManager(Listener):
 
         frames = []
         for scan in scans:
-            frames.append(AnimationFrame(scan.reflectivity))
+            frames.append(
+                AnimationFrame(
+                    scan.reflectivity
+                    if self.state.dataType.getValue() == DataType.REFLECTIVITY
+                    else scan.velocity
+                )
+            )
 
         frames.sort(key=self.getValidTime)
         self.state.animationFrames.setValue(frames)
 
-    def updateFrame(self, time: float) -> None:
+    def updateFrame(self) -> None:
+        time = self.state.animationTime.getValue()
+
         validFrame: str | None = None
         for frame in self.state.animationFrames.getValue():
             if self.getValidTime(frame) <= time:
@@ -129,7 +147,11 @@ class AnimationManager(Listener):
         self.state.animationTime.setValue(time)
 
     def getValidTime(self, frame: AnimationFrame) -> int:
-        return frame.endTime
+        return (
+            frame.startTime
+            if self.state.animationType.getValue() == AnimationType.VOLUME
+            else frame.endTime
+        )
 
     def destroy(self) -> None:
         self.updateTask.cancel()
