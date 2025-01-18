@@ -10,6 +10,7 @@ from lib.model.animation_type import AnimationType
 from lib.model.data_type import DataType
 from lib.model.record import Record
 from lib.model.scan import Scan
+from lib.model.sweep import Sweep
 from lib.util.events.listener import Listener
 
 
@@ -86,6 +87,67 @@ class AnimationManager(Listener):
         self.delayTime = self.state.loopDelay.getValue()
         return task.cont
 
+    def getDataFromScan(self, scan: Scan) -> List[Sweep]:
+        return (
+            scan.reflectivity
+            if self.state.dataType.getValue() == DataType.REFLECTIVITY
+            else scan.velocity
+        )
+
+    def createVolumeFrames(self, scans: List[Scan]) -> List[AnimationFrame]:
+        frames = []
+        for scan in scans:
+            frames.append(
+                AnimationFrame(scan.getSweeps(self.state.dataType.getValue()))
+            )
+
+        frames.sort(key=self.getValidTime)
+        return frames
+
+    def createSweepFrames(self, scans: List[Scan]) -> List[AnimationFrame]:
+        class SweepInfo:
+            def __init__(self, sweep: Sweep, elevations: List[float]):
+                self.sweep = sweep
+                elIndex = elevations.index(sweep.elevation)
+                self.coverageStart = 0.0
+                self.coverageEnd = 1000.0
+
+                if elIndex > 0:
+                    self.coverageStart = (
+                        elevations[elIndex - 1] + elevations[elIndex]
+                    ) / 2.0
+                if elIndex < len(elevations) - 1:
+                    self.coverageEnd = (
+                        elevations[elIndex + 1] + elevations[elIndex]
+                    ) / 2.0
+
+        sweeps: List[SweepInfo] = []
+        for scan in scans:
+            elevations = scan.getElevations(self.state.dataType.getValue())
+            for sweep in scan.getSweeps(self.state.dataType.getValue()):
+                sweeps.append(SweepInfo(sweep, elevations))
+        sweeps.sort(key=lambda sweep: sweep.sweep.startTime)
+
+        frames: List[AnimationFrame] = []
+        currentSweeps: List[Sweep] = []
+
+        for info in sweeps:
+            frameSweeps: List[Sweep] = []
+            for cSweep in currentSweeps:
+                if (
+                    cSweep.elevation < info.coverageStart
+                    or cSweep.elevation > info.coverageEnd
+                ):
+                    frameSweeps.append(cSweep)
+
+            frameSweeps.append(info.sweep)
+            frameSweeps.sort(key=lambda sweep: sweep.elevation)
+
+            frames.append(AnimationFrame(frameSweeps))
+            currentSweeps = frameSweeps.copy()
+
+        return frames
+
     def createFrames(self) -> None:
         data = self.state.animationData.getValue()
 
@@ -94,17 +156,11 @@ class AnimationManager(Listener):
             if scan is not None:
                 scans.append(scan)
 
-        frames = []
-        for scan in scans:
-            frames.append(
-                AnimationFrame(
-                    scan.reflectivity
-                    if self.state.dataType.getValue() == DataType.REFLECTIVITY
-                    else scan.velocity
-                )
-            )
-
-        frames.sort(key=self.getValidTime)
+        frames = (
+            self.createVolumeFrames(scans)
+            if self.state.animationType.getValue() == AnimationType.VOLUME
+            else self.createSweepFrames(scans)
+        )
         self.state.animationFrames.setValue(frames)
 
     def updateFrame(self) -> None:
