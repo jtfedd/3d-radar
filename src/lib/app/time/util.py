@@ -81,7 +81,6 @@ class TimeUtil(Listener):
             day=timeQuery.day,
             hour=hour,
             minute=minute,
-            second=59,
             tzinfo=self.timezone,
         )
 

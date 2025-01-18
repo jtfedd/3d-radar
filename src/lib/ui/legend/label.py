@@ -120,6 +120,7 @@ class Label(Listener):
                 datetime.timezone.utc,
             ),
             capitalizeMonth=True,
+            seconds=True,
         )
 
     def destroy(self) -> None:
