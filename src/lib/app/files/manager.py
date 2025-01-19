@@ -7,6 +7,7 @@ from direct.stdpy import threading
 from platformdirs import user_cache_dir, user_config_dir
 
 from lib.app.events import AppEvents
+from lib.app.files.serialization import SERIALIZATION_VERSION
 from lib.app.logging import newLogger
 from lib.app.state import AppState
 from lib.util.events.listener import Listener
@@ -30,6 +31,7 @@ class FileManager(Listener):
         self._clearPreviousDirs()
 
         self.state = state
+        self.events = events
 
         self.lock = threading.Lock()
 
@@ -45,16 +47,36 @@ class FileManager(Listener):
 
         self.allowSave = True
 
-        self.init()
-        self.listen(self.state.maxCacheSize, lambda _: self.resizeCache())
-        self.listen(
-            self.state.useCache, lambda value: self.clearCache() if not value else None
-        )
-        self.listen(events.clearCache, lambda _: self.clearCache())
+        self.loadConfig()
+        self.enableCache()
 
-    def init(self) -> None:
+    def enableCache(self) -> None:
         with self.lock:
             self._initializeCacheMeta()
+            self.listen(self.state.maxCacheSize, lambda _: self.resizeCache())
+            self.listen(
+                self.state.useCache,
+                lambda value: self.clearCache() if not value else None,
+            )
+            self.listen(self.events.clearCache, lambda _: self.clearCache())
+
+            if self.state.serializationVersion.value != SERIALIZATION_VERSION:
+                self.clearCache()
+                self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
+
+    def loadConfig(self) -> None:
+        raw = self.readConfigFile()
+        if raw is None:
+            return
+
+        jsonStr = raw.decode()
+        if jsonStr == "":
+            return
+
+        self.state.fromJson(jsonStr)
+
+    def saveConfig(self) -> None:
+        self.saveConfigFile(self.state.toJson().encode())
 
     def readConfigFile(self) -> bytes | None:
         with self.lock:

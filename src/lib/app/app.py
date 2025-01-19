@@ -4,7 +4,6 @@ import sys
 from direct.showbase.ShowBase import ShowBase
 
 from lib.app.data_manager.manager import DataManager
-from lib.app.files.serialization import SERIALIZATION_VERSION
 from lib.map.map import Map
 from lib.render_volume.render_volume import VolumeRenderer
 from lib.ui.ui import UI
@@ -23,8 +22,6 @@ class App:
         self.events = AppEvents()
         self.ctx = AppContext(base, self.events, self.state)
 
-        self.loadConfig()
-
         self.ui = UI(self.ctx, self.state, self.events)
         self.map = Map(self.ctx, self.state, self.events)
 
@@ -41,24 +38,6 @@ class App:
 
         atexit.register(self.destroy)
 
-    def loadConfig(self) -> None:
-        raw = self.ctx.fileManager.readConfigFile()
-        if raw is None:
-            return
-
-        jsonStr = raw.decode()
-        if jsonStr == "":
-            return
-
-        self.state.fromJson(jsonStr)
-
-        if self.state.serializationVersion.value != SERIALIZATION_VERSION:
-            self.ctx.fileManager.clearCache()
-            self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
-
-    def saveConfig(self) -> None:
-        self.ctx.fileManager.saveConfigFile(self.state.toJson().encode())
-
     def clearDataAndExit(self) -> None:
         self.ctx.fileManager.clearAllData()
         sys.exit()
@@ -68,7 +47,7 @@ class App:
         self.volumeRenderer.destroy()
         self.ui.destroy()
 
-        self.saveConfig()
+        self.ctx.fileManager.saveConfig()
 
         self.ctx.destroy()
         self.events.destroy()
