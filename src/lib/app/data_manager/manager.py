@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict
 
 from direct.task.Task import Task
 
@@ -8,7 +8,6 @@ from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_query import DataQuery
 from lib.model.loading_progress_payload import LoadingProgressPayload
-from lib.model.record import Record
 from lib.model.scan import Scan
 from lib.util.events.listener import Listener
 from lib.util.state import applyDataQueryToState, dataQueryFromState
@@ -36,7 +35,7 @@ class DataManager(Listener):
         self.loadingTask: LoadingTask | None = None
 
         initialQuery = dataQueryFromState(state)
-        self.onDataLoaded(initialQuery, [], {})
+        self.onDataLoaded(initialQuery, {})
         self.onDataRequested(initialQuery)
         self.listen(events.requestData, self.onDataRequested)
         self.listen(events.refreshData, lambda _: self.refresh())
@@ -91,9 +90,7 @@ class DataManager(Listener):
         self.state.loadingData.setValue(False)
         self.loadingTask = None
 
-    def onDataLoaded(
-        self, query: DataQuery, records: List[Record], scans: Dict[str, Scan]
-    ) -> None:
+    def onDataLoaded(self, query: DataQuery, scans: Dict[str, Scan]) -> None:
         self.refreshTimer = 0
         self.state.loadingData.setValue(False)
         self.loadingTask = None
