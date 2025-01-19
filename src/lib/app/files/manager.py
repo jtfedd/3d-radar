@@ -7,6 +7,7 @@ from direct.stdpy import threading
 from platformdirs import user_cache_dir, user_config_dir
 
 from lib.app.events import AppEvents
+from lib.app.files.serialization import SERIALIZATION_VERSION
 from lib.app.logging import newLogger
 from lib.app.state import AppState
 from lib.util.events.listener import Listener
@@ -45,7 +46,9 @@ class FileManager(Listener):
         self.cacheMeta: Dict[str, CacheFileInfo] = {}
 
         self.allowSave = True
-        self.cacheInitialized = False
+
+        self.loadConfig()
+        self.enableCache()
 
     def enableCache(self) -> None:
         with self.lock:
@@ -57,7 +60,23 @@ class FileManager(Listener):
             )
             self.listen(self.events.clearCache, lambda _: self.clearCache())
 
-            self.cacheInitialized = True
+            if self.state.serializationVersion.value != SERIALIZATION_VERSION:
+                self.clearCache()
+                self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
+
+    def loadConfig(self) -> None:
+        raw = self.readConfigFile()
+        if raw is None:
+            return
+
+        jsonStr = raw.decode()
+        if jsonStr == "":
+            return
+
+        self.state.fromJson(jsonStr)
+
+    def saveConfig(self) -> None:
+        self.saveConfigFile(self.state.toJson().encode())
 
     def readConfigFile(self) -> bytes | None:
         with self.lock:
@@ -191,7 +210,7 @@ class FileManager(Listener):
         self._recalculateCacheSize()
 
     def _readCacheFile(self, filename: str) -> bytes | None:
-        if not self.state.useCache.value or not self.cacheInitialized:
+        if not self.state.useCache.value:
             return None
 
         filepath = self._getCacheFilePath(filename)
@@ -203,7 +222,7 @@ class FileManager(Listener):
         return self._readFile(filepath)
 
     def _saveCacheFile(self, filename: str, data: bytes) -> None:
-        if not self.state.useCache.value or not self.cacheInitialized:
+        if not self.state.useCache.value:
             return
 
         self.log.info("Writing: " + filename)
