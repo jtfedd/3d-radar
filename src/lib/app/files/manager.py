@@ -30,6 +30,7 @@ class FileManager(Listener):
         self._clearPreviousDirs()
 
         self.state = state
+        self.events = events
 
         self.lock = threading.Lock()
 
@@ -44,17 +45,19 @@ class FileManager(Listener):
         self.cacheMeta: Dict[str, CacheFileInfo] = {}
 
         self.allowSave = True
+        self.cacheInitialized = False
 
-        self.init()
-        self.listen(self.state.maxCacheSize, lambda _: self.resizeCache())
-        self.listen(
-            self.state.useCache, lambda value: self.clearCache() if not value else None
-        )
-        self.listen(events.clearCache, lambda _: self.clearCache())
-
-    def init(self) -> None:
+    def enableCache(self) -> None:
         with self.lock:
             self._initializeCacheMeta()
+            self.listen(self.state.maxCacheSize, lambda _: self.resizeCache())
+            self.listen(
+                self.state.useCache,
+                lambda value: self.clearCache() if not value else None,
+            )
+            self.listen(self.events.clearCache, lambda _: self.clearCache())
+
+            self.cacheInitialized = True
 
     def readConfigFile(self) -> bytes | None:
         with self.lock:
@@ -188,7 +191,7 @@ class FileManager(Listener):
         self._recalculateCacheSize()
 
     def _readCacheFile(self, filename: str) -> bytes | None:
-        if not self.state.useCache.value:
+        if not self.state.useCache.value or not self.cacheInitialized:
             return None
 
         filepath = self._getCacheFilePath(filename)
@@ -200,7 +203,7 @@ class FileManager(Listener):
         return self._readFile(filepath)
 
     def _saveCacheFile(self, filename: str, data: bytes) -> None:
-        if not self.state.useCache.value:
+        if not self.state.useCache.value or not self.cacheInitialized:
             return
 
         self.log.info("Writing: " + filename)

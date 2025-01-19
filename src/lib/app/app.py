@@ -24,6 +24,7 @@ class App:
         self.ctx = AppContext(base, self.events, self.state)
 
         self.loadConfig()
+        self.ctx.fileManager.enableCache()
 
         self.ui = UI(self.ctx, self.state, self.events)
         self.map = Map(self.ctx, self.state, self.events)
