@@ -17,9 +17,7 @@ class LoadingTask:
         ctx: AppContext,
         dataQuery: DataQuery,
         getCachedScan: Callable[[str], Scan | None],
-        loadCompleteCallback: Callable[
-            [DataQuery, List[Record], Dict[str, Scan]], None
-        ],
+        loadCompleteCallback: Callable[[DataQuery, Dict[str, Scan]], None],
         loadCancelledCallback: Callable[[], None],
     ) -> None:
         self.cancelled = False
@@ -110,4 +108,4 @@ class LoadingTask:
 
         self.onComplete.send(None)
 
-        self.loadCompleteCallback(self.dataQuery, self.resultRecords, self.resultScans)
+        self.loadCompleteCallback(self.dataQuery, self.resultScans)

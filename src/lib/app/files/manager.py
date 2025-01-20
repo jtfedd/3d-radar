@@ -60,9 +60,9 @@ class FileManager(Listener):
             )
             self.listen(self.events.clearCache, lambda _: self.clearCache())
 
-            if self.state.serializationVersion.value != SERIALIZATION_VERSION:
-                self.clearCache()
-                self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
+        if self.state.serializationVersion.value != SERIALIZATION_VERSION:
+            self.clearCache()
+            self.state.serializationVersion.setValue(SERIALIZATION_VERSION)
 
     def loadConfig(self) -> None:
         raw = self.readConfigFile()

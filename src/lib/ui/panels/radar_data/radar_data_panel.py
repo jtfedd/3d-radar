@@ -147,15 +147,15 @@ class RadarDataPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        self.framesInput = self.addComponent(
+        self.minutesInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 ctx,
                 events,
-                "Number of Frames:",
-                str(state.frames.value),
+                "Loop Time (minutes):",
+                str(state.loopMinutes.value),
                 UIConstants.panelContentWidth / 4,
-                validationText="1-100",
+                validationText="0-120",
             )
         )
 
@@ -195,7 +195,7 @@ class RadarDataPanel(PanelContent):
             focusableItems.append(self.dayInput.input)
             focusableItems.append(self.timeInput.input)
 
-        focusableItems.append(self.framesInput.input)
+        focusableItems.append(self.minutesInput.input)
 
         self.setupFocusLoop(focusableItems)
 
@@ -217,7 +217,7 @@ class RadarDataPanel(PanelContent):
         self.monthInput.setValid(True)
         self.dayInput.setValid(True)
         self.timeInput.setValid(True)
-        self.framesInput.setValid(True)
+        self.minutesInput.setValid(True)
 
     def search(self) -> None:
         valid = True
@@ -274,12 +274,12 @@ class RadarDataPanel(PanelContent):
             self.radarInput.setValid(False)
 
         try:
-            frames = int(self.framesInput.input.entry.get())
-            if frames < 1 or frames > 100:
+            minutes = int(self.minutesInput.input.entry.get())
+            if minutes < 0 or minutes > 120:
                 raise ValueError("Invalid frames value")
         except ValueError:
             valid = False
-            self.framesInput.setValid(False)
+            self.minutesInput.setValid(False)
 
         if not valid:
             return
@@ -295,7 +295,7 @@ class RadarDataPanel(PanelContent):
 
         query = DataQuery(
             radar=radar,
-            frames=frames,
+            minutes=minutes,
             time=timeQuery,
         )
 

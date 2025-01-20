@@ -1,7 +1,7 @@
 blosc>=1.11.2
 panda3d==1.10.14
 platformdirs>=4.3.6
-pynexrad==0.0.20
+pynexrad==0.0.26
 requests>=2.32.3
 tzdata>=2024.2
 tzfpy>=0.15.6

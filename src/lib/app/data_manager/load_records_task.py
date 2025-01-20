@@ -1,3 +1,4 @@
+import datetime
 from typing import Callable, List
 
 from lib.app.task.task import AbstractTask
@@ -27,12 +28,16 @@ class LoadRecordsTask(AbstractTask):
         self.readyForProcessing()
 
     def doProcessing(self) -> None:
+        loopEnd = (
+            self.timeUtil.getQueryTime(self.dataQuery.time)
+            or self.dataQuery.queryTimestamp
+        )
+        loopStart = loopEnd - datetime.timedelta(minutes=self.dataQuery.minutes)
         self.resultRecords = self.radarService.search(
-            Record(
-                self.dataQuery.radar,
-                self.timeUtil.getQueryTime(self.dataQuery.time),
-            ),
-            self.dataQuery.frames,
+            self.dataQuery.radar,
+            loopStart,
+            loopEnd,
+            priorRecords=2,
         )
 
     def doPostProcessing(self) -> None:

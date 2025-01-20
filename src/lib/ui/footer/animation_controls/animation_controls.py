@@ -1,12 +1,14 @@
+import datetime
+
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
 from lib.app.state import AppState
-from lib.model.data_type import DataType
 from lib.ui.core.alignment import HAlign, VAlign
 from lib.ui.core.colors import UIColors
 from lib.ui.core.components.background_card import BackgroundCard
 from lib.ui.core.components.button import Button, ButtonSkin
 from lib.ui.core.components.slider import Slider
+from lib.ui.core.components.text import Text
 from lib.ui.core.constants import UIConstants
 from lib.ui.core.icons import Icons
 from lib.ui.core.layers import UILayer
@@ -18,6 +20,7 @@ class AnimationControls(Listener):
         super().__init__()
 
         self.ctx = ctx
+        self.state = state
 
         self.background = BackgroundCard(
             ctx.anchors.bottom,
@@ -28,34 +31,14 @@ class AnimationControls(Listener):
             layer=UILayer.BACKGROUND_DECORATION,
         )
 
-        self.refButton = Button(
+        self.sliderBackground = BackgroundCard(
             ctx.anchors.bottom,
-            ctx,
-            UIConstants.animationButtonGroupWidth,
-            UIConstants.headerFooterHeight / 2,
-            UIConstants.animationControlsWidth / 2,
-            UIConstants.headerFooterHeight / 2,
-            hAlign=HAlign.RIGHT,
+            width=UIConstants.animationSliderWidth
+            + (2 * UIConstants.animationSliderPadding),
+            height=UIConstants.headerFooterHeight,
+            color=UIColors.BLACK,
             vAlign=VAlign.BOTTOM,
-            text="Reflectivity",
-            skin=ButtonSkin.INSET,
-            toggleSkin=ButtonSkin.LIGHT,
-            toggleState=state.dataType.value == DataType.REFLECTIVITY,
-        )
-
-        self.velButton = Button(
-            ctx.anchors.bottom,
-            ctx,
-            UIConstants.animationButtonGroupWidth,
-            UIConstants.headerFooterHeight / 2,
-            UIConstants.animationControlsWidth / 2,
-            0,
-            hAlign=HAlign.RIGHT,
-            vAlign=VAlign.BOTTOM,
-            text="Velocity",
-            skin=ButtonSkin.INSET,
-            toggleSkin=ButtonSkin.LIGHT,
-            toggleState=state.dataType.value == DataType.VELOCITY,
+            layer=UILayer.CONTENT_BACKGROUND,
         )
 
         self.play = Button(
@@ -63,7 +46,8 @@ class AnimationControls(Listener):
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
-            -UIConstants.animationControlsWidth / 2 + UIConstants.animationButtonWidth,
+            -UIConstants.animationControlsWidth / 2
+            + (2 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -78,7 +62,8 @@ class AnimationControls(Listener):
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
-            -UIConstants.animationControlsWidth / 2,
+            -UIConstants.animationControlsWidth / 2
+            + (1 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -94,7 +79,7 @@ class AnimationControls(Listener):
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + 2 * UIConstants.animationButtonWidth,
+            + (3 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -114,34 +99,44 @@ class AnimationControls(Listener):
             valueRange=(0, 1),
         )
 
-        self.listen(
-            self.refButton.onClick,
-            lambda _: state.dataType.setValue(DataType.REFLECTIVITY),
+        self.time = Text(
+            ctx.anchors.bottom,
+            ctx.fonts.mono,
+            self.getClockStr(),
+            x=UIConstants.animationControlsWidth / 2
+            - UIConstants.animationButtonGroupWidth / 2,
+            y=UIConstants.headerFooterHeight / 2,
+            hAlign=HAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
         )
 
         self.listen(
-            self.velButton.onClick,
-            lambda _: state.dataType.setValue(DataType.VELOCITY),
-        )
-
-        self.listen(
-            state.dataType,
-            lambda dt: self.refButton.setToggleState(dt == DataType.REFLECTIVITY),
-        )
-
-        self.listen(
-            state.dataType,
-            lambda dt: self.velButton.setToggleState(dt == DataType.VELOCITY),
+            state.animationTime, lambda _: self.time.updateText(self.getClockStr())
         )
 
         self.listen(self.play.onClick, events.animation.play.send)
         self.listen(self.next.onClick, events.animation.next.send)
         self.listen(self.previous.onClick, events.animation.previous.send)
-        self.listen(self.animationSlider.onValueChange, events.animation.slider.send)
-        self.listen(events.animation.animationProgress, self.animationSlider.setValue)
+        self.bind(state.animationPlaying, self.updatePlayButton)
 
-        self.updatePlayButton(state.animationPlaying.value)
-        self.listen(state.animationPlaying, self.updatePlayButton)
+        self.listen(self.animationSlider.onValueChange, self.handleSliderChange)
+        self.listen(state.animationTime, self.handleAnimationUpdate)
+
+    def handleSliderChange(self, value: float) -> None:
+        animationStart, animationEnd = self.state.animationBounds.value
+        animationTime = animationStart + value * (animationEnd - animationStart)
+
+        # To avoid programmatic updates causing the slider to think it moved, only
+        # send events when the value difference is greater than 1 tenth of a second
+        if abs(animationTime - self.state.animationTime.getValue()) > 0.1:
+            self.state.animationTime.setValue(animationTime)
+            self.state.animationPlaying.setValue(False)
+
+    def handleAnimationUpdate(self, value: float) -> None:
+        animationStart, animationEnd = self.state.animationBounds.value
+        normalizedValue = (value - animationStart) / (animationEnd - animationStart)
+        normalizedValue = max(0, min(1, normalizedValue))
+        self.animationSlider.setValue(normalizedValue)
 
     def updatePlayButton(self, playing: bool) -> None:
         if playing:
@@ -149,12 +144,19 @@ class AnimationControls(Listener):
         else:
             self.play.setIcon(Icons.PLAY)
 
+    def getClockStr(self) -> str:
+        return self.ctx.timeUtil.formatTime(
+            datetime.datetime.fromtimestamp(
+                self.state.animationTime.value, tz=datetime.timezone.utc
+            ),
+            sep="\n",
+            seconds=True,
+        )
+
     def destroy(self) -> None:
         super().destroy()
 
         self.background.destroy()
-        self.refButton.destroy()
-        self.velButton.destroy()
         self.play.destroy()
         self.previous.destroy()
         self.next.destroy()

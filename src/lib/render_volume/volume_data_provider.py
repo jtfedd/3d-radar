@@ -7,8 +7,8 @@ from panda3d.core import GeomEnums, NodePath, PandaNode, PTA_float, PTA_int, Tex
 
 from lib.app.context import AppContext
 from lib.app.state import AppState
+from lib.model.animation_frame import AnimationFrame
 from lib.model.data_type import DataType
-from lib.model.scan import Scan
 from lib.util import util
 from lib.util.events.listener import Listener
 from lib.util.uuid import uuid
@@ -139,42 +139,42 @@ class VolumeDataProvider(Listener):
             self.state.rHighCut.value if isRef else self.state.vHighCut.value
         )
 
-    def updateVolumeData(self, scan: Scan) -> None:
-        scanData = scan.reflectivity
-        if self.state.dataType.value == DataType.VELOCITY:
-            scanData = scan.velocity
+    def updateVolumeData(self, frame: AnimationFrame) -> None:
+        data = frame.data()
 
         # Create a new buffer if necessary
-        if self.bufferSize < len(scanData.data):
-            self.bufferSize = util.nextPowerOf2(len(scanData.data))
+        if self.bufferSize < len(data):
+            self.bufferSize = util.nextPowerOf2(len(data))
             self.setupBuffer()
 
         # I would love to create a single memory view when the buffer is created
         # and reuse that. It also seems to be faster. But for some reason the data
         # is not sent properly that way.
         dataView = memoryview(self.buffer.modifyRamImage())  # type: ignore
-        dataView[: len(scanData.data)] = scanData.data
+        dataView[: len(data)] = data
 
         # At some point I would like to optimize all of these meta inputs into a packed
         # struct or something but it doesn't seem to be a performance issue yet
 
-        self.scanCount.setElement(0, len(scanData.metas))
+        self.scanCount.setElement(0, len(frame.sweeps))
 
-        for i, meta in enumerate(scanData.metas):
+        offsets = frame.getOffsets()
+
+        for i, meta in enumerate(frame.sweeps):
             self.elevations.setElement(i, meta.elevation)
             self.azSteps.setElement(i, meta.azStep)
             self.azCounts.setElement(i, meta.azCount)
             self.rFirsts.setElement(i, meta.rngFirst)
             self.rSteps.setElement(i, meta.rngStep)
             self.rCounts.setElement(i, meta.rngCount)
-            self.offsets.setElement(i, meta.offset)
+            self.offsets.setElement(i, offsets[i])
 
     def updateFrame(self) -> None:
-        if not self.state.animationFrame.value:
-            return
-
-        scan = self.state.animationData.value[self.state.animationFrame.value]
-        if not scan:
-            return
-
-        self.updateVolumeData(scan)
+        frames = self.state.animationFrames.getValue()
+        frameId = self.state.animationFrame.getValue()
+        if frameId is not None:
+            for frame in frames:
+                if frame.id == frameId:
+                    self.updateVolumeData(frame)
+                    return
+        self.updateVolumeData(AnimationFrame([]))

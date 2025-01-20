@@ -70,7 +70,7 @@ class UIConstants:
     animationSliderWidth = 0.6
     animationSliderPadding = headerFooterHeight / 2
     animationButtonWidth = headerFooterHeight
-    animationButtonGroupWidth = 3 * animationButtonWidth
+    animationButtonGroupWidth = 4 * animationButtonWidth
     animationControlsWidth = (
         animationSliderWidth
         + 2 * animationSliderPadding
@@ -79,7 +79,7 @@ class UIConstants:
 
     legendPadding = 0.015
     legendLabelWidth = 0.8
-    legendLabelHeight = 0.05
+    legendLabelHeight = 0.1
     legendScaleWidth = 0.15
     legendScaleHeight = 1
     legendScaleBarWidth = 0.03

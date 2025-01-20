@@ -55,9 +55,9 @@ class TimeUtil(Listener):
 
         raise ValueError("Unknown time mode: " + self.state.timeMode.value)
 
-    def getQueryTime(self, timeQuery: TimeQuery | None) -> datetime.datetime:
+    def getQueryTime(self, timeQuery: TimeQuery | None) -> datetime.datetime | None:
         if timeQuery is None:
-            return datetime.datetime.now(tz=datetime.UTC)
+            return None
 
         time = timeQuery.time
 
@@ -81,7 +81,6 @@ class TimeUtil(Listener):
             day=timeQuery.day,
             hour=hour,
             minute=minute,
-            second=59,
             tzinfo=self.timezone,
         )
 
@@ -93,22 +92,23 @@ class TimeUtil(Listener):
     def findTimezone(self, location: GeoPoint) -> str | None:
         return get_tz(lng=location.lon, lat=location.lat)
 
-    def getTimeFormatStr(self) -> str:
+    def getTimeFormatStr(self, seconds: bool = False) -> str:
         if self.state.timeMode.value == TimeMode.UTC:
-            return "%H:%MZ"
+            return "%H:%M:%SZ" if seconds else "%H:%MZ"
 
         if self.state.timeFormat.value:
-            return "%I:%M %p"
+            return "%I:%M:%S %p" if seconds else "%I:%M %p"
 
-        return "%H:%M"
+        return "%H:%M:%S" if seconds else "%H:%M"
 
     def formatTime(
         self,
         time: datetime.datetime,
         sep: str = " ",
         capitalizeMonth: bool = False,
+        seconds: bool = False,
     ) -> str:
         dateFormat = self.getDateFormatStr(capitalizeMonth)
-        timeFormat = self.getTimeFormatStr()
+        timeFormat = self.getTimeFormatStr(seconds=seconds)
 
         return time.astimezone(self.timezone).strftime(dateFormat + sep + timeFormat)

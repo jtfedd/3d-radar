@@ -7,6 +7,7 @@ from lib.app.events import AppEvents
 from lib.app.files.manager import FileManager
 from lib.app.focus.focusable import Focusable
 from lib.app.state import AppState
+from lib.model.animation_type import AnimationType
 from lib.model.time_mode import TimeMode
 from lib.ui.core.constants import UIConstants
 from lib.ui.panels.components.button import PanelButton
@@ -27,7 +28,7 @@ from .ui_scale import UIScaleInput
 
 class SettingsPanel(PanelContent):
     MIN_ANIMATION_SPEED = 1
-    MAX_ANIMATION_SPEED = 30
+    MAX_ANIMATION_SPEED = 60
 
     MAX_LOOP_DELAY = 10.0
 
@@ -119,12 +120,28 @@ class SettingsPanel(PanelContent):
 
         self.addComponent(TitleComponent(self.root, ctx, "Animation"))
 
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                self.ctx,
+                self.state.animationType,
+                [
+                    ("Volumes", AnimationType.VOLUME),
+                    ("Sweeps", AnimationType.SWEEP),
+                ],
+                "Animate:",
+                left=UIConstants.panelContentWidth / 2,
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
         self.animationSpeedInput = self.addComponent(
             PanelTextInput(
                 self.root,
                 self.ctx,
                 self.events,
-                "Animation Speed (fps):",
+                "Animation Speed (min/sec):",
                 str(state.animationSpeed.value),
                 UIConstants.panelContentWidth / 6,
             )
@@ -144,7 +161,7 @@ class SettingsPanel(PanelContent):
                 self.root,
                 self.ctx,
                 self.events,
-                "Loop Delay (s):",
+                "Loop Delay (sec):",
                 str(state.loopDelay.value),
                 UIConstants.panelContentWidth / 6,
             )

@@ -1,3 +1,5 @@
+import datetime
+
 from .time_query import TimeQuery
 
 
@@ -5,9 +7,11 @@ class DataQuery:
     def __init__(
         self,
         radar: str,
-        frames: int,
+        minutes: int,
         time: TimeQuery | None,
     ):
         self.radar = radar
-        self.frames = frames
+        self.minutes = minutes
         self.time = time
+
+        self.queryTimestamp = datetime.datetime.now(tz=datetime.UTC)
