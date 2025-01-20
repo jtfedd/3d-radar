@@ -55,9 +55,9 @@ class TimeUtil(Listener):
 
         raise ValueError("Unknown time mode: " + self.state.timeMode.value)
 
-    def getQueryTime(self, timeQuery: TimeQuery | None) -> datetime.datetime:
+    def getQueryTime(self, timeQuery: TimeQuery | None) -> datetime.datetime | None:
         if timeQuery is None:
-            return datetime.datetime.now(tz=datetime.UTC)
+            return None
 
         time = timeQuery.time
 

@@ -28,7 +28,10 @@ class LoadRecordsTask(AbstractTask):
         self.readyForProcessing()
 
     def doProcessing(self) -> None:
-        loopEnd = self.timeUtil.getQueryTime(self.dataQuery.time)
+        loopEnd = (
+            self.timeUtil.getQueryTime(self.dataQuery.time)
+            or self.dataQuery.queryTimestamp
+        )
         loopStart = loopEnd - datetime.timedelta(minutes=self.dataQuery.minutes)
         self.resultRecords = self.radarService.search(
             self.dataQuery.radar,

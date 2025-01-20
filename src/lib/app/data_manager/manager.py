@@ -101,9 +101,12 @@ class DataManager(Listener):
             forceSend=True,
         )
 
-        # TODO for latest this could be different than when the data was loaded
         animationTimestamp = int(
-            round(self.ctx.timeUtil.getQueryTime(query.time).timestamp())
+            round(
+                (
+                    self.ctx.timeUtil.getQueryTime(query.time) or query.queryTimestamp
+                ).timestamp()
+            )
         )
         self.state.animationBounds.setValue(
             (animationTimestamp - (60 * query.minutes), animationTimestamp)
