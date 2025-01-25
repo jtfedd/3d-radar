@@ -8,9 +8,6 @@ from lib.map.constants import EARTH_RADIUS, RADAR_RANGE
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
-from .lighting_data_provider import LightingDataProvider
-from .volume_data_provider import VolumeDataProvider
-
 
 class VolumeRenderer(Listener):
     def __init__(self, ctx: AppContext, state: AppState) -> None:
@@ -21,14 +18,14 @@ class VolumeRenderer(Listener):
 
         self.smoothShader = Shader.load(
             Shader.SL_GLSL,
-            vertex="shaders/gen/vertex.glsl",
-            fragment="shaders/gen/fragment_smooth.glsl",
+            vertex="shaders/gen/volume_vertex.glsl",
+            fragment="shaders/gen/volume_sharp_fragment.glsl",
         )
 
         self.sharpShader = Shader.load(
             Shader.SL_GLSL,
-            vertex="shaders/gen/vertex.glsl",
-            fragment="shaders/gen/fragment_sharp.glsl",
+            vertex="shaders/gen/volume_vertex.glsl",
+            fragment="shaders/gen/volume_smooth_fragment.glsl",
         )
 
         manager = FilterManager(self.ctx.base.win, self.ctx.base.cam)
@@ -36,8 +33,7 @@ class VolumeRenderer(Listener):
         depth = Texture()
         self.plane = unwrap(manager.renderSceneInto(colortex=scene, depthtex=depth))
 
-        self.updateShader(state.smooth.value)
-        self.listen(state.smooth, self.updateShader)
+        self.bind(state.smooth, self.updateShader)
 
         ctx.windowManager.resolutionProvider.addNode(self.plane)
 
@@ -60,16 +56,8 @@ class VolumeRenderer(Listener):
         )
         self.timeTask = self.ctx.base.taskMgr.add(self.updateTime, "update-time")
 
-        self.volumeDataProvider = VolumeDataProvider(ctx, state)
-        self.lightingDataProvider = LightingDataProvider(ctx, state)
-        self.volumeDataProvider.addNode(self.plane)
-        self.lightingDataProvider.addNode(self.plane)
-
     def updateShader(self, smooth: bool) -> None:
-        if smooth:
-            self.plane.setShader(self.smoothShader)
-        else:
-            self.plane.setShader(self.sharpShader)
+        self.plane.setShader(self.smoothShader if smooth else self.sharpShader)
 
     def updateCameraParams(self, task: Task.Task) -> int:
         self.plane.setShaderInput(
@@ -93,9 +81,6 @@ class VolumeRenderer(Listener):
         super().destroy()
 
         self.ctx.windowManager.resolutionProvider.removeNode(self.plane)
-
-        self.lightingDataProvider.destroy()
-        self.volumeDataProvider.destroy()
 
         self.cameraTask.cancel()
         self.timeTask.cancel()
