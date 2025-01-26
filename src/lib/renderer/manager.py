@@ -22,6 +22,7 @@ class RenderManager(Listener):
         self.surfaceRenderer = SurfaceRenderer(ctx, state)
 
         self.volumeDataProvider.addNode(self.volumeRenderer.plane)
+        self.volumeDataProvider.addNode(self.surfaceRenderer.surface)
         self.lightingDataProvider.addNode(self.volumeRenderer.plane)
 
     def destroy(self) -> None:

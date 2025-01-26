@@ -19,13 +19,13 @@ class VolumeRenderer(Listener):
         self.smoothShader = Shader.load(
             Shader.SL_GLSL,
             vertex="shaders/gen/volume_vertex.glsl",
-            fragment="shaders/gen/volume_sharp_fragment.glsl",
+            fragment="shaders/gen/volume_smooth_fragment.glsl",
         )
 
         self.sharpShader = Shader.load(
             Shader.SL_GLSL,
             vertex="shaders/gen/volume_vertex.glsl",
-            fragment="shaders/gen/volume_smooth_fragment.glsl",
+            fragment="shaders/gen/volume_sharp_fragment.glsl",
         )
 
         manager = FilterManager(self.ctx.base.win, self.ctx.base.cam)
