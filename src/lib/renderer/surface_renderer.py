@@ -3,6 +3,7 @@ from panda3d.core import Shader, Vec3
 from lib.app.context import AppContext
 from lib.app.state import AppState
 from lib.map.constants import EARTH_RADIUS
+from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
 
@@ -32,6 +33,7 @@ class SurfaceRenderer(Listener):
         self.surface.reparentTo(ctx.base.render)
         self.surface.setZ(-EARTH_RADIUS)
         self.surface.setScale(EARTH_RADIUS)
+        self.surface.setBin("background", UILayer.RADAR_SURFACE.value)
 
         self.bind(state.smooth, self.updateShader)
         self.surface.setShaderInput("earth_center", Vec3(0, 0, -EARTH_RADIUS))

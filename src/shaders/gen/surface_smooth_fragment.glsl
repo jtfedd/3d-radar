@@ -42,6 +42,17 @@ int calc_sweep_index(float el) {
     return 0;
 }
 
+vec3 resolve_surface_sample_position(vec3 surface_pos, int sweep_index) {
+    vec3 ray = surface_pos - earth_center;
+    vec3 up = -earth_center;
+    float center_angle = acos(dot(ray, up)/ (length(ray) * length(up)));
+    float x_angle = (PI / 2.0) + elevation[sweep_index];
+    float a_angle = PI - x_angle - center_angle;
+    float a = length(up);
+    float x = (a / sin(a_angle)) * sin(x_angle);
+    vec3 sample_pos = earth_center + (normalize(ray)*x);
+    return sample_pos;
+}
 
 float interpolate(float low, float high, float factor) {
     if (low < 0 && high < 0) {
@@ -141,10 +152,10 @@ out vec4 p3d_FragColor;
 void main() {
     if (scan_count[0] < 3) discard;
 
-    float sample_value = data_value_for_sweep(vpos, 1);
-    if (sample_value < 0.1) discard;
+    vec3 sample_pos = resolve_surface_sample_position(vpos, 1);
+    float sample_value = data_value_for_sweep(sample_pos, 1);
+    if (sample_value < 0) discard;
     
     vec3 sample_color = colorize(sample_value);
-
     p3d_FragColor = vec4(sample_color.xyz, 1.0);
 }

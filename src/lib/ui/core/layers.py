@@ -8,8 +8,10 @@ class UILayer(Enum):
     MAP_COUNTIES = 1
     MAP_STATES = 2
 
-    MAP_SVW = 3
-    MAP_TOW = 4
+    RADAR_SURFACE = 3
+
+    MAP_SVW = 4
+    MAP_TOW = 5
 
     # 2D Layers
     MARKER_BACKGROUND = 0
