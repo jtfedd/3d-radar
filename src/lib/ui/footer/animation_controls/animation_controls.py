@@ -41,6 +41,36 @@ class AnimationControls(Listener):
             layer=UILayer.CONTENT_BACKGROUND,
         )
 
+        self.select2D = Button(
+            ctx.anchors.bottom,
+            ctx,
+            UIConstants.animationButtonWidth,
+            UIConstants.headerFooterHeight / 2,
+            -UIConstants.animationControlsWidth / 2,
+            UIConstants.headerFooterHeight / 2,
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.BOTTOM,
+            text="2D",
+            skin=ButtonSkin.INSET,
+            toggleSkin=ButtonSkin.LIGHT,
+            toggleState=(not state.view3D.getValue()),
+        )
+
+        self.select3D = Button(
+            ctx.anchors.bottom,
+            ctx,
+            UIConstants.animationButtonWidth,
+            UIConstants.headerFooterHeight / 2,
+            -UIConstants.animationControlsWidth / 2,
+            0,
+            hAlign=HAlign.LEFT,
+            vAlign=VAlign.BOTTOM,
+            text="3D",
+            skin=ButtonSkin.INSET,
+            toggleSkin=ButtonSkin.LIGHT,
+            toggleState=state.view3D.getValue(),
+        )
+
         self.play = Button(
             ctx.anchors.bottom,
             ctx,
@@ -122,6 +152,11 @@ class AnimationControls(Listener):
         self.listen(self.animationSlider.onValueChange, self.handleSliderChange)
         self.listen(state.animationTime, self.handleAnimationUpdate)
 
+        self.listen(self.select2D.onClick, lambda _: state.view3D.setValue(False))
+        self.listen(self.select3D.onClick, lambda _: state.view3D.setValue(True))
+        self.listen(state.view3D, lambda value: self.select2D.setToggleState(not value))
+        self.listen(state.view3D, self.select3D.setToggleState)
+
     def handleSliderChange(self, value: float) -> None:
         animationStart, animationEnd = self.state.animationBounds.value
         animationTime = animationStart + value * (animationEnd - animationStart)
@@ -157,6 +192,11 @@ class AnimationControls(Listener):
         super().destroy()
 
         self.background.destroy()
+        self.sliderBackground.destroy()
+        self.select2D.destroy()
+        self.select3D.destroy()
         self.play.destroy()
         self.previous.destroy()
         self.next.destroy()
+        self.animationSlider.destroy()
+        self.time.destroy()

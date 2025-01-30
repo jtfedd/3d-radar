@@ -108,6 +108,7 @@ class AppState:
         self.maxCacheSize = self.createField("maxCacheSize", 100)
         self.serializationVersion = self.createField("serializationVersion", -1)
 
+        self.view3D = self.createField("view3D", True)
         self.smooth = self.createField("smooth", True)
         self.volumetricLighting = self.createField("volumetricLighting", False)
 
