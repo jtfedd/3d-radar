@@ -19,26 +19,25 @@ uniform float density_params[7];
 
 uniform usamplerBuffer volume_data;
 
-$inputs
+uniform float opacity;
+uniform float threshold;
+uniform float max_el_index;
 
-#include resolve_elevation.part.glsl
-#include surface_sample_position.part.glsl
-#include volume_smooth.part.glsl
-#include color_util.part.glsl
+$inputs
 
 // World-space vertex position from vertex shader
 in vec3 vpos;
 
 // Outputs to Panda3D
 out vec4 p3d_FragColor;
+
+#include resolve_elevation.part.glsl
+#include surface_sample_position.part.glsl
+#include volume_smooth.part.glsl
+#include color_util.part.glsl
+#include surface_color.part.glsl
       
 void main() {
-    if (scan_count[0] < 3) discard;
-
-    vec3 sample_pos = resolve_surface_sample_position(vpos, 1);
-    float sample_value = data_value_for_sweep(sample_pos, 1);
-    if (sample_value < 0) discard;
-    
-    vec3 sample_color = colorize(sample_value);
-    p3d_FragColor = vec4(sample_color.xyz, 1.0);
+    vec3 color = resolve_surface_color();
+    p3d_FragColor = vec4(color.xyz, opacity);
 }
