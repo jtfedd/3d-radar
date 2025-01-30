@@ -5,7 +5,7 @@ from direct.showbase.ShowBase import ShowBase
 
 from lib.app.data_manager.manager import DataManager
 from lib.map.map import Map
-from lib.render_volume.render_volume import VolumeRenderer
+from lib.renderer.manager import RenderManager
 from lib.ui.ui import UI
 
 from .alerts.manager import AlertManager
@@ -25,7 +25,7 @@ class App:
         self.ui = UI(self.ctx, self.state, self.events)
         self.map = Map(self.ctx, self.state, self.events)
 
-        self.volumeRenderer = VolumeRenderer(self.ctx, self.state)
+        self.renderer = RenderManager(self.ctx, self.state)
         self.alertManager = AlertManager(self.ctx, self.state, self.events)
 
         self.dataManager = DataManager(
@@ -44,7 +44,7 @@ class App:
 
     def destroy(self) -> None:
         self.dataManager.destroy()
-        self.volumeRenderer.destroy()
+        self.renderer.destroy()
         self.ui.destroy()
 
         self.ctx.fileManager.saveConfig()

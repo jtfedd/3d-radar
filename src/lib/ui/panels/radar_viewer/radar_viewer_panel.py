@@ -57,6 +57,63 @@ class RadarViewerPanel(PanelContent):
             )
         )
 
+        self.addComponent(TitleComponent(self.root, ctx, "Surface Layer"))
+
+        self.addComponent(
+            CheckboxComponent(
+                self.root,
+                ctx,
+                "Show Surface Layer",
+                state.showSurfaceLayer,
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
+        self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                ctx,
+                self.state.surfaceComposite,
+                [
+                    ("Base", False),
+                    ("Composite", True),
+                ],
+                label="Mode:",
+                left=UIConstants.panelContentWidth - UIConstants.panelSliderWidth,
+            )
+        )
+
+        self.addComponent(SpacerComponent(self.root))
+
+        self.surfaceOpacitySlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.surfaceOpacity.getValue(),
+                (0.0, 1.0),
+                "Opacity:",
+            )
+        )
+        self.listener.listen(
+            self.surfaceOpacitySlider.slider.onValueChange,
+            self.state.surfaceOpacity.setValue,
+        )
+
+        self.surfaceThresholdSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                ctx,
+                self.state.surfaceThreshold.getValue(),
+                (0.0, 1.0),
+                "Threshold:",
+            )
+        )
+        self.listener.listen(
+            self.surfaceThresholdSlider.slider.onValueChange,
+            self.state.surfaceThreshold.setValue,
+        )
+
         self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
 
         self.createVolumeControls(
