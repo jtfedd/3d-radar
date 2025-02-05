@@ -113,7 +113,7 @@ jobs:
         sed -i "s;$PWD/;;g" reports/coverage.lcov
 
     - name: Publish Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: reports
         path: reports/
