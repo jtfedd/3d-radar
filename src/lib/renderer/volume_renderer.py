@@ -48,7 +48,7 @@ class VolumeRenderer(Listener):
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",
-            self.ctx.base.cam.node().getLens().getProjectionMatInv(),
+            self.ctx.base.camLens.getProjectionMatInv(),
         )
 
         self.cameraTask = self.ctx.base.taskMgr.add(
@@ -67,7 +67,7 @@ class VolumeRenderer(Listener):
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",
-            self.ctx.base.cam.node().getLens().getProjectionMatInv(),
+            self.ctx.base.camLens.getProjectionMatInv(),
         )
 
         return task.cont

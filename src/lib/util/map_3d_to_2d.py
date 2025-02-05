@@ -16,7 +16,7 @@ def map3dToAspect2d(
     p3 = ctx.base.cam.getRelativePoint(ctx.base.render, point)
     # Convert it through the lens to render2d coordinates
     p2 = Point2()
-    if not ctx.base.camLens.project(p3, p2):
+    if not ctx.base.cam.node().getLens().project(p3, p2):
         return None
     r2d = Point3(p2[0], 0, p2[1])
     # And then convert it to aspect2d coordinates
