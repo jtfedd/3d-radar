@@ -113,13 +113,13 @@ jobs:
         sed -i "s;$PWD/;;g" reports/coverage.lcov
 
     - name: Publish Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: reports
         path: reports/
  
     - name: Publish Unit Test Coverage
-      uses: zgosalvez/github-actions-report-lcov@v3
+      uses: zgosalvez/github-actions-report-lcov@v4
       with:
         coverage-files: reports/coverage.lcov
         artifact-name: code-coverage-report
