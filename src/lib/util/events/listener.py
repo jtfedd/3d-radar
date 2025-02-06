@@ -26,6 +26,21 @@ class Listener:
         callback(observable.getValue())
         self.listen(observable, callback)
 
+    def trigger(
+        self,
+        dispatcher: EventDispatcher[T],
+        callback: Callable[[], None],
+    ) -> None:
+        self.subscriptions.append(dispatcher.listen(lambda _: callback()))
+
+    def triggerMany(  # type: ignore
+        self,
+        dispatchers: List[EventDispatcher[Any]],
+        callback: Callable[[], None],
+    ) -> None:
+        for dispatcher in dispatchers:
+            self.trigger(dispatcher, callback)
+
     def destroy(self) -> None:
         for sub in self.subscriptions:
             sub.cancel()
