@@ -119,7 +119,7 @@ jobs:
         path: reports/
  
     - name: Publish Unit Test Coverage
-      uses: zgosalvez/github-actions-report-lcov@v3
+      uses: zgosalvez/github-actions-report-lcov@v4
       with:
         coverage-files: reports/coverage.lcov
         artifact-name: code-coverage-report
