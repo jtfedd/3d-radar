@@ -27,10 +27,11 @@ class InputManager(DirectObject):
         self.createBindings()
 
         self.listener = Listener()
-        self.listener.listen(self.state.hideKeybinding, lambda _: self.createBindings())
-        self.listener.listen(self.state.playKeybinding, lambda _: self.createBindings())
-        self.listener.listen(self.state.nextKeybinding, lambda _: self.createBindings())
-        self.listener.listen(self.state.prevKeybinding, lambda _: self.createBindings())
+        self.listener.trigger(self.state.hideKeybinding, self.createBindings)
+        self.listener.trigger(self.state.playKeybinding, self.createBindings)
+        self.listener.trigger(self.state.nextKeybinding, self.createBindings)
+        self.listener.trigger(self.state.prevKeybinding, self.createBindings)
+        self.listener.trigger(self.state.stationsButtonKeybinding, self.createBindings)
 
         self.mouse1Pressed = False
         self.mouse3Pressed = False
@@ -70,11 +71,9 @@ class InputManager(DirectObject):
 
         self.accept(
             self.state.stationsButtonKeybinding.value,
-            lambda: self.send(self.events.showStationsButtons),
-        )
-        self.accept(
-            self.state.stationsButtonKeybinding.value + "-up",
-            lambda: self.events.hideStationsButtons.send(None),
+            lambda: self.state.showStations.setValue(
+                not self.state.showStations.getValue()
+            ),
         )
 
         self.accept("wheel_up-up", lambda: self.events.scroll.send(-1))

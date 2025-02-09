@@ -258,6 +258,9 @@ class SettingsPanel(PanelContent):
         self.playKey = self.addKeybindingInput("Play/Pause:", state.playKeybinding)
         self.prevKey = self.addKeybindingInput("Previous Frame:", state.prevKeybinding)
         self.nextKey = self.addKeybindingInput("Next Frame:", state.nextKeybinding)
+        self.stationsKey = self.addKeybindingInput(
+            "Show/Hide Stations:", state.stationsButtonKeybinding
+        )
 
         self.updateInputsForTimeMode()
         self.listener.listen(state.timeMode, lambda _: self.updateInputsForTimeMode())
@@ -292,6 +295,7 @@ class SettingsPanel(PanelContent):
         focusableItems.append(self.playKey.input)
         focusableItems.append(self.prevKey.input)
         focusableItems.append(self.nextKey.input)
+        focusableItems.append(self.stationsKey.input)
 
         self.setupFocusLoop(focusableItems)
 
