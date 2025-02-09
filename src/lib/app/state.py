@@ -160,6 +160,7 @@ class AppState:
         self.showTornadoWarnings = self.createField("showTOW", True)
         self.showSevereThunderstormWarnings = self.createField("showSVW", True)
 
+        self.showStations = self.createField("showStations", True)
         self.show3dMarkers = self.createField("show3dMarkers", False)
         self.mapMarkers: Observable[List[LocationMarker]] = (
             self.createFieldCustomSerialization(

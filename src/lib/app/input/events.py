@@ -15,8 +15,6 @@ class InputEvents:
         self.rightMouseRaw = EventDispatcher[bool]()
         self.tab = EventDispatcher[bool]()
         self.shiftTab = EventDispatcher[bool]()
-        self.showStationsButtons = EventDispatcher[None]()
-        self.hideStationsButtons = EventDispatcher[None]()
 
     def destroy(self) -> None:
         self.onHide.close()
@@ -29,5 +27,3 @@ class InputEvents:
         self.rightMouseRaw.close()
         self.tab.close()
         self.shiftTab.close()
-        self.showStationsButtons.close()
-        self.hideStationsButtons.close()
