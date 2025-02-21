@@ -26,9 +26,14 @@ class VolumeDataProvider(Listener):
         self.reflectivityScale = ctx.base.loader.loadTexture(
             "assets/reflectivity_scale.png",
         )
+        self.reflectivityScale.setWrapU(Texture.WM_clamp)
+        self.reflectivityScale.setWrapV(Texture.WM_clamp)
+
         self.velocityScale = ctx.base.loader.loadTexture(
             "assets/velocity_scale.png",
         )
+        self.velocityScale.setWrapU(Texture.WM_clamp)
+        self.velocityScale.setWrapV(Texture.WM_clamp)
 
         self.scanCount = PTA_int.empty_array(1)
         self.elevations = PTA_float.emptyArray(self.MAX_SCANS)
