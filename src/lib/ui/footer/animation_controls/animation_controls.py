@@ -22,18 +22,8 @@ class AnimationControls(Listener):
         self.ctx = ctx
         self.state = state
 
-        self.background = BackgroundCard(
-            ctx.anchors.bottom,
-            width=UIConstants.animationControlsWidth,
-            height=UIConstants.headerFooterHeight,
-            color=UIColors.INSET,
-            vAlign=VAlign.BOTTOM,
-            layer=UILayer.BACKGROUND_DECORATION,
-        )
-
         self.sliderBackground = BackgroundCard(
             ctx.anchors.bottom,
-            x=-UIConstants.animationButtonWidth,
             width=UIConstants.animationSliderWidth
             + (2 * UIConstants.animationSliderPadding),
             height=UIConstants.headerFooterHeight,
@@ -47,7 +37,7 @@ class AnimationControls(Listener):
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight / 2,
-            UIConstants.animationControlsWidth / 2,
+            UIConstants.animationControlsWidth / 2 + UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight / 2,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.BOTTOM,
@@ -62,7 +52,7 @@ class AnimationControls(Listener):
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight / 2,
-            UIConstants.animationControlsWidth / 2,
+            UIConstants.animationControlsWidth / 2 + UIConstants.animationButtonWidth,
             0,
             hAlign=HAlign.RIGHT,
             vAlign=VAlign.BOTTOM,
@@ -122,7 +112,7 @@ class AnimationControls(Listener):
 
         self.animationSlider = Slider(
             ctx.anchors.bottom,
-            -UIConstants.animationButtonWidth,
+            0,
             UIConstants.headerFooterHeight / 2,
             UIConstants.animationSliderWidth,
             hAlign=HAlign.CENTER,
@@ -135,11 +125,22 @@ class AnimationControls(Listener):
             ctx.fonts.mono,
             self.getClockStr(),
             x=UIConstants.animationControlsWidth / 2
-            - UIConstants.animationButtonGroupWidth / 2
-            - UIConstants.animationButtonWidth,
+            - UIConstants.animationButtonGroupWidth / 2,
             y=UIConstants.headerFooterHeight / 2,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.BOTTOM,
+        )
+
+        self.timeBackground = BackgroundCard(
+            ctx.anchors.bottom,
+            x=UIConstants.animationControlsWidth / 2
+            - UIConstants.animationButtonGroupWidth / 2,
+            width=UIConstants.animationButtonGroupWidth,
+            height=UIConstants.headerFooterHeight,
+            color=UIColors.INSET,
+            hAlign=HAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
+            layer=UILayer.BACKGROUND_DECORATION,
         )
 
         self.listen(
@@ -193,7 +194,7 @@ class AnimationControls(Listener):
     def destroy(self) -> None:
         super().destroy()
 
-        self.background.destroy()
+        self.timeBackground.destroy()
         self.sliderBackground.destroy()
         self.select2D.destroy()
         self.select3D.destroy()
