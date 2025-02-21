@@ -34,6 +34,7 @@ class PanelButtonGroup(PanelComponent, Generic[T]):
         self.observable = observable
         self.buttons: List[Button] = []
         self.buttonDefs = buttonDefs
+        self.buttonHeight = height
 
         self.label: ComponentLabel | None = None
         if label:
@@ -69,7 +70,7 @@ class PanelButtonGroup(PanelComponent, Generic[T]):
             button.setToggleState(self.observable.value == self.buttonDefs[i][1])
 
     def getHeight(self) -> float:
-        return UIConstants.panelButtonGroupHeight
+        return self.buttonHeight
 
     def destroy(self) -> None:
         super().destroy()
