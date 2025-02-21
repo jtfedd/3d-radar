@@ -70,22 +70,6 @@ class RadarViewerPanel(PanelContent):
 
         self.addComponent(SpacerComponent(self.root))
 
-        self.addComponent(
-            PanelButtonGroup(
-                self.root,
-                ctx,
-                self.state.surfaceComposite,
-                [
-                    ("Base", False),
-                    ("Composite", True),
-                ],
-                label="Mode:",
-                left=UIConstants.panelContentWidth - UIConstants.panelSliderWidth,
-            )
-        )
-
-        self.addComponent(SpacerComponent(self.root))
-
         self.surfaceOpacitySlider = self.addComponent(
             SliderComponent(
                 self.root,
@@ -100,18 +84,16 @@ class RadarViewerPanel(PanelContent):
             self.state.surfaceOpacity.setValue,
         )
 
-        self.surfaceThresholdSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                self.state.surfaceThreshold.getValue(),
-                (0.0, 1.0),
-                "Threshold:",
-            )
+        self.createSurfaceControls(
+            self.state.refThreshold,
+            self.state.refComposite,
+            DataType.REFLECTIVITY,
         )
-        self.listener.listen(
-            self.surfaceThresholdSlider.slider.onValueChange,
-            self.state.surfaceThreshold.setValue,
+
+        self.createSurfaceControls(
+            self.state.velThreshold,
+            self.state.velComposite,
+            DataType.VELOCITY,
         )
 
         self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
@@ -164,6 +146,55 @@ class RadarViewerPanel(PanelContent):
 
         self.lightingDirection = self.addComponent(
             LightingDirection(self.root, ctx, state)
+        )
+
+    def createSurfaceControls(
+        self,
+        threshold: Observable[float],
+        composite: Observable[bool],
+        dataType: DataType,
+    ) -> None:
+        thresholdSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                threshold.getValue(),
+                (0.0, 1.0),
+                "Threshold:",
+            )
+        )
+        self.listener.listen(
+            thresholdSlider.slider.onValueChange,
+            threshold.setValue,
+        )
+
+        spacer = self.addComponent(SpacerComponent(self.root))
+
+        compositeButtonGroup = self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                self.ctx,
+                composite,
+                [
+                    ("Base", False),
+                    ("Composite", True),
+                ],
+                label="Mode:",
+                left=UIConstants.panelContentWidth - UIConstants.panelSliderWidth,
+            )
+        )
+
+        self.listener.bind(
+            self.state.dataType,
+            lambda dt: thresholdSlider.setHidden(dt != dataType),
+        )
+        self.listener.bind(
+            self.state.dataType,
+            lambda dt: spacer.setHidden(dt != dataType),
+        )
+        self.listener.bind(
+            self.state.dataType,
+            lambda dt: compositeButtonGroup.setHidden(dt != dataType),
         )
 
     def createVolumeControls(

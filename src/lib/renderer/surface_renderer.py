@@ -3,6 +3,7 @@ from panda3d.core import Shader, TransparencyAttrib, Vec3
 from lib.app.context import AppContext
 from lib.app.state import AppState
 from lib.map.constants import EARTH_RADIUS
+from lib.model.data_type import DataType
 from lib.ui.core.layers import UILayer
 from lib.util.events.listener import Listener
 from lib.util.optional import unwrap
@@ -46,15 +47,15 @@ class SurfaceRenderer(Listener):
             state.surfaceOpacity,
             lambda opacity: self.surface.setShaderInput("opacity", opacity),
         )
-        self.bind(
-            state.surfaceThreshold,
-            lambda threshold: self.surface.setShaderInput("threshold", threshold),
+        self.triggerMany(
+            [state.velThreshold, state.refThreshold, state.dataType],
+            self.updateThreshold,
+            triggerImmediately=True,
         )
-        self.bind(
-            state.surfaceComposite,
-            lambda composite: self.surface.setShaderInput(
-                "max_el_index", 100 if composite else 1
-            ),
+        self.triggerMany(
+            [state.velComposite, state.refComposite, state.dataType],
+            self.updateComposite,
+            triggerImmediately=True,
         )
         self.surface.setShaderInput("earth_center", Vec3(0, 0, -EARTH_RADIUS))
 
@@ -67,6 +68,24 @@ class SurfaceRenderer(Listener):
             self.surface.show()
         else:
             self.surface.hide()
+
+    def updateThreshold(self) -> None:
+        threshold = (
+            self.state.refThreshold.getValue()
+            if self.state.dataType.getValue() == DataType.REFLECTIVITY
+            else self.state.velThreshold.getValue()
+        )
+
+        self.surface.setShaderInput("threshold", threshold)
+
+    def updateComposite(self) -> None:
+        composite = (
+            self.state.refComposite.getValue()
+            if self.state.dataType.getValue() == DataType.REFLECTIVITY
+            else self.state.velComposite.getValue()
+        )
+
+        self.surface.setShaderInput("max_el_index", 100 if composite else 1)
 
     def updateShader(self, smooth: bool) -> None:
         self.surface.setShader(self.smoothShader if smooth else self.sharpShader)
