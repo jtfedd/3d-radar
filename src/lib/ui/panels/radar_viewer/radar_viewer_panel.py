@@ -79,10 +79,7 @@ class RadarViewerPanel(PanelContent):
                 "Opacity:",
             )
         )
-        self.listener.listen(
-            self.surfaceOpacitySlider.slider.onValueChange,
-            self.state.surfaceOpacity.setValue,
-        )
+        self.linkSlider(self.state.surfaceOpacity, self.surfaceOpacitySlider)
 
         self.createSurfaceControls(
             self.state.refThreshold,
@@ -163,10 +160,7 @@ class RadarViewerPanel(PanelContent):
                 "Threshold:",
             )
         )
-        self.listener.listen(
-            thresholdSlider.slider.onValueChange,
-            threshold.setValue,
-        )
+        self.linkSlider(threshold, thresholdSlider)
 
         spacer = self.addComponent(SpacerComponent(self.root))
 
