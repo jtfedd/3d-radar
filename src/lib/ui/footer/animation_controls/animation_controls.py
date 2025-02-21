@@ -33,6 +33,7 @@ class AnimationControls(Listener):
 
         self.sliderBackground = BackgroundCard(
             ctx.anchors.bottom,
+            x=-UIConstants.animationButtonWidth,
             width=UIConstants.animationSliderWidth
             + (2 * UIConstants.animationSliderPadding),
             height=UIConstants.headerFooterHeight,
@@ -46,9 +47,9 @@ class AnimationControls(Listener):
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight / 2,
-            -UIConstants.animationControlsWidth / 2,
+            UIConstants.animationControlsWidth / 2,
             UIConstants.headerFooterHeight / 2,
-            hAlign=HAlign.LEFT,
+            hAlign=HAlign.RIGHT,
             vAlign=VAlign.BOTTOM,
             text="2D",
             skin=ButtonSkin.INSET,
@@ -61,9 +62,9 @@ class AnimationControls(Listener):
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight / 2,
-            -UIConstants.animationControlsWidth / 2,
+            UIConstants.animationControlsWidth / 2,
             0,
-            hAlign=HAlign.LEFT,
+            hAlign=HAlign.RIGHT,
             vAlign=VAlign.BOTTOM,
             text="3D",
             skin=ButtonSkin.INSET,
@@ -77,7 +78,7 @@ class AnimationControls(Listener):
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + (2 * UIConstants.animationButtonWidth),
+            + (1 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -93,7 +94,7 @@ class AnimationControls(Listener):
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + (1 * UIConstants.animationButtonWidth),
+            + (0 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -109,7 +110,7 @@ class AnimationControls(Listener):
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + (3 * UIConstants.animationButtonWidth),
+            + (2 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -121,7 +122,7 @@ class AnimationControls(Listener):
 
         self.animationSlider = Slider(
             ctx.anchors.bottom,
-            0,
+            -UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight / 2,
             UIConstants.animationSliderWidth,
             hAlign=HAlign.CENTER,
@@ -134,7 +135,8 @@ class AnimationControls(Listener):
             ctx.fonts.mono,
             self.getClockStr(),
             x=UIConstants.animationControlsWidth / 2
-            - UIConstants.animationButtonGroupWidth / 2,
+            - UIConstants.animationButtonGroupWidth / 2
+            - UIConstants.animationButtonWidth,
             y=UIConstants.headerFooterHeight / 2,
             hAlign=HAlign.CENTER,
             vAlign=VAlign.BOTTOM,
