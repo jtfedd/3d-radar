@@ -143,8 +143,9 @@ class AnimationControls(Listener):
             layer=UILayer.BACKGROUND_DECORATION,
         )
 
-        self.listen(
-            state.animationTime, lambda _: self.time.updateText(self.getClockStr())
+        self.triggerMany(
+            [state.animationTime, events.timeFormatChanged, state.station],
+            self.updateClock,
         )
 
         self.listen(self.play.onClick, events.animation.play.send)
@@ -181,6 +182,9 @@ class AnimationControls(Listener):
             self.play.setIcon(Icons.PAUSE)
         else:
             self.play.setIcon(Icons.PLAY)
+
+    def updateClock(self) -> None:
+        self.time.updateText(self.getClockStr())
 
     def getClockStr(self) -> str:
         return self.ctx.timeUtil.formatTime(
