@@ -37,8 +37,11 @@ class SurfaceRenderer(Listener):
         self.surface.setTransparency(TransparencyAttrib.MAlpha)
 
         self.bind(state.smooth, self.updateShader)
-        self.trigger(state.showSurfaceLayer, self.updateVisibility)
-        self.trigger(state.view3D, self.updateVisibility, triggerImmediately=True)
+        self.triggerMany(
+            [state.showSurfaceLayer, state.view3D],
+            self.updateVisibility,
+            triggerImmediately=True,
+        )
         self.bind(
             state.surfaceOpacity,
             lambda opacity: self.surface.setShaderInput("opacity", opacity),
