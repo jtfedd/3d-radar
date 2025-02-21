@@ -37,7 +37,8 @@ class SurfaceRenderer(Listener):
         self.surface.setTransparency(TransparencyAttrib.MAlpha)
 
         self.bind(state.smooth, self.updateShader)
-        self.bind(state.showSurfaceLayer, lambda _: self.updateVisibility())
+        self.trigger(state.showSurfaceLayer, self.updateVisibility)
+        self.trigger(state.view3D, self.updateVisibility, triggerImmediately=True)
         self.bind(
             state.surfaceOpacity,
             lambda opacity: self.surface.setShaderInput("opacity", opacity),
@@ -55,7 +56,9 @@ class SurfaceRenderer(Listener):
         self.surface.setShaderInput("earth_center", Vec3(0, 0, -EARTH_RADIUS))
 
     def updateVisibility(self) -> None:
-        visible = self.state.showSurfaceLayer.getValue()
+        visible = (
+            self.state.showSurfaceLayer.getValue() or not self.state.view3D.getValue()
+        )
 
         if visible:
             self.surface.show()
