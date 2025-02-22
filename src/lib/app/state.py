@@ -108,13 +108,16 @@ class AppState:
         self.maxCacheSize = self.createField("maxCacheSize", 100)
         self.serializationVersion = self.createField("serializationVersion", -1)
 
+        self.view3D = self.createField("view3D", True)
         self.smooth = self.createField("smooth", True)
         self.volumetricLighting = self.createField("volumetricLighting", False)
 
         self.showSurfaceLayer = self.createField("showSurfaceLayer", False)
-        self.surfaceComposite = self.createField("surfaceComposite", False)
         self.surfaceOpacity = self.createField("surfaceOpacity", 1.0)
-        self.surfaceThreshold = self.createField("surfaceThreshold", 0.0)
+        self.refComposite = self.createField("refComposite", False)
+        self.velComposite = self.createField("velComposite", False)
+        self.refThreshold = self.createField("refThreshold", 0.0)
+        self.velThreshold = self.createField("velThreshold", 0.0)
 
         self.rMin = self.createField("rMin", 0.04)
         self.rMax = self.createField("rMax", 1.0)

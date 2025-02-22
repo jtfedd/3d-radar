@@ -8,6 +8,7 @@ from lib.ui.panels.components.checkbox import CheckboxComponent
 from lib.ui.panels.components.slider import SliderComponent
 from lib.ui.panels.components.spacer import SpacerComponent
 from lib.ui.panels.components.title import TitleComponent
+from lib.ui.panels.core.panel_component import PanelComponent
 from lib.ui.panels.core.panel_content import PanelContent
 from lib.util.events.listener import Listener
 from lib.util.events.observable import Observable
@@ -56,10 +57,11 @@ class RadarViewerPanel(PanelContent):
                 state.volumetricLighting,
             )
         )
+        self.hideFor2D(self.volumetricLighting)
 
         self.addComponent(TitleComponent(self.root, ctx, "Surface Layer"))
 
-        self.addComponent(
+        self.showSurfaceLayer = self.addComponent(
             CheckboxComponent(
                 self.root,
                 ctx,
@@ -68,23 +70,10 @@ class RadarViewerPanel(PanelContent):
             )
         )
 
-        self.addComponent(SpacerComponent(self.root))
+        self.showSurfaceLayerSpacer = self.addComponent(SpacerComponent(self.root))
 
-        self.addComponent(
-            PanelButtonGroup(
-                self.root,
-                ctx,
-                self.state.surfaceComposite,
-                [
-                    ("Base", False),
-                    ("Composite", True),
-                ],
-                label="Mode:",
-                left=UIConstants.panelContentWidth - UIConstants.panelSliderWidth,
-            )
-        )
-
-        self.addComponent(SpacerComponent(self.root))
+        self.hideFor2D(self.showSurfaceLayer)
+        self.hideFor2D(self.showSurfaceLayerSpacer)
 
         self.surfaceOpacitySlider = self.addComponent(
             SliderComponent(
@@ -95,26 +84,19 @@ class RadarViewerPanel(PanelContent):
                 "Opacity:",
             )
         )
-        self.listener.listen(
-            self.surfaceOpacitySlider.slider.onValueChange,
-            self.state.surfaceOpacity.setValue,
+        self.linkSlider(self.state.surfaceOpacity, self.surfaceOpacitySlider)
+
+        self.createSurfaceControls(
+            self.state.refThreshold,
+            self.state.refComposite,
+            DataType.REFLECTIVITY,
         )
 
-        self.surfaceThresholdSlider = self.addComponent(
-            SliderComponent(
-                self.root,
-                ctx,
-                self.state.surfaceThreshold.getValue(),
-                (0.0, 1.0),
-                "Threshold:",
-            )
+        self.createSurfaceControls(
+            self.state.velThreshold,
+            self.state.velComposite,
+            DataType.VELOCITY,
         )
-        self.listener.listen(
-            self.surfaceThresholdSlider.slider.onValueChange,
-            self.state.surfaceThreshold.setValue,
-        )
-
-        self.addComponent(TitleComponent(self.root, ctx, "Volume Parameters"))
 
         self.createVolumeControls(
             state.rLowCut,
@@ -134,7 +116,9 @@ class RadarViewerPanel(PanelContent):
             DataType.VELOCITY,
         )
 
-        self.addComponent(TitleComponent(self.root, ctx, "Ambient Lighting"))
+        self.aLightTitle = self.addComponent(
+            TitleComponent(self.root, ctx, "Ambient Lighting")
+        )
 
         self.ambientIntensitySlider = self.addComponent(
             SliderComponent(
@@ -147,7 +131,9 @@ class RadarViewerPanel(PanelContent):
         )
         self.linkSlider(state.ambientLightIntensity, self.ambientIntensitySlider)
 
-        self.addComponent(TitleComponent(self.root, ctx, "Directional Lighting"))
+        self.dLightTitle = self.addComponent(
+            TitleComponent(self.root, ctx, "Directional Lighting")
+        )
 
         self.directionalIntensitySlider = self.addComponent(
             SliderComponent(
@@ -166,6 +152,58 @@ class RadarViewerPanel(PanelContent):
             LightingDirection(self.root, ctx, state)
         )
 
+        self.hideFor2D(self.aLightTitle)
+        self.hideFor2D(self.ambientIntensitySlider)
+        self.hideFor2D(self.dLightTitle)
+        self.hideFor2D(self.directionalIntensitySlider)
+        self.hideFor2D(self.lightingDirection)
+
+    def createSurfaceControls(
+        self,
+        threshold: Observable[float],
+        composite: Observable[bool],
+        dataType: DataType,
+    ) -> None:
+        thresholdSlider = self.addComponent(
+            SliderComponent(
+                self.root,
+                self.ctx,
+                threshold.getValue(),
+                (0.0, 1.0),
+                "Threshold:",
+            )
+        )
+        self.linkSlider(threshold, thresholdSlider)
+
+        spacer = self.addComponent(SpacerComponent(self.root))
+
+        compositeButtonGroup = self.addComponent(
+            PanelButtonGroup(
+                self.root,
+                self.ctx,
+                composite,
+                [
+                    ("Base", False),
+                    ("Composite", True),
+                ],
+                label="Mode:",
+                left=UIConstants.panelContentWidth - UIConstants.panelSliderWidth,
+            )
+        )
+
+        self.listener.bind(
+            self.state.dataType,
+            lambda dt: thresholdSlider.setHidden(dt != dataType),
+        )
+        self.listener.bind(
+            self.state.dataType,
+            lambda dt: spacer.setHidden(dt != dataType),
+        )
+        self.listener.bind(
+            self.state.dataType,
+            lambda dt: compositeButtonGroup.setHidden(dt != dataType),
+        )
+
     def createVolumeControls(
         self,
         low: Observable[float],
@@ -175,6 +213,10 @@ class RadarViewerPanel(PanelContent):
         falloff: Observable[float],
         dataType: DataType,
     ) -> None:
+        title = self.addComponent(
+            TitleComponent(self.root, self.ctx, "Volume Parameters")
+        )
+
         graph = self.addComponent(
             DensityGraph(self.root, low, high, minVal, maxVal, falloff, dataType)
         )
@@ -255,30 +297,35 @@ class RadarViewerPanel(PanelContent):
             lambda value: low.setValue(min(value, low.value)),
         )
 
-        self.listener.bind(
-            self.state.dataType, lambda dt: graph.setHidden(dt != dataType)
-        )
-        self.listener.bind(
-            self.state.dataType, lambda dt: lowCutSlider.setHidden(dt != dataType)
-        )
-        self.listener.bind(
-            self.state.dataType, lambda dt: highCutSlider.setHidden(dt != dataType)
-        )
-        self.listener.bind(
-            self.state.dataType, lambda dt: minSlider.setHidden(dt != dataType)
-        )
-        self.listener.bind(
-            self.state.dataType, lambda dt: maxSlider.setHidden(dt != dataType)
-        )
-        self.listener.bind(
-            self.state.dataType, lambda dt: falloffSlider.setHidden(dt != dataType)
-        )
+        def configureHide(component: PanelComponent) -> None:
+            self.listener.triggerMany(
+                [self.state.dataType, self.state.view3D],
+                lambda: component.setHidden(
+                    self.state.dataType.getValue() != dataType
+                    or not self.state.view3D.getValue()
+                ),
+                triggerImmediately=True,
+            )
+
+        configureHide(title)
+        configureHide(graph)
+        configureHide(lowCutSlider)
+        configureHide(highCutSlider)
+        configureHide(minSlider)
+        configureHide(maxSlider)
+        configureHide(falloffSlider)
 
     def linkSlider(
         self, observable: Observable[float], slider: SliderComponent
     ) -> None:
         self.listener.listen(slider.slider.onValueChange, observable.setValue)
         self.listener.listen(observable, slider.slider.setValue)
+
+    def hideFor2D(self, component: PanelComponent) -> None:
+        self.listener.bind(
+            self.state.view3D,
+            lambda is3d: component.setHidden(not is3d),
+        )
 
     def headerText(self) -> str:
         return "Radar Viewer"

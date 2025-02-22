@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 
 from direct.task.Task import Task
-from panda3d.core import NodePath, PandaNode
+from panda3d.core import NodePath, OrthographicLens, PandaNode
 
 from lib.app.context import AppContext
 from lib.app.events import AppEvents
@@ -30,9 +30,14 @@ class CameraControl(Listener):
         super().__init__()
 
         self.base = ctx.base
+        self.state = state
 
         # Disable the built-in mouse camera control
         self.base.disableMouse()
+
+        self.lens2D = OrthographicLens()
+        self.lens2D.setFar(EARTH_RADIUS * 3)
+        self.lens3D = ctx.base.cam.node().get_lens()
 
         # Consts
         self.movementFactor = 0.07
@@ -63,11 +68,13 @@ class CameraControl(Listener):
         self.cameraP = self.cameraH.attachNewNode("camera-pivot")
         self.cameraMount = self.cameraP.attachNewNode("camera-mount")
 
-        self.base.camera.reparentTo(self.cameraMount)
-
         self.cameraBase.setY(EARTH_RADIUS)
         self.cameraBase.setP(-90)
         self.cameraBase.setH(self.cameraBase, 180)
+
+        self.camera2dMount = self.cameraBase.attachNewNode("camera-2d-mount")
+        self.camera2dMount.setP(-90)
+        self.camera2dMount.setY(self.camera2dMount, -EARTH_RADIUS * 2)
 
         self.updatePositions()
 
@@ -78,17 +85,41 @@ class CameraControl(Listener):
         self.listen(events.input.leftMouse, self.handleDrag)
         self.listen(events.input.rightMouse, self.handleRotate)
         self.listen(events.input.zoom, self.handleZoom)
+        self.bind(state.view3D, lambda _: self.updateLens())
 
         self.updateTask = ctx.base.taskMgr.add(self.update, "camera-update")
 
-    def resetOrientation(self) -> None:
+    def updateLens(self) -> None:
+        self.resetOrientation()
+        if self.state.view3D.getValue():
+            self.base.cam.node().setLens(self.lens3D)
+            self.base.camera.reparentTo(self.cameraMount)
+        else:
+            self.base.cam.node().setLens(self.lens2D)
+            self.base.camera.reparentTo(self.camera2dMount)
+
+    def update2dLens(self) -> None:
+        aspectRatio = self.base.getAspectRatio()
+
+        width = aspectRatio
+        height = 1.0
+
+        if aspectRatio < 1.0:
+            width = 1.0
+            height = 1 / aspectRatio
+
+        self.lens2D.setFilmSize((self.zoom * width, self.zoom * height))
+
+    def resetOrientation(self, resetZoom: bool = False) -> None:
         self.pitch = self.DEFAULT_PITCH
         self.heading = self.DEFAULT_HEADING
-        self.zoom = self.DEFAULT_ZOOM
+        if resetZoom:
+            self.zoom = self.DEFAULT_ZOOM
 
     def update(self, task: Task) -> int:
         self.handleMouseUpdate()
         self.updatePositions()
+        self.update2dLens()
 
         return task.cont
 
@@ -132,7 +163,7 @@ class CameraControl(Listener):
             self.lat = min(self.lat, 90)
             self.lat = max(self.lat, -90)
 
-        if self.rotating:
+        if self.rotating and self.state.view3D.getValue():
             self.heading += -deltaX * self.rotateFactor
             self.pitch += -deltaY * self.rotateFactor
 

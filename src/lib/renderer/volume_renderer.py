@@ -39,22 +39,30 @@ class VolumeRenderer(Listener):
 
         self.plane.setShaderInput("scene", scene)
         self.plane.setShaderInput("depth", depth)
-        self.plane.setShaderInput("bounds_start", (-RADAR_RANGE, -RADAR_RANGE, 0))
-        self.plane.setShaderInput("bounds_end", (RADAR_RANGE, RADAR_RANGE, 15))
         self.plane.setShaderInput("earth_center", Vec3(0, 0, -EARTH_RADIUS))
         self.plane.setShaderInput("earth_radius", EARTH_RADIUS)
         self.plane.setShaderInput("camera", self.ctx.base.camera)
         self.plane.setShaderInput("time", 0)
 
+        self.bind(state.view3D, lambda _: self.updateBounds())
+
         self.plane.setShaderInput(
             "projection_matrix_inverse",
-            self.ctx.base.cam.node().getLens().getProjectionMatInv(),
+            self.ctx.base.camLens.getProjectionMatInv(),
         )
 
         self.cameraTask = self.ctx.base.taskMgr.add(
             self.updateCameraParams, "update-camera-params"
         )
         self.timeTask = self.ctx.base.taskMgr.add(self.updateTime, "update-time")
+
+    def updateBounds(self) -> None:
+        if self.state.view3D.getValue():
+            self.plane.setShaderInput("bounds_start", (-RADAR_RANGE, -RADAR_RANGE, 0))
+            self.plane.setShaderInput("bounds_end", (RADAR_RANGE, RADAR_RANGE, 15))
+        else:
+            self.plane.setShaderInput("bounds_start", (0, 0, -1))
+            self.plane.setShaderInput("bounds_end", (0, 0, -1))
 
     def updateShader(self, smooth: bool) -> None:
         self.plane.setShader(self.smoothShader if smooth else self.sharpShader)
@@ -67,7 +75,7 @@ class VolumeRenderer(Listener):
 
         self.plane.setShaderInput(
             "projection_matrix_inverse",
-            self.ctx.base.cam.node().getLens().getProjectionMatInv(),
+            self.ctx.base.camLens.getProjectionMatInv(),
         )
 
         return task.cont

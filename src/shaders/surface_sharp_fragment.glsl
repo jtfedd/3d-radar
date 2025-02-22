@@ -15,10 +15,13 @@ uniform float r_step[MAX_SCANS];
 uniform int r_count[MAX_SCANS];
 uniform int offset[MAX_SCANS];
 
+uniform float density_params[7];
+
 uniform usamplerBuffer volume_data;
 
 uniform float opacity;
 uniform float threshold;
+uniform float max_el_index;
 
 $inputs
 

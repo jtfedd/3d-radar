@@ -22,15 +22,6 @@ class AnimationControls(Listener):
         self.ctx = ctx
         self.state = state
 
-        self.background = BackgroundCard(
-            ctx.anchors.bottom,
-            width=UIConstants.animationControlsWidth,
-            height=UIConstants.headerFooterHeight,
-            color=UIColors.INSET,
-            vAlign=VAlign.BOTTOM,
-            layer=UILayer.BACKGROUND_DECORATION,
-        )
-
         self.sliderBackground = BackgroundCard(
             ctx.anchors.bottom,
             width=UIConstants.animationSliderWidth
@@ -41,13 +32,43 @@ class AnimationControls(Listener):
             layer=UILayer.CONTENT_BACKGROUND,
         )
 
+        self.select2D = Button(
+            ctx.anchors.bottom,
+            ctx,
+            UIConstants.animationButtonWidth,
+            UIConstants.headerFooterHeight / 2,
+            UIConstants.animationControlsWidth / 2 + UIConstants.animationButtonWidth,
+            UIConstants.headerFooterHeight / 2,
+            hAlign=HAlign.RIGHT,
+            vAlign=VAlign.BOTTOM,
+            text="2D",
+            skin=ButtonSkin.INSET,
+            toggleSkin=ButtonSkin.LIGHT,
+            toggleState=(not state.view3D.getValue()),
+        )
+
+        self.select3D = Button(
+            ctx.anchors.bottom,
+            ctx,
+            UIConstants.animationButtonWidth,
+            UIConstants.headerFooterHeight / 2,
+            UIConstants.animationControlsWidth / 2 + UIConstants.animationButtonWidth,
+            0,
+            hAlign=HAlign.RIGHT,
+            vAlign=VAlign.BOTTOM,
+            text="3D",
+            skin=ButtonSkin.INSET,
+            toggleSkin=ButtonSkin.LIGHT,
+            toggleState=state.view3D.getValue(),
+        )
+
         self.play = Button(
             ctx.anchors.bottom,
             ctx,
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + (2 * UIConstants.animationButtonWidth),
+            + (1 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -63,7 +84,7 @@ class AnimationControls(Listener):
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + (1 * UIConstants.animationButtonWidth),
+            + (0 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -79,7 +100,7 @@ class AnimationControls(Listener):
             UIConstants.animationButtonWidth,
             UIConstants.headerFooterHeight,
             -UIConstants.animationControlsWidth / 2
-            + (3 * UIConstants.animationButtonWidth),
+            + (2 * UIConstants.animationButtonWidth),
             0,
             hAlign=HAlign.LEFT,
             vAlign=VAlign.BOTTOM,
@@ -110,8 +131,21 @@ class AnimationControls(Listener):
             vAlign=VAlign.BOTTOM,
         )
 
-        self.listen(
-            state.animationTime, lambda _: self.time.updateText(self.getClockStr())
+        self.timeBackground = BackgroundCard(
+            ctx.anchors.bottom,
+            x=UIConstants.animationControlsWidth / 2
+            - UIConstants.animationButtonGroupWidth / 2,
+            width=UIConstants.animationButtonGroupWidth,
+            height=UIConstants.headerFooterHeight,
+            color=UIColors.INSET,
+            hAlign=HAlign.CENTER,
+            vAlign=VAlign.BOTTOM,
+            layer=UILayer.BACKGROUND_DECORATION,
+        )
+
+        self.triggerMany(
+            [state.animationTime, events.timeFormatChanged, state.station],
+            self.updateClock,
         )
 
         self.listen(self.play.onClick, events.animation.play.send)
@@ -121,6 +155,11 @@ class AnimationControls(Listener):
 
         self.listen(self.animationSlider.onValueChange, self.handleSliderChange)
         self.listen(state.animationTime, self.handleAnimationUpdate)
+
+        self.listen(self.select2D.onClick, lambda _: state.view3D.setValue(False))
+        self.listen(self.select3D.onClick, lambda _: state.view3D.setValue(True))
+        self.listen(state.view3D, lambda value: self.select2D.setToggleState(not value))
+        self.listen(state.view3D, self.select3D.setToggleState)
 
     def handleSliderChange(self, value: float) -> None:
         animationStart, animationEnd = self.state.animationBounds.value
@@ -144,6 +183,9 @@ class AnimationControls(Listener):
         else:
             self.play.setIcon(Icons.PLAY)
 
+    def updateClock(self) -> None:
+        self.time.updateText(self.getClockStr())
+
     def getClockStr(self) -> str:
         return self.ctx.timeUtil.formatTime(
             datetime.datetime.fromtimestamp(
@@ -156,7 +198,12 @@ class AnimationControls(Listener):
     def destroy(self) -> None:
         super().destroy()
 
-        self.background.destroy()
+        self.timeBackground.destroy()
+        self.sliderBackground.destroy()
+        self.select2D.destroy()
+        self.select3D.destroy()
         self.play.destroy()
         self.previous.destroy()
         self.next.destroy()
+        self.animationSlider.destroy()
+        self.time.destroy()

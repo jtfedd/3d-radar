@@ -69,11 +69,16 @@ class Label(Listener):
             layer=UILayer.LABEL_CONTENT,
         )
 
-        self.updateLabel()
-        self.listen(state.animationFrame, lambda _: self.updateLabel())
-        self.listen(state.dataType, lambda _: self.updateLabel())
-        self.listen(events.timeFormatChanged, lambda _: self.updateLabel())
-        self.listen(state.station, lambda _: self.updateLabel())
+        self.triggerMany(
+            [
+                state.animationFrame,
+                state.dataType,
+                events.timeFormatChanged,
+                state.station,
+            ],
+            self.updateLabel,
+            triggerImmediately=True,
+        )
 
     def updateLabel(self) -> None:
         frame: AnimationFrame | None = None

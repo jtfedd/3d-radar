@@ -43,7 +43,10 @@ class Listener:
         triggerImmediately: bool = False,
     ) -> None:
         for dispatcher in dispatchers:
-            self.trigger(dispatcher, callback, triggerImmediately=triggerImmediately)
+            self.trigger(dispatcher, callback)
+
+        if triggerImmediately:
+            callback()
 
     def destroy(self) -> None:
         for sub in self.subscriptions:

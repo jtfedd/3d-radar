@@ -64,7 +64,7 @@ class MapPanel(PanelContent):
 
         self.addComponent(TitleComponent(self.root, ctx, "Markers"))
 
-        self.addComponent(
+        self.markerTypeGroup = self.addComponent(
             PanelButtonGroup(
                 self.root,
                 ctx,
@@ -73,7 +73,16 @@ class MapPanel(PanelContent):
             )
         )
 
-        self.addComponent(SpacerComponent(self.root))
+        self.markerTypeSpacer = self.addComponent(SpacerComponent(self.root))
+
+        self.listener.bind(
+            state.view3D,
+            lambda is3d: self.markerTypeGroup.setHidden(not is3d),
+        )
+        self.listener.bind(
+            state.view3D,
+            lambda is3d: self.markerTypeSpacer.setHidden(not is3d),
+        )
 
         self.addMarkerButton = self.addComponent(
             PanelButton(self.root, ctx, "Add Marker")

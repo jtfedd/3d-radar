@@ -79,8 +79,11 @@ class MapMarker(Listener):
             self.ctx, self.posRoot.getPos(self.ctx.base.render)
         )
 
-        show2dMarker = self.visible and not self.state.show3dMarkers.value
-        show3dMarker = self.visible and self.state.show3dMarkers.value
+        visible = self.visible
+        show3d = self.state.show3dMarkers.getValue() and self.state.view3D.getValue()
+
+        show2dMarker = visible and not show3d
+        show3dMarker = visible and show3d
 
         if markerOnscreenPos is None or not show2dMarker:
             self.iconRoot.hide()
