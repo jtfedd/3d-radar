@@ -4,6 +4,7 @@ from typing import List
 from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 
+from lib.app.animation.base_frames import createBaseFrames
 from lib.app.animation.sweep_frames import createSweepFrames
 from lib.app.animation.volume_frames import createVolumeFrames
 from lib.app.events import AppEvents
@@ -26,10 +27,18 @@ class AnimationManager(Listener):
         self.records: List[Record] = []
         self.index = 0
 
-        self.createFrames()
-        self.listen(state.animationData, lambda _: self.createFrames())
-        self.listen(state.animationType, lambda _: self.createFrames())
-        self.listen(state.dataType, lambda _: self.createFrames())
+        self.triggerMany(
+            [
+                state.animationData,
+                state.animationType,
+                state.dataType,
+                state.view3D,
+                state.velComposite,
+                state.refComposite,
+            ],
+            self.createFrames,
+            triggerImmediately=True,
+        )
 
         self.listen(
             events.animation.play,
@@ -100,16 +109,26 @@ class AnimationManager(Listener):
     def createFrames(self) -> None:
         data = self.state.animationData.getValue()
 
+        is3D = self.state.view3D.getValue()
+        isComposite = (
+            self.state.refComposite.getValue()
+            if self.state.dataType.getValue() == DataType.REFLECTIVITY
+            else self.state.velComposite.getValue()
+        )
+
         scans: List[Scan] = []
         for _, scan in data.items():
             if scan is not None:
                 scans.append(scan)
 
-        frames = (
-            createVolumeFrames(scans, self.state.dataType.getValue())
-            if self.state.animationType.getValue() == AnimationType.VOLUME
-            else createSweepFrames(scans, self.state.dataType.getValue())
-        )
+        frames = []
+        if not is3D and not isComposite:
+            frames = createBaseFrames(scans, self.state.dataType.getValue())
+        elif self.state.animationType.getValue() == AnimationType.VOLUME:
+            frames = createVolumeFrames(scans, self.state.dataType.getValue())
+        else:
+            frames = createSweepFrames(scans, self.state.dataType.getValue())
+
         self.state.animationFrames.setValue(frames)
 
     def updateFrame(self) -> None:
