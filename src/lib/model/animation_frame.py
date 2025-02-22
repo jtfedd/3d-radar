@@ -14,18 +14,20 @@ class AnimationFrame:
         self.startTime = 0
         self.endTime = 0
 
+        self.baseStartTime = 0
+        self.baseEndTime = 0
+
         if len(sweeps) == 0:
             return
 
         self.startTime = min(sweep.startTime for sweep in sweeps)
         self.endTime = max(sweep.endTime for sweep in sweeps)
-        self.sweeps.extend(sweeps)
+        self.baseStartTime = sweeps[0].startTime
+        self.baseEndTime = sweeps[0].endTime
 
-        if len(self.sweeps) > 1:
-            lastElevationGap = self.sweeps[-1].elevation - self.sweeps[-2].elevation
-            self.sweeps.append(
-                Sweep.empty(self.sweeps[-1].elevation + lastElevationGap)
-            )
+        self.sweeps.extend(sweeps)
+        lastElevationGap = self.sweeps[-1].elevation - self.sweeps[-2].elevation
+        self.sweeps.append(Sweep.empty(self.sweeps[-1].elevation + lastElevationGap))
 
     def data(self) -> bytes:
         result = bytearray()
