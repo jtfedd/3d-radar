@@ -75,9 +75,6 @@ class Label(Listener):
                 state.dataType,
                 events.timeFormatChanged,
                 state.station,
-                state.view3D,
-                state.refComposite,
-                state.velComposite,
             ],
             self.updateLabel,
             triggerImmediately=True,
@@ -115,18 +112,10 @@ class Label(Listener):
         return radar + "\n" + product
 
     def getTimeText(self, frame: AnimationFrame) -> str:
-        isComposite = self.state.view3D.getValue() or (
-            self.state.refComposite.getValue()
-            if self.state.dataType.getValue() == DataType.REFLECTIVITY
-            else self.state.velComposite.getValue()
-        )
-
         return (
-            self.formatTimestamp(
-                frame.startTime if isComposite else frame.baseStartTime
-            )
+            self.formatTimestamp(frame.startTime)
             + "\n"
-            + self.formatTimestamp(frame.endTime if isComposite else frame.baseEndTime)
+            + self.formatTimestamp(frame.endTime)
         )
 
     def formatTimestamp(self, timestamp: int) -> str:
