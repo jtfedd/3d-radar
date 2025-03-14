@@ -4,6 +4,7 @@ from typing import Dict
 from direct.task.Task import Task
 
 from lib.app.context import AppContext
+from lib.app.data_manager.realtime import RealtimeManager
 from lib.app.events import AppEvents
 from lib.app.state import AppState
 from lib.model.data_query import DataQuery
@@ -27,6 +28,8 @@ class DataManager(Listener):
         super().__init__()
 
         self.cache: Dict[str, Scan] = {}
+
+        self.realtimeDataManager = RealtimeManager(ctx, state)
 
         self.ctx = ctx
         self.state = state
@@ -96,6 +99,8 @@ class DataManager(Listener):
         self.loadingTask = None
 
         applyDataQueryToState(self.state, query)
+        self.realtimeDataManager.activate()
+
         self.state.animationData.setValue(
             defaultdict(lambda: None, scans),
             forceSend=True,

@@ -7,3 +7,4 @@ notify-level-task_manager info
 notify-level-location_provider info
 notify-level-nws_service info
 nofity-level-radar_provider info
+notify-level-realtime_data info
