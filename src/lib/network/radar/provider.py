@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 
-import pynexrad
+from pynexrad import PyLevel2File, PySweep, download_nexrad_file, list_records
 
 from lib.app.logging import newLogger
 from lib.model.record import Record
@@ -9,7 +9,7 @@ from lib.model.scan import Scan
 from lib.model.sweep import Sweep
 
 
-def convertSweep(sweep: pynexrad.Sweep) -> Sweep:
+def convertSweep(sweep: PySweep) -> Sweep:
     return Sweep(
         sweep.elevation,
         sweep.az_first,
@@ -24,11 +24,11 @@ def convertSweep(sweep: pynexrad.Sweep) -> Sweep:
     )
 
 
-def convertSweeps(sweeps: List[pynexrad.Sweep]) -> List[Sweep]:
+def convertSweeps(sweeps: List[PySweep]) -> List[Sweep]:
     return [convertSweep(sweep) for sweep in sweeps]
 
 
-def convertLevel2File(record: Record, file: pynexrad.Level2File) -> Scan:
+def convertLevel2File(record: Record, file: PyLevel2File) -> Scan:
     return Scan(
         record,
         convertSweeps(file.reflectivity),
@@ -45,7 +45,7 @@ class RadarProvider:
 
         self.log.info(f"Fetching from s3: {key}")
 
-        level2File = pynexrad.download_nexrad_file(key)
+        level2File = download_nexrad_file(key)
 
         self.log.info(f"Post-processing {key}")
         return convertLevel2File(record, level2File)
@@ -113,7 +113,7 @@ class RadarProvider:
         return records
 
     def getScans(self, radar: str, year: int, month: int, day: int) -> List[Record]:
-        resp = pynexrad.list_records(radar, year, month, day)
+        resp = list_records(radar, year, month, day)
 
         records = []
 
