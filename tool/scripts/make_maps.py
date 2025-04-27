@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import os
+import pathlib
 from typing import Callable, List, Tuple, cast
 
 import requests
@@ -21,20 +22,23 @@ from panda3d.core import (
 )
 
 MAPS_FOLDER = "src/assets/maps/"
+MAPS_CACHE_FOLDER = MAPS_FOLDER + "cache/"
+MAPS_SOURCE_YEAR = "2024"
 
 HOST = "https://www2.census.gov/geo/tiger/"
+REQUESTS_TIMEOUT = 60  # Note: census.gov server has been squirrelly lately
 
-COUNTY_RAW = "TIGER2023/COUNTY/tl_2023_us_county.zip"
-COUNTY_500K = "GENZ2022/shp/cb_2022_us_county_500k.zip"
-COUNTY_5M = "GENZ2022/shp/cb_2022_us_county_5m.zip"
-COUNTY_20M = "GENZ2022/shp/cb_2022_us_county_20m.zip"
+COUNTY_RAW = f"TIGER{MAPS_SOURCE_YEAR}/COUNTY/tl_{MAPS_SOURCE_YEAR}_us_county.zip"
+COUNTY_500K = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_county_500k.zip"
+COUNTY_5M = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_county_5m.zip"
+COUNTY_20M = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_county_20m.zip"
 
-STATE_RAW = "TIGER2023/STATE/tl_2023_us_state.zip"
-STATE_500K = "GENZ2022/shp/cb_2022_us_state_500k.zip"
-STATE_5M = "GENZ2022/shp/cb_2022_us_state_5m.zip"
-STATE_20M = "GENZ2022/shp/cb_2022_us_state_20m.zip"
+STATE_RAW = f"TIGER{MAPS_SOURCE_YEAR}/STATE/tl_{MAPS_SOURCE_YEAR}_us_state.zip"
+STATE_500K = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_state_500k.zip"
+STATE_5M = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_state_5m.zip"
+STATE_20M = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_state_20m.zip"
 
-ROADS = "TIGER2023/PRISECROADS/tl_2023_{0:02d}_prisecroads.zip"
+ROADS = f"TIGER{MAPS_SOURCE_YEAR}/PRISECROADS/tl_{MAPS_SOURCE_YEAR}_{{0:02d}}_prisecroads.zip"
 
 TOLERANCE_METERS = 250
 
@@ -47,17 +51,19 @@ def collectLineStrings(
     linestrings: List[shapely.LineString],
     geometry: shapely.geometry.base.BaseGeometry,
 ) -> None:
-    geomType = shapely.get_type_id(geometry)
-    if geomType == shapely.GeometryType.LINESTRING:
+    if isinstance(geometry, shapely.LineString):
         linestrings.append(geometry)
-    if geomType == shapely.GeometryType.MULTILINESTRING:
-        multiLineString = cast(shapely.MultiLineString, geometry)
-        for linestring in multiLineString.geoms:
+    elif isinstance(geometry, shapely.MultiLineString):
+        for linestring in geometry.geoms:
             linestrings.append(linestring)
-    if geomType == shapely.GeometryType.GEOMETRYCOLLECTION:
-        collection = cast(shapely.GeometryCollection, geometry)
-        for geom in collection.geoms:
+    elif isinstance(geometry, shapely.GeometryCollection):
+        for geom in geometry.geoms:
             collectLineStrings(linestrings, geom)
+    else:
+        # Optionally, log or raise for unsupported geometry types
+        raise TypeError(
+            f"Warning: Unsupported geometry type: {type(geometry).__name__}"
+        )
 
 
 class Counter:
@@ -125,15 +131,32 @@ def countPoints(geometry: shapely.geometry.base.BaseGeometry, counter: Counter) 
 def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
     shapes = []
 
-    for f in files:
-        filename = HOST + f
-        print("Downloading", filename)
-        r = requests.head(filename, allow_redirects=True, timeout=10)
-        if r.status_code == 404:
-            print("Does not exist")
-            continue
+    # Set up cache directory
+    cache_root = pathlib.Path(MAPS_CACHE_FOLDER)
+    cache_root.mkdir(parents=True, exist_ok=True)
 
-        shape = shapely.geometry.shape(shapefile.Reader(filename).shapes())
+    for f in files:
+        # Use the file path as a subpath in the cache
+        cache_path = cache_root / f
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if cache_path.exists():
+            print(f"Using cached file: {cache_path}")
+            shp_reader = shapefile.Reader(str(cache_path))
+        else:
+            filename = HOST + f
+            print("Downloading", filename)
+            r = requests.get(filename, allow_redirects=True, timeout=REQUESTS_TIMEOUT)
+            if r.status_code == 404:
+                print("...but it does not exist")
+                continue
+            # Save to cache
+            with open(cache_path, "wb") as out:
+                out.write(r.content)
+            print(f"Saved to cache: {cache_path}")
+            shp_reader = shapefile.Reader(str(cache_path))
+
+        shape = shapely.geometry.shape(shp_reader.shapes())
         shapes.append(shape)
 
     return shapely.geometry.GeometryCollection(shapes)
@@ -154,16 +177,23 @@ def loadRoads() -> shapely.geometry.base.BaseGeometry:
 def openOrCreate(
     filename: str,
     create: Callable[[], shapely.geometry.base.BaseGeometry],
+    force_download: bool = False,
 ) -> shapely.geometry.base.BaseGeometry:
     filepath = MAPS_FOLDER + filename + ".json"
     if os.path.exists(filepath):
-        print("Checking", filepath, "- exists")
-        with open(filepath, "r", encoding="utf-8") as f:
-            print("Reading", filepath)
-            fileJson = f.read()
-            return shapely.from_geojson(fileJson)
+        if not force_download:
+            print("Checking", filepath, "- exists")
+            with open(filepath, "r", encoding="utf-8") as f:
+                print("Reading", filepath)
+                fileJson = f.read()
+                return shapely.from_geojson(fileJson)
+        else:
+            print(
+                f"File {filepath} exists, but will be re-created from a new download (force update enabled)"
+            )
+    else:
+        print("Checking", filepath, "- does not exist")
 
-    print("Checking", filepath, "- does not exist")
     shape = create()
     with open(filepath, "w", encoding="utf-8") as f:
         print("Writing", filepath)
@@ -178,8 +208,12 @@ def writeBam(node: NodePath[PandaNode], filename: str) -> None:
     node.writeBamFile(filepath)
 
 
-def mergeRoads() -> shapely.geometry.base.BaseGeometry:
-    raw = openOrCreate("roads_raw", loadRoads)
+def mergeRoads(force_download: bool = False) -> shapely.geometry.base.BaseGeometry:
+    raw = openOrCreate(
+        "roads_raw",
+        loadRoads,
+        force_download=force_download,
+    )
 
     print("Collecting Lines")
     linestrings: List[shapely.LineString] = []
@@ -199,8 +233,12 @@ def mergeRoads() -> shapely.geometry.base.BaseGeometry:
     return merged
 
 
-def simplfyRoads() -> shapely.geometry.base.BaseGeometry:
-    merged = openOrCreate("roads_merged", mergeRoads)
+def simplfyRoads(force_download: bool = False) -> shapely.geometry.base.BaseGeometry:
+    merged = openOrCreate(
+        "roads_merged",
+        lambda: mergeRoads(force_download=force_download),
+        force_download=force_download,
+    )
 
     print("Simplifying Roads")
     print("Tolerance:", str(TOLERANCE_METERS) + "m", TOLERANCE)
@@ -301,7 +339,7 @@ class LinesAdjacencyInfo:
         return self.points
 
 
-def drawSegs(seq: shapely.geometry.base.CoordinateSequence, drawer: LineDrawer) -> None:
+def drawSegs(seq, drawer: LineDrawer) -> None:
     coords = list(seq)
 
     info = LinesAdjacencyInfo()
@@ -350,6 +388,36 @@ def render(
 
 
 if __name__ == "__main__":
-    render(openOrCreate("states", loadStates), "states")
-    render(openOrCreate("counties", loadCounties), "counties")
-    render(openOrCreate("roads_simple", simplfyRoads), "roads")
+    answer = (
+        input(
+            "Attempt to download updates even if geometry files already exist? [y/N]: "
+        )
+        .strip()
+        .lower()
+    )
+    force_download = answer == "y"
+
+    render(
+        openOrCreate(
+            "states",
+            loadStates,
+            force_download=force_download,
+        ),
+        "states",
+    )
+    render(
+        openOrCreate(
+            "counties",
+            loadCounties,
+            force_download=force_download,
+        ),
+        "counties",
+    )
+    render(
+        openOrCreate(
+            "roads_simple",
+            lambda: simplfyRoads(force_download=force_download),
+            force_download=force_download,
+        ),
+        "roads",
+    )
