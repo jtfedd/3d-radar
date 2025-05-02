@@ -19,7 +19,7 @@ class TestEvents(unittest.TestCase):
         self.assertEqual(x, 0)
         event.send(5)
         self.assertEqual(x, 5)
-        event.send(10)
+        event.send(11)
         self.assertEqual(x, 15)
 
         subscription.cancel()
