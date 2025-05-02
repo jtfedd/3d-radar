@@ -24,7 +24,7 @@ class TestEvents(unittest.TestCase):
 
         subscription.cancel()
 
-        event.send(2)
+        event.send(3)
         self.assertEqual(x, 15)
 
     def testEventMultipleSubscriptions(self) -> None:
