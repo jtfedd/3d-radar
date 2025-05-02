@@ -10,129 +10,104 @@ env:
   PYTHON_VERSION: '3.12'
 
 jobs:
+  event_file:
+    name: "Event File"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Event File
+          path: ${{ github.event_path }}
+        
   packages:
     name: Packages
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - run: make packages-check
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: make packages-check
 
   shaders:
     name: Shaders
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - run: make shaders
-    - run: git diff --exit-code
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: make shaders
+      - run: git diff --exit-code
 
   format:
     name: Formatting
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - run: pip install $(grep black requirements-dev.txt)
-    - run: make format-check
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install $(grep black requirements-dev.txt)
+      - run: make format-check
 
   imports:
     name: Import Order
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - run: pip install $(grep isort requirements-dev.txt)
-    - run: make import-check
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install $(grep isort requirements-dev.txt)
+      - run: make import-check
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-        cache-dependency-path: |
-          requirements.txt
-          requirements-dev.txt
-    
-    - run: make install-dev
-    - run: make lint
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      - run: make install-dev
+      - run: make lint
 
   test:
     name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      contents: write
-      pull-requests: write
-      checks: write
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-        cache-dependency-path: |
-          requirements.txt
-          requirements-dev.txt
-
-    - run: make install-dev
-
-    - name: Setup LCOV
-      uses: hrishikesh-kadam/setup-lcov@v1
-
-    - name: Run Unit Tests With Coverage
-      run: make test-xml-coverage
-      continue-on-error: true
-
-    - name: Generate LCOV report
-      run: |
-        make coverage-lcov
-        sed -i "s;$PWD/;;g" reports/coverage.lcov
-
-    - name: Publish Reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: reports
-        path: reports/
- 
-    - name: Publish Unit Test Coverage
-      uses: zgosalvez/github-actions-report-lcov@v4
-      with:
-        coverage-files: reports/coverage.lcov
-        artifact-name: code-coverage-report
-        minimum-coverage: 0
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        update-comment: true
-
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      with:
-        files: |
-          reports/TEST-*.xml
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      - run: make install-dev
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
+      - name: Run Unit Tests With Coverage
+        run: make test-xml-coverage
+        continue-on-error: true
+      - name: Generate LCOV report
+        run: |
+          make coverage-lcov
+          sed -i "s;$PWD/;;g" reports/coverage.lcov
+      - name: Publish Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: reports/
