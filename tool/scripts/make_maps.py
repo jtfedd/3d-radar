@@ -9,7 +9,6 @@ import requests
 import shapefile
 import shapely
 import shapely.geometry.base
-
 from panda3d.core import (
     Geom,
     GeomLinestripsAdjacency,
