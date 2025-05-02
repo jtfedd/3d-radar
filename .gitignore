@@ -12,6 +12,7 @@
 
 # VSCode config
 .vscode/*
+*.code-workspace
 
 # PyCharm config
 .idea/*
@@ -22,5 +23,6 @@ reports/*
 # Requirements lock file
 requirements-lock.txt
 
-# Map json files
+# Cached and intemediate map files
 src/assets/maps/*.json
+src/assets/maps/cache/
