@@ -9,6 +9,7 @@ import requests
 import shapefile
 import shapely
 import shapely.geometry.base
+
 from panda3d.core import (
     Geom,
     GeomLinestripsAdjacency,
@@ -20,6 +21,7 @@ from panda3d.core import (
     PandaNode,
     Vec3,
 )
+from shapely.coords import CoordinateSequence
 
 MAPS_FOLDER = "src/assets/maps/"
 MAPS_CACHE_FOLDER = MAPS_FOLDER + "cache/"
@@ -38,7 +40,10 @@ STATE_500K = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_state_500k.zi
 STATE_5M = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_state_5m.zip"
 STATE_20M = f"GENZ{MAPS_SOURCE_YEAR}/shp/cb_{MAPS_SOURCE_YEAR}_us_state_20m.zip"
 
-ROADS = f"TIGER{MAPS_SOURCE_YEAR}/PRISECROADS/tl_{MAPS_SOURCE_YEAR}_{{0:02d}}_prisecroads.zip"
+ROADS = (
+    f"TIGER{MAPS_SOURCE_YEAR}/PRISECROADS/"
+    f"tl_{MAPS_SOURCE_YEAR}_{{0:02d}}_prisecroads.zip"
+)
 
 TOLERANCE_METERS = 250
 
@@ -132,17 +137,17 @@ def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
     shapes = []
 
     # Set up cache directory
-    cache_root = pathlib.Path(MAPS_CACHE_FOLDER)
-    cache_root.mkdir(parents=True, exist_ok=True)
+    cacheRoot = pathlib.Path(MAPS_CACHE_FOLDER)
+    cacheRoot.mkdir(parents=True, exist_ok=True)
 
     for f in files:
         # Use the file path as a subpath in the cache
-        cache_path = cache_root / f
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cachePath = cacheRoot / f
+        cachePath.parent.mkdir(parents=True, exist_ok=True)
 
-        if cache_path.exists():
-            print(f"Using cached file: {cache_path}")
-            shp_reader = shapefile.Reader(str(cache_path))
+        if cachePath.exists():
+            print(f"Using cached file: {cachePath}")
+            shapeReader = shapefile.Reader(str(cachePath))
         else:
             filename = HOST + f
             print("Downloading", filename)
@@ -151,12 +156,12 @@ def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
                 print("...but it does not exist")
                 continue
             # Save to cache
-            with open(cache_path, "wb") as out:
+            with open(cachePath, "wb") as out:
                 out.write(r.content)
-            print(f"Saved to cache: {cache_path}")
-            shp_reader = shapefile.Reader(str(cache_path))
+            print(f"Saved to cache: {cachePath}")
+            shapeReader = shapefile.Reader(str(cachePath))
 
-        shape = shapely.geometry.shape(shp_reader.shapes())
+        shape = shapely.geometry.shape(shapeReader.shapes())
         shapes.append(shape)
 
     return shapely.geometry.GeometryCollection(shapes)
@@ -177,11 +182,11 @@ def loadRoads() -> shapely.geometry.base.BaseGeometry:
 def openOrCreate(
     filename: str,
     create: Callable[[], shapely.geometry.base.BaseGeometry],
-    force_download: bool = False,
+    forceDownload: bool = False,
 ) -> shapely.geometry.base.BaseGeometry:
     filepath = MAPS_FOLDER + filename + ".json"
     if os.path.exists(filepath):
-        if not force_download:
+        if not forceDownload:
             print("Checking", filepath, "- exists")
             with open(filepath, "r", encoding="utf-8") as f:
                 print("Reading", filepath)
@@ -189,7 +194,10 @@ def openOrCreate(
                 return shapely.from_geojson(fileJson)
         else:
             print(
-                f"File {filepath} exists, but will be re-created from a new download (force update enabled)"
+                (
+                    f"File {filepath} exists, but will be re-created"
+                    "from a new download (force update enabled)"
+                )
             )
     else:
         print("Checking", filepath, "- does not exist")
@@ -208,11 +216,11 @@ def writeBam(node: NodePath[PandaNode], filename: str) -> None:
     node.writeBamFile(filepath)
 
 
-def mergeRoads(force_download: bool = False) -> shapely.geometry.base.BaseGeometry:
+def mergeRoads(forceDownload: bool = False) -> shapely.geometry.base.BaseGeometry:
     raw = openOrCreate(
         "roads_raw",
         loadRoads,
-        force_download=force_download,
+        forceDownload=forceDownload,
     )
 
     print("Collecting Lines")
@@ -233,11 +241,11 @@ def mergeRoads(force_download: bool = False) -> shapely.geometry.base.BaseGeomet
     return merged
 
 
-def simplfyRoads(force_download: bool = False) -> shapely.geometry.base.BaseGeometry:
+def simplfyRoads(forceDownload: bool = False) -> shapely.geometry.base.BaseGeometry:
     merged = openOrCreate(
         "roads_merged",
-        lambda: mergeRoads(force_download=force_download),
-        force_download=force_download,
+        lambda: mergeRoads(forceDownload=forceDownload),
+        forceDownload=forceDownload,
     )
 
     print("Simplifying Roads")
@@ -339,11 +347,12 @@ class LinesAdjacencyInfo:
         return self.points
 
 
-def drawSegs(seq, drawer: LineDrawer) -> None:
+def drawSegs(seq: CoordinateSequence, drawer: LineDrawer) -> None:
     coords = list(seq)
 
     info = LinesAdjacencyInfo()
     for point in coords:
+        assert len(point) == 2
         info.add(toGlobe(point))
 
     drawer.add(info)
@@ -395,13 +404,13 @@ if __name__ == "__main__":
         .strip()
         .lower()
     )
-    force_download = answer == "y"
+    shouldForceDownload = answer == "y"
 
     render(
         openOrCreate(
             "states",
             loadStates,
-            force_download=force_download,
+            forceDownload=shouldForceDownload,
         ),
         "states",
     )
@@ -409,15 +418,15 @@ if __name__ == "__main__":
         openOrCreate(
             "counties",
             loadCounties,
-            force_download=force_download,
+            forceDownload=shouldForceDownload,
         ),
         "counties",
     )
     render(
         openOrCreate(
             "roads_simple",
-            lambda: simplfyRoads(force_download=force_download),
-            force_download=force_download,
+            lambda: simplfyRoads(forceDownload=shouldForceDownload),
+            forceDownload=shouldForceDownload,
         ),
         "roads",
     )
