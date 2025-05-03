@@ -25,15 +25,6 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           path: artifacts
 
-    #   - name: Publish Unit Test Coverage
-    #     uses: zgosalvez/github-actions-report-lcov@v4
-    #     with:
-    #       coverage-files: artifacts/reports/coverage.lcov
-    #       artifact-name: code-coverage-report
-    #       minimum-coverage: 0
-    #       github-token: ${{ secrets.GITHUB_TOKEN }}
-    #       update-comment: true
-
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
