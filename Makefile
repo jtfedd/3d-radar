@@ -65,29 +65,9 @@ packages-check: ## Check for packages with a missing __init__ file
 test: ## Run tests
 	cd src && python -m unittest
 
-.PHONY: test-coverage
-test-coverage: ## Run tests and generate coverage report
-	cd src && python -m coverage run --source=lib --data-file=../reports/.coverage -m unittest
-
 .PHONY: test-xml
 test-xml: ## Run unit tests and generate xml reports
 	cd src && python -m xmlrunner -o ../reports
-
-.PHONY: test-xml-coverage
-test-xml-coverage:  ## Run unit tests and generate xml reports and coverage report
-	cd src && python -m coverage run --source=lib --data-file=../reports/.coverage -m xmlrunner -o ../reports
-
-.PHONY: coverage-report
-coverage-report: ## Print the coverage report from a previous test coverage run
-	cd reports && python -m coverage report
-
-.PHONY: coverage-html
-coverage-html: ## Generate html coverage report from a previous test coverage run
-	cd reports && python -m coverage html
-
-.PHONY: coverage-lcov
-coverage-lcov: ## Generage lcov report from a previous test coverage run
-	cd reports && python -m coverage lcov
 
 .PHONY: maps
 maps: ## Download and generate maps
