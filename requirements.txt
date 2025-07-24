@@ -1,7 +1,7 @@
-blosc>=1.11.2
+blosc>=1.11.3
 panda3d==1.10.14
-platformdirs>=4.3.6
+platformdirs>=4.3.8
 pynexrad==0.0.29
-requests>=2.32.3
-tzdata>=2024.2
-tzfpy>=0.15.6
+requests>=2.32.4
+tzdata>=2025.2
+tzfpy>=1.0.0
