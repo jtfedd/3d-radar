@@ -107,7 +107,7 @@ class Label(Listener):
         elif self.state.dataType.value == DataType.VELOCITY:
             product = "VELOCITY"
         else:
-            return None
+            return ""
 
         return radar + "\n" + product
 

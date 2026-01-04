@@ -160,7 +160,9 @@ def downloadAndMerge(files: List[str]) -> shapely.geometry.base.BaseGeometry:
             print(f"Saved to cache: {cachePath}")
             shapeReader = shapefile.Reader(str(cachePath))
 
-        shape = shapely.geometry.shape(shapeReader.shapes())
+        shape = shapely.geometry.shape(
+            shapeReader.shapes(),  # type:ignore[unused-ignore]
+        )
         shapes.append(shape)
 
     return shapely.geometry.GeometryCollection(shapes)
@@ -194,7 +196,7 @@ def openOrCreate(
         else:
             print(
                 (
-                    f"File {filepath} exists, but will be re-created"
+                    f"File {filepath} exists, but will be re-created "
                     "from a new download (force update enabled)"
                 )
             )
