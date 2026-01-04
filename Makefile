@@ -51,6 +51,7 @@ lint: ## Check for lints
 	python -m mypy src tool || RC=1; \
 	python -m flake8 src tool || RC=1; \
 	python -m pylint src tool || RC=1; \
+	python -m pyright --level=warning src tool || RC=1; \
 	exit $$RC
 
 .PHONY: packages

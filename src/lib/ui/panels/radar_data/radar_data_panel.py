@@ -224,6 +224,11 @@ class RadarDataPanel(PanelContent):
 
         self.resetValidation()
 
+        year = 0
+        month = 0
+        day = 0
+        minutes = 0
+
         try:
             year = int(self.yearInput.input.entry.get())
             if year < 1991 or year > 9999:

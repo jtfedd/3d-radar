@@ -20,7 +20,7 @@ def convertSweep(sweep: PySweep) -> Sweep:
         sweep.range_count,
         sweep.start_time,
         sweep.end_time,
-        bytearray(sweep.data),
+        bytes(sweep.data),
     )
 
 

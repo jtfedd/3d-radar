@@ -1,5 +1,5 @@
 blosc>=1.11.3
-panda3d==1.10.14
+panda3d==1.10.16
 platformdirs>=4.5.1
 pynexrad==0.0.32
 requests>=2.32.5

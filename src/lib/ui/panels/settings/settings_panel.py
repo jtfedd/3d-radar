@@ -322,6 +322,7 @@ class SettingsPanel(PanelContent):
         try:
             newLoopDelay = float(valueStr)
         except ValueError:
+            newLoopDelay = 0
             self.loopDelayInput.input.setText(str(self.state.loopDelay.value))
 
         newLoopDelay = min(self.MAX_LOOP_DELAY, round(newLoopDelay, 2))

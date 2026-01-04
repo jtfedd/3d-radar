@@ -20,7 +20,7 @@ class ContextMenuItem(ABC):
     ) -> List[Text]:
         pass
 
-    def renderLeftCap(self, _: NodePath[PandaNode]) -> BackgroundCard | None:
+    def renderLeftCap(self, _root: NodePath[PandaNode]) -> BackgroundCard | None:
         return None
 
     @abstractmethod

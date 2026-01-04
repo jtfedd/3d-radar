@@ -60,6 +60,7 @@ class TimeUtil(Listener):
             return None
 
         time = timeQuery.time
+        ampm = ""
 
         if not self.state.use24HourTime():
             parts = time.split(" ")

@@ -53,9 +53,9 @@ class Scale(Listener):
         node = root.attachNewNode("scaleNode")
         node.setX(-UIConstants.legendPadding)
 
-        title: str
-        scale: str
-        increments: List[int]
+        title = ""
+        scale = ""
+        increments: List[int] = []
 
         if dataType == DataType.REFLECTIVITY:
             title = "dBZ"
